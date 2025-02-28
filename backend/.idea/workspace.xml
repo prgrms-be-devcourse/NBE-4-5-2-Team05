@@ -4,7 +4,16 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="1c004391-a666-4ce3-a152-639853d9cad1" name="변경" comment="" />
+    <list default="true" id="1c004391-a666-4ce3-a152-639853d9cad1" name="변경" comment="">
+      <change afterPath="$PROJECT_DIR$/src/main/resources/application.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/build.gradle" beforeDir="false" afterPath="$PROJECT_DIR$/build.gradle" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/NBE_4_5_2/Team5/domain/user/dto/UserDto.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/NBE_4_5_2/Team5/domain/user/dto/UserDto.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/NBE_4_5_2/Team5/domain/user/entity/User.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/NBE_4_5_2/Team5/domain/user/entity/User.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/NBE_4_5_2/Team5/domain/user/repository/UserRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/NBE_4_5_2/Team5/domain/user/repository/UserRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/NBE_4_5_2/Team5/domain/user/service/UserService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/NBE_4_5_2/Team5/domain/user/service/UserService.java" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -73,12 +82,18 @@
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
     "ASKED_MARK_IGNORED_FILES_AS_EXCLUDED": "true",
+    "Gradle.backend 빌드.executor": "Run",
+    "RequestMappingsPanelOrder0": "0",
+    "RequestMappingsPanelOrder1": "1",
+    "RequestMappingsPanelWidth0": "75",
+    "RequestMappingsPanelWidth1": "75",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "RunOnceActivity.git.unshallow": "true",
     "SHARE_PROJECT_CONFIGURATION_FILES": "true",
+    "Spring Boot.Team5Application.executor": "Run",
     "git-widget-placeholder": "서준식/feat-3",
     "kotlin-language-version-configured": "true",
-    "last_opened_file_path": "C:/NBE4-5-1-Team04/backend",
+    "last_opened_file_path": "C:/NBE-4-5-2-Team05/backend/src/main",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
@@ -91,6 +106,11 @@
     "vue.rearranger.settings.migration": "true"
   }
 }]]></component>
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\NBE-4-5-2-Team05\backend\src\main" />
+    </key>
+  </component>
   <component name="RunManager">
     <configuration name="Team5Application" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
       <option name="ALTERNATIVE_JRE_PATH" value="17 (2)" />
@@ -120,7 +140,7 @@
       <option name="presentableId" value="Default" />
       <updated>1740714930278</updated>
       <workItem from="1740714931390" duration="3797000" />
-      <workItem from="1740719006130" duration="1364000" />
+      <workItem from="1740719006130" duration="9065000" />
     </task>
     <servers />
   </component>

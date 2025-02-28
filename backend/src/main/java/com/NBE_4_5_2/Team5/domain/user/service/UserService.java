@@ -13,24 +13,14 @@ public class UserService {
 
 
     //프로필 조회
-    public UserDto getUserProfile(String username){
-        User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new IllegalArgumentException("user not found"));
-
-        return new UserDto(
-                user.getId(),
-                user.getRole(),
-                user.getUsername(),
-                user.getEmail(),
-                user.getNickname(),
-                user.getAddress(),
-                user.getProfileUrl(),
-                user.isBlocked(),
-                user.getBlockedCount(),
-                user.getCreatedAt(),
-                user.getModifiedAt()
-        );
-
+    public UserDto getMyProfile(String userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        return UserDto.fromEntity(user);
     }
 
+
 }
+
+
+
