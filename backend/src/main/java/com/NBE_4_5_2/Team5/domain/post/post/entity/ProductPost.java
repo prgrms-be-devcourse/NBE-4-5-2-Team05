@@ -2,19 +2,18 @@ package com.NBE_4_5_2.Team5.domain.post.post.entity;
 
 import com.NBE_4_5_2.Team5.domain.post.post.enums.ProductStatus;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.UUID;
 
 @Entity
 @AllArgsConstructor
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 @Builder
 @EntityListeners(AuditingEntityListener.class)
@@ -58,6 +57,26 @@ public class ProductPost {
 
     @LastModifiedDate
     private LocalDateTime modifiedAt;
+
+    public static ProductPost create(String productName,
+                                     Integer productPrice,
+                                     String title,
+                                     String content,
+                                     List<String> imageUrlList,
+                                     Float latitude,
+                                     Float longitude) {
+        return ProductPost
+                .builder()
+                .id("ppost-" + UUID.randomUUID())
+                .productName(productName)
+                .productPrice(productPrice)
+                .title(title)
+                .content(content)
+                .image_urls(String.join(",", imageUrlList))
+                .latitude(latitude)
+                .longitude(longitude)
+                .build();
+    }
 
 
 }
