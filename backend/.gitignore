@@ -36,4 +36,8 @@ out/
 ### VS Code ###
 .vscode/
 /src/main/resources/application.properties
+/src/main/resources/*.yml
 gradle
+
+### custom ###
+db_dev.mv.db
