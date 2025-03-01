@@ -77,7 +77,7 @@ class UserControllerTest {
     void signup1() throws Exception {
 
         String username = "userNew";
-        String password = "1234";
+        String password = "new1234@";
         String email = "new@naver.com";
         String nickname = "무명";
         String address = "서울시 강남구";
@@ -105,7 +105,7 @@ class UserControllerTest {
     void signup2() throws Exception {
 
         String username = "user1";
-        String password = "1234";
+        String password = "new1234@";
         String email = "new@naver.com";
         String nickname = "무명";
         String address = "서울시 강남구";
@@ -127,7 +127,7 @@ class UserControllerTest {
     void signup3() throws Exception {
 
         String username = "user4";
-        String password = "1234";
+        String password = "new1234@";
         String email = "user1@gmail.com";
         String nickname = "무명";
         String address = "서울시 강남구";
@@ -149,7 +149,7 @@ class UserControllerTest {
     void signup4() throws Exception {
 
         String username = "user4";
-        String password = "1234";
+        String password = "new1234@";
         String email = "user4@gmail.com";
         String nickname = "user1";
         String address = "서울시 강남구";
@@ -164,6 +164,34 @@ class UserControllerTest {
                 .andExpect(jsonPath("$.code").value("409-3"))
                 .andExpect(jsonPath("$.message").value("이미 사용중인 닉네임입니다."));
 
+    }
+
+    @Test
+    @DisplayName("회원 가입5 - 필수 입력 데이터 누락")
+    void signup5() throws Exception {
+
+        String username = "";
+        String password = "";
+        String email = "";
+        String nickname = "";
+        String address = "서울시 강남구";
+        String profileUrl = "https://example.com/default_profile.png";
+
+        ResultActions resultActions = signupRequest(username, password, email, nickname, address, profileUrl);
+
+        resultActions
+                .andExpect(status().isBadRequest())
+                .andExpect(handler().handlerType(UserController.class))
+                .andExpect(handler().methodName("signup"))
+                .andExpect(jsonPath("$.code").value("400-1"))
+                .andExpect(jsonPath("$.message").value("""
+                        email : 이메일은 필수 입력값입니다.
+                        nickname : 닉네임은 2~20자 사이여야 합니다.
+                        password : 비밀번호는 8~50자 사이여야 합니다.
+                        password : 비밀번호는 영문, 숫자, 특수문자를 포함해야 합니다.
+                        username : 아이디는 4~20자 사이여야 합니다.
+                        username : 아이디는 영문과 숫자만 사용할 수 있습니다.
+                        """.stripIndent().stripTrailing()));
     }
 
 }
