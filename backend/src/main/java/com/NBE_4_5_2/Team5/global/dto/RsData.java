@@ -12,8 +12,8 @@ public class RsData<T> {
     private String code;
     private T data;
 
-    public RsData(String code, String msg) {
-        this(code, msg, null);
+    public RsData(String message, String code) {
+        this(message, code, null);
     }
 
 }

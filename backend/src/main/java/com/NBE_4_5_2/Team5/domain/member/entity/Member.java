@@ -5,6 +5,7 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
 import lombok.*;
+import lombok.experimental.SuperBuilder;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 @Entity
@@ -12,7 +13,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-@Builder
+@SuperBuilder
 @EntityListeners(AuditingEntityListener.class)
 public class Member extends BaseTime {
 
@@ -25,7 +26,7 @@ public class Member extends BaseTime {
     @Column(length = 50, nullable = false, unique = true)
     private String email;
 
-    @Column(length = 20, nullable = false)
+    @Column(length = 20, nullable = false, unique = true)
     private String nickname;
 
     @Column(length = 255)
@@ -35,12 +36,15 @@ public class Member extends BaseTime {
     private String profileUrl;
 
     @Column(nullable = false)
-    private Integer role;  // 0: Admin, 1: 일반 유저
+    @Builder.Default
+    private Integer role = 1;  // 0: Admin, 1: 일반 유저
 
     @Column(nullable = false)
+    @Builder.Default
     private Boolean blocked = false; // 계정이 잠겼는지 여부
 
     @Column(name = "blocked_count", nullable = false)
+    @Builder.Default
     private Integer blockedCount = 0; // 계정 차단 횟수
 
     public boolean isAdmin() {
