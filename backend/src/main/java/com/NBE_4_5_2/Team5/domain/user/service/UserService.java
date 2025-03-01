@@ -4,6 +4,7 @@ import com.NBE_4_5_2.Team5.domain.user.entity.User;
 import com.NBE_4_5_2.Team5.domain.user.repository.UserRepository;
 import com.NBE_4_5_2.Team5.global.exception.ServiceException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.UUID;
@@ -11,17 +12,20 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 public class UserService {
+
     private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
 
     public User signup(String username, String password, String email,
                        String nickname, String address, String profileUrl) {
 
         validateDuplicateUser(username, email, nickname);
 
+
         User user = User.builder()
                 .id("user-" + UUID.randomUUID().toString())
                 .username(username)
-                .password(password)
+                .password(passwordEncoder.encode(password))
                 .email(email)
                 .nickname(nickname)
                 .address(address)
