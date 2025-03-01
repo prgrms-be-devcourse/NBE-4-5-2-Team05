@@ -5,14 +5,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="1c004391-a666-4ce3-a152-639853d9cad1" name="변경" comment="">
-      <change afterPath="$PROJECT_DIR$/src/main/resources/application.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/build.gradle" beforeDir="false" afterPath="$PROJECT_DIR$/build.gradle" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/NBE_4_5_2/Team5/domain/user/dto/UserDto.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/NBE_4_5_2/Team5/domain/user/dto/UserDto.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/NBE_4_5_2/Team5/domain/user/entity/User.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/NBE_4_5_2/Team5/domain/user/entity/User.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/NBE_4_5_2/Team5/domain/user/repository/UserRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/NBE_4_5_2/Team5/domain/user/repository/UserRepository.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/NBE_4_5_2/Team5/domain/user/service/UserService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/NBE_4_5_2/Team5/domain/user/service/UserService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/application.yml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/application.yml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -93,7 +87,7 @@
     "Spring Boot.Team5Application.executor": "Run",
     "git-widget-placeholder": "서준식/feat-3",
     "kotlin-language-version-configured": "true",
-    "last_opened_file_path": "C:/NBE-4-5-2-Team05/backend/src/main",
+    "last_opened_file_path": "C:/global",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
@@ -140,7 +134,8 @@
       <option name="presentableId" value="Default" />
       <updated>1740714930278</updated>
       <workItem from="1740714931390" duration="3797000" />
-      <workItem from="1740719006130" duration="9065000" />
+      <workItem from="1740719006130" duration="12251000" />
+      <workItem from="1740804769279" duration="299000" />
     </task>
     <servers />
   </component>

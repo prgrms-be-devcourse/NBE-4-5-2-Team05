@@ -2,7 +2,7 @@ package com.NBE_4_5_2.Team5.domain.user.controller;
 
 import com.NBE_4_5_2.Team5.domain.user.dto.UserDto;
 import com.NBE_4_5_2.Team5.domain.user.service.UserService;
-import com.NBE_4_5_2.Team5.global.response.RsData;
+import com.NBE_4_5_2.Team5.global.dto.RsData;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;

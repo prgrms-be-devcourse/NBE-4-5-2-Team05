@@ -28,10 +28,10 @@ public class BaseInitData {
             return; // 기존 데이터가 있으면 초기화하지 않음
         }
 
-        // ✅ 새로운 UUID 생성
+        // 새로운 UUID 생성
         String userId = "a26f722-1aa6-4784-a8b8-acde4b8a30b1";
 
-        // ✅ UUID가 기존 데이터베이스에 있는지 확인
+        // UUID가 기존 데이터베이스에 있는지 확인
         if (!userRepository.existsById(userId)) {
             User user = new User(
                     userId,
@@ -47,13 +47,13 @@ public class BaseInitData {
                     LocalDateTime.now()
             );
 
-            // ✅ 저장 전에 중복 검사
+            // 저장 전에 중복 검사
             Optional<User> existingUser = userRepository.findByEmail(user.getEmail());
             if (existingUser.isEmpty()) {
                 userRepository.save(user);
-                System.out.println("✅ 초기 유저 데이터 삽입 완료: " + user.getUsername());
+                System.out.println("초기 유저 데이터 삽입 완료: " + user.getUsername());
             } else {
-                System.out.println("⚠️ 이미 존재하는 유저입니다: " + user.getEmail());
+                System.out.println("이미 존재하는 유저입니다: " + user.getEmail());
             }
         }
     }

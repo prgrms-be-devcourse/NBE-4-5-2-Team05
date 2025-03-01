@@ -42,9 +42,9 @@ public class User {
     private LocalDateTime createdAt;
     private LocalDateTime modifiedAt;
 
-    public User(String username, String email, String nickname, String address, String profileUrl,
+    public User(String id, String username, String email, String nickname, String address, String profileUrl,
                 int role, boolean blocked, int blockedCount, LocalDateTime createdAt, LocalDateTime modifiedAt) {
-        this.id = UUID.randomUUID().toString(); // ✅ 새로운 UUID 할당
+        this.id = id;  //새로운 UUID 할당 UUID.randomUUID().toString();
         this.username = username;
         this.email = email;
         this.nickname = nickname;
