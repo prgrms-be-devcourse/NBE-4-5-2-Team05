@@ -1,4 +1,4 @@
-package com.NBE_4_5_2.Team5.global.response;
+package com.NBE_4_5_2.Team5.global;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.ApplicationRunner;
@@ -10,6 +10,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.NBE_4_5_2.Team5.domain.member.entity.Member;
 import com.NBE_4_5_2.Team5.domain.member.entity.MemberRepository;
+import com.NBE_4_5_2.Team5.domain.product.dto.ProductStatus;
+import com.NBE_4_5_2.Team5.domain.product.entity.Product;
+import com.NBE_4_5_2.Team5.domain.product.entity.ProductRepository;
 
 import lombok.RequiredArgsConstructor;
 
@@ -23,11 +26,15 @@ public class DevInitData {
 	@Lazy
 	@Autowired
 	private DevInitData self;
+	@Autowired
+	private ProductRepository productRepository;
 
 	@Bean
 	public ApplicationRunner applicationRunner() {
-		return args ->
+		return args -> {
 			self.memberInit();
+			self.productInit();
+		};
 	}
 
 	@Transactional
@@ -39,4 +46,12 @@ public class DevInitData {
 		memberRepository.save(new Member());
 	}
 
+	@Transactional
+	public void productInit() {
+		if (productRepository.count() > 0) {
+			return;
+		}
+
+		productRepository.save(new Product(ProductStatus.AVAILABLE, 5000));
+	}
 }
