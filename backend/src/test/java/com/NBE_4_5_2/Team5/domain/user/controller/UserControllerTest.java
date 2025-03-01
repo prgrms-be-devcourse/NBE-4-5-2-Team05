@@ -194,4 +194,30 @@ class UserControllerTest {
                         """.stripIndent().stripTrailing()));
     }
 
+    @Test
+    @DisplayName("회원 가입6 - 잘못된 형식의 데이터 입력")
+    void signup6() throws Exception {
+
+        String username = "wrong id"; // 공백 포함
+        String password = "wrongpassword"; // 특수문자 미포함
+        String email = "wrongemail"; // 이메일 형식 미준수
+        String nickname = "i"; // 1자 미만
+        String address = "서울시 강남구";
+        String profileUrl = "https://example.com/default_profile.png";
+
+        ResultActions resultActions = signupRequest(username, password, email, nickname, address, profileUrl);
+
+        resultActions
+                .andExpect(status().isBadRequest())
+                .andExpect(handler().handlerType(UserController.class))
+                .andExpect(handler().methodName("signup"))
+                .andExpect(jsonPath("$.code").value("400-1"))
+                .andExpect(jsonPath("$.message").value("""
+                        email : 올바른 이메일 형식이 아닙니다.
+                        nickname : 닉네임은 2~20자 사이여야 합니다.
+                        password : 비밀번호는 영문, 숫자, 특수문자를 포함해야 합니다.
+                        username : 아이디는 영문과 숫자만 사용할 수 있습니다.
+                        """.stripIndent().stripTrailing()));
+    }
+
 }
