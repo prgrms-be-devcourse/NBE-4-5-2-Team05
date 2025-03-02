@@ -59,7 +59,8 @@ public class Payment {
 	}
 
 	/**
-	 * 결제 요청 전에 저장한 payment 메타데이터의 {@code totalAmount}와 인자로 들어오는 {@code amount}가 같은지 비교합니다.
+	 * 결제 요청 전에 저장한 payment 메타데이터({@link com.NBE_4_5_2.Team5.domain.payment.dto.PaymentMetaData PaymentMetaData}
+	 * )의 {@code totalAmount}와 인자로 들어오는 {@code amount}가 같은지 비교합니다.
 	 * @param amount 결제 요청시 클라이언트가 전달한 총 지불 금액
 	 * @return 요청 전에 저장한 데이터와 인자로 받은 총 가격이 동일하다면 {@code true}, 그렇지 않다면 {@code false}를 반환합니다.
 	 */
