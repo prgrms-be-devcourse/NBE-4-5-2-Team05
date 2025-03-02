@@ -257,6 +257,7 @@ class UserControllerTest {
                 .andExpect(jsonPath("$.code").value("200-1"))
                 .andExpect(jsonPath("$.message").value("%s님 환영합니다.".formatted(user.getNickname())))
                 .andExpect(jsonPath("$.data").exists())
+                .andExpect(jsonPath("$.data.accessToken").exists())
                 .andExpect(jsonPath("$.data.refreshToken").value(user.getRefreshToken()))
                 .andExpect(jsonPath("$.data.item.id").value(user.getId()))
                 .andExpect(jsonPath("$.data.item.username").value(user.getUsername()))

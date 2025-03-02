@@ -14,13 +14,13 @@ import java.util.UUID;
 public class UserService {
 
     private final UserRepository userRepository;
+    private final AuthTokenService authTokenService;
 //    private final PasswordEncoder passwordEncoder;
 
     public User signup(String username, String password, String email,
                        String nickname, String address, String profileUrl) {
 
         validateDuplicateUser(username, email, nickname);
-
 
         User user = User.builder()
                 .id("user-" + UUID.randomUUID().toString())
@@ -65,5 +65,9 @@ public class UserService {
 
     public Optional<User> findByRefreshToken(String refreshToken) {
         return userRepository.findByRefreshToken(refreshToken);
+    }
+
+    public String getAccessToken(User user) {
+        return authTokenService.genAccessToken(user);
     }
 }

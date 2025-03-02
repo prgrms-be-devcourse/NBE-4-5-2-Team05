@@ -38,7 +38,7 @@ public class UserController {
                          @NotBlank(message = "비밀번호는 필수 입력값입니다.") String password) {
     }
 
-    record LoginUserDto(String refreshToken, UserDto item) {
+    record LoginUserDto(String accessToken, String refreshToken, UserDto item) {
     }
 
     @PostMapping("/login")
@@ -52,10 +52,13 @@ public class UserController {
             throw new ServiceException("401-2", "비밀번호가 일치하지 않습니다.");
         }
 
+        String accessToken = userService.getAccessToken(user);
+
         return new RsData<>(
                 "200-1",
                 "%s님 환영합니다.".formatted(user.getNickname()),
                 new LoginUserDto(
+                        accessToken,
                         user.getRefreshToken(),
                         new UserDto(user)
                 )
