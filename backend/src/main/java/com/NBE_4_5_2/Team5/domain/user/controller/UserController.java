@@ -4,12 +4,16 @@ import com.NBE_4_5_2.Team5.domain.user.dto.SignUpUserForm;
 import com.NBE_4_5_2.Team5.domain.user.dto.UserDto;
 import com.NBE_4_5_2.Team5.domain.user.entity.User;
 import com.NBE_4_5_2.Team5.domain.user.service.UserService;
+import com.NBE_4_5_2.Team5.global.Rq;
 import com.NBE_4_5_2.Team5.global.dto.RsData;
 import com.NBE_4_5_2.Team5.global.exception.ServiceException;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/users")
@@ -17,6 +21,7 @@ import org.springframework.web.bind.annotation.*;
 public class UserController {
 
     private final UserService userService;
+    private final Rq rq;
 
     @PostMapping("/signup")
     public RsData<UserDto> signup(@RequestBody @Valid SignUpUserForm userForm) {
@@ -39,17 +44,20 @@ public class UserController {
     }
 
     @PostMapping("/login")
-    public RsData<LoginUserDto> login(@RequestBody @Valid LoginUserForm reqBody) {
+    public RsData<LoginUserDto> login(@RequestBody @Valid LoginUserForm userForm) {
 
-        User user = userService.findByUsername(reqBody.username()).orElseThrow(
+        User user = userService.findByUsername(userForm.username()).orElseThrow(
                 () -> new ServiceException("401-1", "잘못된 아이디입니다.")
         );
 
-        if (!user.getPassword().equals(reqBody.password())) {
+        if (!user.getPassword().equals(userForm.password())) {
             throw new ServiceException("401-2", "비밀번호가 일치하지 않습니다.");
         }
 
         String accessToken = userService.generateAccessToken(user);
+
+        rq.addCookie("accessToken", accessToken);
+        rq.addCookie("refreshToken", user.getRefreshToken());
 
         return new RsData<>(
                 "200-1",

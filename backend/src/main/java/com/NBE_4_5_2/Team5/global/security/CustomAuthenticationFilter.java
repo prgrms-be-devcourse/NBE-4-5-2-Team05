@@ -12,6 +12,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Optional;
 
 @Component
@@ -24,55 +25,96 @@ public class CustomAuthenticationFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
 
-        String authorizationHeader = request.getHeader("Authorization");
+        String url = request.getRequestURI();
+
+        if(List.of("/api/users/login", "/api/users/signup").contains(url)) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+
+        AuthToken tokens = getAuthTokenFromRequest();
+
+        if (tokens == null) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+
+        String refreshToken = tokens.refreshToken();
+        String accessToken = tokens.accessToken();
+
+        User actor = refreshAccessToken(refreshToken, accessToken);
+
+        if (actor == null) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+
+        rq.setLogin(actor);
+        filterChain.doFilter(request, response);
+    }
+
+    private boolean isAuthorizationHeader() {
+        String authorizationHeader = rq.getHeader("Authorization");
 
         if (authorizationHeader == null) {
-            filterChain.doFilter(request, response);
-            return;
+            return false;
         }
 
-        if(!authorizationHeader.startsWith("Bearer ")) {
-            filterChain.doFilter(request, response);
-            return;
+        return authorizationHeader.startsWith("Bearer ");
+    }
+
+
+    record AuthToken(String refreshToken, String accessToken) {
+    }
+
+    private AuthToken getAuthTokenFromRequest() {
+
+        if (isAuthorizationHeader()) {
+
+            String authorizationHeader = rq.getHeader("Authorization");
+            String authToken = authorizationHeader.substring("Bearer ".length());
+
+            String[] tokenBits = authToken.split(" ", 2);
+
+            if (tokenBits.length < 2) {
+                return null;
+            }
+
+            String refreshToken = tokenBits[0];
+            String accessToken = tokenBits[1];
+
+            return new AuthToken(refreshToken, accessToken);
         }
 
-        String authToken = authorizationHeader.substring("Bearer ".length());
+        String refreshToken = rq.getValueFromCookie("refreshToken");
+        String accessToken = rq.getValueFromCookie("accessToken");
 
-        String[] tokenBits = authToken.split(" ", 2);
-
-        if(tokenBits.length < 2) {
-            filterChain.doFilter(request, response);
-            return;
+        if (refreshToken == null || accessToken == null) {
+            return null;
         }
 
-        String refreshToken = tokenBits[0];
-        String accessToken = tokenBits[1];
+        return new AuthToken(refreshToken, accessToken);
+
+    }
+
+    private User refreshAccessToken(String refreshToken, String accessToken) {
 
         Optional<User> opAccessUser = userService.getUserByAccessToken(accessToken);
 
-        if(opAccessUser.isEmpty()) {
-
-            Optional<User> opRefreshUser = userService.findByRefreshToken(refreshToken);
-
-            if(opRefreshUser.isEmpty()) {
-                filterChain.doFilter(request, response);
-                return;
-            }
-
-            // accessToken 재발급
-            String newAuthToken = userService.getAuthToken(opRefreshUser.get());
-            response.addHeader("Authorization", "Bearer " + newAuthToken);
-
-            User actor = opRefreshUser.get();
-            rq.setLogin(actor);
-
-            filterChain.doFilter(request, response);
-            return;
+        if (opAccessUser.isPresent()) {
+            return opAccessUser.get();
         }
 
-        User actor = opAccessUser.get();
-        rq.setLogin(actor);
+        Optional<User> opRefreshUser = userService.findByRefreshToken(refreshToken);
 
-        filterChain.doFilter(request, response);
+        if (opRefreshUser.isEmpty()) {
+            return null;
+        }
+
+        String newAccessToken = userService.generateAccessToken(opRefreshUser.get());
+        rq.addCookie("refreshToken", refreshToken);
+        rq.addCookie("accessToken", newAccessToken);
+
+        return opRefreshUser.get();
     }
 }
