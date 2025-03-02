@@ -2,6 +2,7 @@ package com.NBE_4_5_2.Team5.domain.user.controller;
 
 import com.NBE_4_5_2.Team5.domain.user.entity.User;
 import com.NBE_4_5_2.Team5.domain.user.repository.UserRepository;
+import jakarta.servlet.http.Cookie;
 import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -17,6 +18,7 @@ import java.nio.charset.StandardCharsets;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.matchesPattern;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -269,6 +271,29 @@ class UserControllerTest {
                 .andExpect(jsonPath("$.data.item.createdAt").value(matchesPattern(user.getCreatedAt().toString().replaceAll("0+$", "") + ".*")))
                 .andExpect(jsonPath("$.data.item.modifiedAt").value(matchesPattern(user.getModifiedAt().toString().replaceAll("0+$", "") + ".*")));
 
+        resultActions
+                .andExpect(mvcResult -> {
+                    Cookie refreshToken = mvcResult.getResponse().getCookie("refreshToken");
+
+                    assertThat(refreshToken).isNotNull();
+                    assertThat(refreshToken.getName()).isEqualTo("refreshToken");
+                    assertThat(refreshToken.getValue()).isNotBlank();
+                    assertThat(refreshToken.getDomain()).isEqualTo("localhost");
+                    assertThat(refreshToken.getPath()).isEqualTo("/");
+                    assertThat(refreshToken.isHttpOnly()).isTrue();
+                    assertThat(refreshToken.getSecure()).isTrue();
+
+                    Cookie accessToken = mvcResult.getResponse().getCookie("accessToken");
+
+                    assertThat(accessToken).isNotNull();
+                    assertThat(accessToken.getName()).isEqualTo("accessToken");
+                    assertThat(accessToken.getValue()).isNotBlank();
+                    assertThat(accessToken.getDomain()).isEqualTo("localhost");
+                    assertThat(accessToken.getPath()).isEqualTo("/");
+                    assertThat(accessToken.isHttpOnly()).isTrue();
+                    assertThat(accessToken.getSecure()).isTrue();
+
+                });
     }
 
     @Test
@@ -340,6 +365,36 @@ class UserControllerTest {
                 .andExpect(handler().methodName("login"))
                 .andExpect(jsonPath("$.code").value("400-1"))
                 .andExpect(jsonPath("$.message").value("password : 비밀번호는 필수 입력값입니다."));
+
+    }
+
+    @Test
+    @DisplayName("로그아웃")
+    void logout() throws Exception {
+        ResultActions resultActions = mvc.perform(
+                delete("/api/users/logout")
+        );
+
+        resultActions
+                .andExpect(status().isOk())
+                .andExpect(handler().handlerType(UserController.class))
+                .andExpect(handler().methodName("logout"))
+                .andExpect(jsonPath("$.code").value("200-1"))
+                .andExpect(jsonPath("$.message").value("로그아웃 되었습니다."));
+
+
+        resultActions.
+                andExpect(
+                        mvcResult -> {
+                            Cookie refreshToken = mvcResult.getResponse().getCookie("refreshToken");
+                            assertThat(refreshToken).isNotNull();
+                            assertThat(refreshToken.getMaxAge()).isZero();
+
+                            Cookie accessToken = mvcResult.getResponse().getCookie("accessToken");
+                            assertThat(accessToken).isNotNull();
+                            assertThat(accessToken.getMaxAge()).isZero();
+                        }
+                );
 
     }
 }
