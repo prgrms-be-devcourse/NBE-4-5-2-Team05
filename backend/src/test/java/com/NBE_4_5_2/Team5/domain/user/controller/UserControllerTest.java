@@ -73,7 +73,7 @@ class UserControllerTest {
     }
 
     @Test
-    @DisplayName("회원 가입1")
+    @DisplayName("회원 가입 - 성공")
     void signup1() throws Exception {
 
         String username = "userNew";
@@ -101,7 +101,7 @@ class UserControllerTest {
     }
 
     @Test
-    @DisplayName("회원 가입2 - username 중복")
+    @DisplayName("회원 가입 - 실패 - username 중복")
     void signup2() throws Exception {
 
         String username = "user1";
@@ -123,7 +123,7 @@ class UserControllerTest {
     }
 
     @Test
-    @DisplayName("회원 가입3 - email 중복")
+    @DisplayName("회원 가입 - 실패 - email 중복")
     void signup3() throws Exception {
 
         String username = "user4";
@@ -145,7 +145,7 @@ class UserControllerTest {
     }
 
     @Test
-    @DisplayName("회원 가입4 - nickname 중복")
+    @DisplayName("회원 가입 - 실패 - nickname 중복")
     void signup4() throws Exception {
 
         String username = "user4";
@@ -167,7 +167,7 @@ class UserControllerTest {
     }
 
     @Test
-    @DisplayName("회원 가입5 - 필수 입력 데이터 누락")
+    @DisplayName("회원 가입 - 실패 - 필수 입력 데이터 누락")
     void signup5() throws Exception {
 
         String username = "";
@@ -195,7 +195,7 @@ class UserControllerTest {
     }
 
     @Test
-    @DisplayName("회원 가입6 - 잘못된 형식의 데이터 입력")
+    @DisplayName("회원 가입 - 실패 - 잘못된 형식의 데이터 입력")
     void signup6() throws Exception {
 
         String username = "wrong id"; // 공백 포함
@@ -220,4 +220,125 @@ class UserControllerTest {
                         """.stripIndent().stripTrailing()));
     }
 
+    private ResultActions loginRequest(String username, String password) throws Exception {
+        return mvc
+                .perform(
+                        post("/api/users/login")
+                                .content("""
+                                        {
+                                          "username": "%s",
+                                          "password": "%s"
+                                        }
+                                        """
+                                        .formatted(username, password)
+                                        .stripIndent())
+                                .contentType(
+                                        new MediaType(MediaType.APPLICATION_JSON, StandardCharsets.UTF_8)
+                                )
+                )
+                .andDo(print());
+    }
+
+
+    @Test
+    @DisplayName("로그인 - 성공")
+    void login1() throws Exception {
+
+        String username = "user1";
+        String password = "user11234@";
+
+        ResultActions resultActions = loginRequest(username, password);
+        User user = userRepository.findByUsername(username).get();
+
+        resultActions
+                .andExpect(status().isOk())
+                .andExpect(handler().handlerType(UserController.class))
+                .andExpect(handler().methodName("login"))
+                .andExpect(jsonPath("$.code").value("200-1"))
+                .andExpect(jsonPath("$.message").value("%s님 환영합니다.".formatted(user.getNickname())))
+                .andExpect(jsonPath("$.data").exists())
+                .andExpect(jsonPath("$.data.refreshToken").value(user.getRefreshToken()))
+                .andExpect(jsonPath("$.data.item.id").value(user.getId()))
+                .andExpect(jsonPath("$.data.item.username").value(user.getUsername()))
+                .andExpect(jsonPath("$.data.item.email").value(user.getEmail()))
+                .andExpect(jsonPath("$.data.item.nickname").value(user.getNickname()))
+                .andExpect(jsonPath("$.data.item.address").value(user.getAddress()))
+                .andExpect(jsonPath("$.data.item.profileUrl").value(user.getProfileUrl()))
+                .andExpect(jsonPath("$.data.item.role").value(user.getRole()))
+                .andExpect(jsonPath("$.data.item.createdAt").value(matchesPattern(user.getCreatedAt().toString().replaceAll("0+$", "") + ".*")))
+                .andExpect(jsonPath("$.data.item.modifiedAt").value(matchesPattern(user.getModifiedAt().toString().replaceAll("0+$", "") + ".*")));
+
+    }
+
+    @Test
+    @DisplayName("로그인 - 실패 - 비밀번호 틀림")
+    void login2() throws Exception {
+
+        String username = "user1";
+        String password = "1111";
+
+        ResultActions resultActions = loginRequest(username, password);
+
+        resultActions
+                .andExpect(status().isUnauthorized())
+                .andExpect(handler().handlerType(UserController.class))
+                .andExpect(handler().methodName("login"))
+                .andExpect(jsonPath("$.code").value("401-2"))
+                .andExpect(jsonPath("$.message").value("비밀번호가 일치하지 않습니다."));
+
+    }
+
+    @Test
+    @DisplayName("로그인 - 실패 - 존재하지 않는 username")
+    void login3() throws Exception {
+
+        String username = "stranger";
+        String password = "user11234@";
+
+        ResultActions resultActions = loginRequest(username, password);
+
+        resultActions
+                .andExpect(status().isUnauthorized())
+                .andExpect(handler().handlerType(UserController.class))
+                .andExpect(handler().methodName("login"))
+                .andExpect(jsonPath("$.code").value("401-1"))
+                .andExpect(jsonPath("$.message").value("잘못된 아이디입니다."));
+
+    }
+
+    @Test
+    @DisplayName("로그인 - 실패 - username 누락")
+    void login4() throws Exception {
+
+        String username = "";
+        String password = "stranger";
+
+        ResultActions resultActions = loginRequest(username, password);
+
+        resultActions
+                .andExpect(status().isBadRequest())
+                .andExpect(handler().handlerType(UserController.class))
+                .andExpect(handler().methodName("login"))
+                .andExpect(jsonPath("$.code").value("400-1"))
+                .andExpect(jsonPath("$.message").value("username : 아이디는 필수 입력값입니다."));
+
+    }
+
+    @Test
+    @DisplayName("로그인 - 실패 - password 누락")
+    void login5() throws Exception {
+
+        String username = "stranger";
+        String password = "";
+
+        ResultActions resultActions = loginRequest(username, password);
+
+        resultActions
+                .andExpect(status().isBadRequest())
+                .andExpect(handler().handlerType(UserController.class))
+                .andExpect(handler().methodName("login"))
+                .andExpect(jsonPath("$.code").value("400-1"))
+                .andExpect(jsonPath("$.message").value("password : 비밀번호는 필수 입력값입니다."));
+
+    }
 }
