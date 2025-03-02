@@ -28,13 +28,12 @@ public class BaseInitData {
             return; // 기존 데이터가 있으면 초기화하지 않음
         }
 
-        // 새로운 UUID 생성
-        String userId = "a26f722-1aa6-4784-a8b8-acde4b8a30b1";
 
-        // UUID가 기존 데이터베이스에 있는지 확인
-        if (!userRepository.existsById(userId)) {
+
+
+
+
             User user = new User(
-                    userId,
                     "testuser",
                     "test@example.com",
                     "테스트유저",
@@ -55,6 +54,6 @@ public class BaseInitData {
             } else {
                 System.out.println("이미 존재하는 유저입니다: " + user.getEmail());
             }
-        }
+
     }
 }

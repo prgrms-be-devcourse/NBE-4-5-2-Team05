@@ -8,20 +8,25 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
 
+//@AllArgsConstructor 나중에 적용
 @Getter
 @Setter
 @NoArgsConstructor
-
+@EntityListeners(AuditingEntityListener.class)
 @Entity
 @Table(name = "member")
 public class User {
 
     @Id
-    private String id;  // user-UUID
+    private String id = "user-" + UUID.randomUUID();   // user-UUID
+
 
 
     private String username;
@@ -39,12 +44,13 @@ public class User {
     private boolean blocked;
     private int blockedCount;
 
+    @CreatedDate
     private LocalDateTime createdAt;
+    @LastModifiedDate
     private LocalDateTime modifiedAt;
 
-    public User(String id, String username, String email, String nickname, String address, String profileUrl,
+    public User(String username, String email, String nickname, String address, String profileUrl,
                 int role, boolean blocked, int blockedCount, LocalDateTime createdAt, LocalDateTime modifiedAt) {
-        this.id = id;  //새로운 UUID 할당 UUID.randomUUID().toString();
         this.username = username;
         this.email = email;
         this.nickname = nickname;
