@@ -10,10 +10,7 @@ import com.NBE_4_5_2.Team5.global.exception.ServiceException;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/users")
@@ -68,6 +65,15 @@ public class UserController {
                         new UserDto(user)
                 )
         );
+    }
+
+    @DeleteMapping("/logout")
+    public RsData<Void> logout() {
+
+        rq.removeCookie("accessToken");
+        rq.removeCookie("refreshToken");
+
+        return new RsData<>("200-1", "로그아웃 되었습니다.");
     }
 
 }
