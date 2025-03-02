@@ -6,14 +6,14 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.NBE_4_5_2.Team5.domain.member.entity.Member;
-import com.NBE_4_5_2.Team5.domain.member.entity.MemberRepository;
+import com.NBE_4_5_2.Team5.domain.member.repository.MemberRepository;
 import com.NBE_4_5_2.Team5.domain.payment.dto.PaymentDto;
 import com.NBE_4_5_2.Team5.domain.payment.dto.PaymentMetaData;
 import com.NBE_4_5_2.Team5.domain.payment.entity.Payment;
 import com.NBE_4_5_2.Team5.domain.payment.enums.PaymentStatus;
 import com.NBE_4_5_2.Team5.domain.payment.repository.PaymentRepository;
 import com.NBE_4_5_2.Team5.domain.product.entity.Product;
-import com.NBE_4_5_2.Team5.domain.product.entity.ProductRepository;
+import com.NBE_4_5_2.Team5.domain.product.repository.ProductRepository;
 import com.NBE_4_5_2.Team5.global.exception.product.ProductNotFoundException;
 
 import jakarta.validation.constraints.NotNull;
