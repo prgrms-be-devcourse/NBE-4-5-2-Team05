@@ -2,6 +2,12 @@ package com.NBE_4_5_2.Team5.global.standard.util;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.security.Keys;
+
+import javax.crypto.SecretKey;
+import java.util.Date;
+import java.util.Map;
 
 public class Ut {
     public static class Json {
@@ -14,6 +20,54 @@ public class Ut {
             } catch (JsonProcessingException e) {
                 throw new RuntimeException(e);
             }
+        }
+    }
+
+    public static class Jwt {
+        public static String createToken(String keyString, int expireSeconds, Map<String, Object> claims) {
+
+            SecretKey secretKey = Keys.hmacShaKeyFor(keyString.getBytes());
+
+            Date issuedAt = new Date();
+            Date expiration = new Date(issuedAt.getTime() + 1000L * expireSeconds);
+
+            String jwt = Jwts.builder()
+                    .claims(claims)
+                    .issuedAt(issuedAt)
+                    .expiration(expiration)
+                    .signWith(secretKey)
+                    .compact();
+
+            return jwt;
+        }
+
+        public static boolean isValidToken(String keyString, String token) {
+
+            SecretKey secretKey = Keys.hmacShaKeyFor(keyString.getBytes());
+
+            try {
+                Jwts
+                        .parser()
+                        .verifyWith(secretKey)
+                        .build()
+                        .parse(token);
+
+            } catch (Exception e) {
+                return false;
+            }
+            return true;
+        }
+
+        public static Map<String, Object> getPayload(String keyString, String jwtStr) {
+
+            SecretKey secretKey = Keys.hmacShaKeyFor(keyString.getBytes());
+
+            return Jwts
+                    .parser()
+                    .verifyWith(secretKey)
+                    .build()
+                    .parseSignedClaims(jwtStr)
+                    .getPayload();
         }
     }
 }
