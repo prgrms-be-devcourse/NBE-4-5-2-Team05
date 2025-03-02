@@ -18,8 +18,7 @@ bin/
 !**/src/test/**/bin/
 
 ### IntelliJ IDEA ###
-../.idea
-.idea
+.idea/
 *.iws
 *.iml
 *.ipr
@@ -38,3 +37,10 @@ out/
 .vscode/
 /src/main/resources/application.properties
 gradle
+
+# 애플리케이션 설정 파일
+/src/main/resources/application.properties
+
+# 특정 데이터 폴더 무시
+data/
+db_dev.mv.db  # H2 데이터베이스 파일도 무시
