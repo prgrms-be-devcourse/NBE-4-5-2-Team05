@@ -26,6 +26,9 @@ public class User {
 	private String username;
 
 	@Column(nullable = false)
+	private String password;
+
+	@Column(nullable = false)
 	private String email;
 
 	@Column(nullable = false)
@@ -45,17 +48,18 @@ public class User {
 	private LocalDateTime createdAt;
 	private LocalDateTime modifiedAt;
 
-	public User(String id, String username, String email, String nickname, String address, String profileUrl, Role role,
-		boolean blocked, int blockedCount, LocalDateTime createdAt, LocalDateTime modifiedAt) {
-		this.id = id;
+	public User(String username, String password, String email, String nickname, String address, String profileUrl,
+		Role role,
+		LocalDateTime createdAt, LocalDateTime modifiedAt) {
 		this.username = username;
+		this.password = password;
 		this.email = email;
+		this.blocked = false;
+		this.blockedCount = 0;
 		this.nickname = nickname;
 		this.address = address;
 		this.profileUrl = profileUrl;
 		this.role = role;
-		this.blocked = blocked;
-		this.blockedCount = blockedCount;
 		this.createdAt = createdAt;
 		this.modifiedAt = modifiedAt;
 	}
