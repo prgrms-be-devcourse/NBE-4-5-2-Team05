@@ -37,5 +37,15 @@ public class ProductController {
         return new RsData<>("200-SUCCESS", "내 판매내역 조회 성공", products);
     }
 
+    //찜한 게시글 조회
+    @GetMapping("/favorites")
+    public RsData<List<ProductDto>> getFavoriteProducts(@RequestParam(name = "type") String type, @RequestParam(name = "userId") String userId) {
+        if (!"favorite".equals(type)) {
+            throw new ServiceException("400-INVALID_PARAM", "Invalid type parameter");
+        }
+        List<ProductDto> favoriteProducts = productService.getFavoriteProducts(userId);
+        return new RsData<>("200-SUCCESS", "내가 찜한 내역 조회 성공", favoriteProducts);
+    }
+
 
 }
