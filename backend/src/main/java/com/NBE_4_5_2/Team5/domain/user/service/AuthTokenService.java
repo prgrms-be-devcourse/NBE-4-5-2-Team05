@@ -27,13 +27,15 @@ public class AuthTokenService {
         );
     }
 
-    Map<String, Object> getPayload(String token) {
-        Map<String, Object> payload = Ut.Jwt.getPayload(keyString, token);
+    Map<String, Object> getPayload(String accessToken) {
 
-        if(payload == null) return null;
+        if(!Ut.Jwt.isValidToken(keyString, accessToken)) {
+            return null;
+        }
 
-        String id = (String)payload.get("id");
-        String username = (String)payload.get("username");
+        Map<String, Object> payload = Ut.Jwt.getPayload(keyString, accessToken);
+        String id = (String) payload.get("id");
+        String username = (String) payload.get("username");
 
         return Map.of("id", id, "username", username);
     }
