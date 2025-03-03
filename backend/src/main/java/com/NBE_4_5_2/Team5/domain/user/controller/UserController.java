@@ -1,5 +1,7 @@
 package com.NBE_4_5_2.Team5.domain.user.controller;
 
+import com.NBE_4_5_2.Team5.domain.user.dto.LoginUserDto;
+import com.NBE_4_5_2.Team5.domain.user.dto.LoginUserForm;
 import com.NBE_4_5_2.Team5.domain.user.dto.SignUpUserForm;
 import com.NBE_4_5_2.Team5.domain.user.dto.UserDto;
 import com.NBE_4_5_2.Team5.domain.user.entity.User;
@@ -8,7 +10,6 @@ import com.NBE_4_5_2.Team5.global.Rq;
 import com.NBE_4_5_2.Team5.global.dto.RsData;
 import com.NBE_4_5_2.Team5.global.exception.ServiceException;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -31,13 +32,6 @@ public class UserController {
                 "회원 가입이 완료되었습니다.",
                 new UserDto(user)
         );
-    }
-
-    record LoginUserForm(@NotBlank(message = "아이디는 필수 입력값입니다.") String username,
-                         @NotBlank(message = "비밀번호는 필수 입력값입니다.") String password) {
-    }
-
-    record LoginUserDto(String accessToken, String refreshToken, UserDto item) {
     }
 
     @PostMapping("/login")
