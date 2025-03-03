@@ -2,6 +2,7 @@ package com.NBE_4_5_2.Team5.domain.user.service;
 
 import com.NBE_4_5_2.Team5.domain.user.entity.User;
 import com.NBE_4_5_2.Team5.domain.user.repository.UserRepository;
+import com.NBE_4_5_2.Team5.global.Rq;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -18,6 +19,7 @@ public class UserService {
     private final AuthTokenService authTokenService;
     private final PasswordEncoder passwordEncoder;
     private final UserValidator userValidator;
+    private final Rq rq;
 
     public User signup(String username, String password, String email,
                        String nickname, String address, String profileUrl) {
@@ -36,6 +38,13 @@ public class UserService {
                 .build();
 
         return userRepository.save(user);
+    }
+
+    public void logout(User user) {
+        String newRefreshToken = "user-" + UUID.randomUUID();
+        user.setRefreshToken(newRefreshToken);
+
+        userRepository.save(user);
     }
 
     public User processUserAuthentication(String username, String password) {

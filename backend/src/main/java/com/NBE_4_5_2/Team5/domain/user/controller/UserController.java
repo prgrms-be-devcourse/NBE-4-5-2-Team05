@@ -53,9 +53,13 @@ public class UserController {
         );
     }
 
-    @DeleteMapping("/logout")
+    @PostMapping("/logout")
     public RsData<Void> logout() {
 
+        User userIdentity = rq.getUserIdentity();
+        User user = rq.getRealActor(userIdentity);
+
+        userService.logout(user);
         rq.removeCookie("accessToken");
         rq.removeCookie("refreshToken");
 
@@ -66,7 +70,7 @@ public class UserController {
     public RsData<UserDto> me() {
 
         User userIdentity = rq.getUserIdentity();
-        User user = userService.findById(userIdentity.getId()).get();
+        User user = rq.getRealActor(userIdentity);
 
         return new RsData<>(
                 "200-1",
