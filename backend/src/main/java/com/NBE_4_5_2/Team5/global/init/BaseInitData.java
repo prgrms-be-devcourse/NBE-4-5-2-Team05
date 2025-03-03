@@ -7,10 +7,13 @@ import com.NBE_4_5_2.Team5.domain.post.post.entity.ProductPost;
 import com.NBE_4_5_2.Team5.domain.post.post.repository.ProductCategoryRepository;
 import com.NBE_4_5_2.Team5.domain.post.post.repository.ProductPostRepository;
 import com.NBE_4_5_2.Team5.domain.product.entity.Product;
+import com.NBE_4_5_2.Team5.domain.product.entity.LikedPost;
 import com.NBE_4_5_2.Team5.domain.product.repository.ProductRepository;
 import com.NBE_4_5_2.Team5.domain.user.entity.User;
 import com.NBE_4_5_2.Team5.domain.user.repository.UserRepository;
 import com.NBE_4_5_2.Team5.domain.user.service.UserService;
+import com.NBE_4_5_2.Team5.domain.product.repository.LikedPostRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.ApplicationRunner;
@@ -18,8 +21,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.core.annotation.Order;
-import org.springframework.transaction.annotation.Transactional;
-
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -145,20 +146,23 @@ public class BaseInitData {
     }
 
     private final ProductRepository productRepository;
+    private final LikedPostRepository likedPostRepository;
 
     @Bean
     public ApplicationRunner applicationRunner() {
-        return args -> productInit();
+        return args -> {
+            productInit();
+            likedPostInit();
+        };
     }
 
     @Transactional
     public void productInit() {
         if (productRepository.count() > 0) {
-            return; // 기존 데이터가 있으면 초기화하지 않음
+            return;
         }
 
         List<Product> products = List.of(
-                // ✅ 구매 내역 데이터
                 Product.builder()
                         .id("ppost-11111")
                         .productName("Laptop")
@@ -166,8 +170,8 @@ public class BaseInitData {
                         .title("Gaming Laptop for sale")
                         .content("Brand new gaming laptop with RTX 3060.")
                         .likedCount(5)
-                        .status("purchased") // 구매 완료
-                        .sellerId("user-001") // 판매자 ID 추가
+                        .status("purchased")
+                        .sellerId("user-001")
                         .createdAt(LocalDateTime.now())
                         .modifiedAt(LocalDateTime.now())
                         .build(),
@@ -183,8 +187,6 @@ public class BaseInitData {
                         .createdAt(LocalDateTime.now())
                         .modifiedAt(LocalDateTime.now())
                         .build(),
-
-                // ✅ 판매 내역 데이터 (판매 완료)
                 Product.builder()
                         .id("ppost-33333")
                         .productName("Monitor")
@@ -192,36 +194,8 @@ public class BaseInitData {
                         .title("27-inch 4K Monitor")
                         .content("Perfect condition 27-inch 4K monitor.")
                         .likedCount(3)
-                        .status("sold") // 판매 완료
-                        .sellerId("user-001") // 판매자 ID 추가
-                        .createdAt(LocalDateTime.now())
-                        .modifiedAt(LocalDateTime.now())
-                        .build(),
-
-                // ✅ 판매 진행 중 데이터
-                Product.builder()
-                        .id("ppost-44444")
-                        .productName("Mechanical Keyboard")
-                        .productPrice(150000)
-                        .title("Cherry MX Mechanical Keyboard")
-                        .content("Barely used Cherry MX keyboard, great for gaming.")
-                        .likedCount(7)
-                        .status("selling") // 판매 진행 중
-                        .sellerId("user-002")
-                        .createdAt(LocalDateTime.now())
-                        .modifiedAt(LocalDateTime.now())
-                        .build(),
-
-                // ✅ 예약된 상품 데이터
-                Product.builder()
-                        .id("ppost-55555")
-                        .productName("Gaming Chair")
-                        .productPrice(250000)
-                        .title("Ergonomic Gaming Chair")
-                        .content("High-quality ergonomic gaming chair, almost new.")
-                        .likedCount(9)
-                        .status("reserved") // 예약됨
-                        .sellerId("user-003")
+                        .status("sold")
+                        .sellerId("user-001")
                         .createdAt(LocalDateTime.now())
                         .modifiedAt(LocalDateTime.now())
                         .build()
@@ -229,6 +203,31 @@ public class BaseInitData {
 
         productRepository.saveAll(products);
         System.out.println("✅ 초기 상품 데이터 (구매 내역 & 판매 내역) 삽입 완료!");
+    }
+
+    @Transactional
+    public void likedPostInit() {
+        if (likedPostRepository.count() > 0) {
+            return;
+        }
+
+        List<LikedPost> likedPosts = List.of(
+                LikedPost.builder()
+                        .userId("user-001")
+                        .productPostId("ppost-11111") // user-001이 Laptop 찜
+                        .build(),
+                LikedPost.builder()
+                        .userId("user-001")
+                        .productPostId("ppost-22222") // user-001이 Smartphone 찜
+                        .build(),
+                LikedPost.builder()
+                        .userId("user-002")
+                        .productPostId("ppost-33333") // user-002가 Monitor 찜
+                        .build()
+        );
+
+        likedPostRepository.saveAll(likedPosts);
+        System.out.println("✅ 초기 찜 데이터 삽입 완료!");
     }
 }
 
