@@ -11,6 +11,7 @@ import com.NBE_4_5_2.Team5.domain.user.entity.User;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToOne;
 import lombok.Builder;
 import lombok.Getter;
@@ -27,6 +28,7 @@ public class BanList {
 	private String reason;
 
 	@OneToOne
+	@JoinColumn(name = "user_id")
 	private User bannedUser;
 
 	@CreatedDate

@@ -68,4 +68,12 @@ public class User {
 		this.blocked = true;
 		this.blockedCount++;
 	}
+
+	public void unBan() {
+
+		if (!this.blocked) {
+			return;
+		}
+		blocked = false;
+	}
 }
