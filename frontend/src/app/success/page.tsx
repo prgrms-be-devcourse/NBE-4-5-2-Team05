@@ -13,12 +13,7 @@ export default async function Page({
 }) {
   const { paymentType, orderId, paymentKey, amount } = await searchParams;
 
-  const response = await fetch(
-    `http://localhost:8080/api/payments/request?orderId=${orderId}&paymentKey=${paymentKey}&amount=${amount}`
-  );
-  const json = await response.json();
 
-  console.log(json);
 
-  return <ClientPage></ClientPage>;
+  return <ClientPage orderId={orderId} paymentKey={paymentKey} amount={amount}></ClientPage>;
 }
