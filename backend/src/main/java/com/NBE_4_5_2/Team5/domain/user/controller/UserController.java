@@ -110,7 +110,7 @@ public class UserController {
 
     //  내 정보 수정
     @PutMapping("/me")
-    public ResponseEntity<RsData<UserDto>> updateMyProfile(@RequestBody UserUpdateRequest updateRequest) {
+    public ResponseEntity<RsData<UserDto>> updateMyProfile(@RequestBody @Valid UserUpdateRequest updateRequest) {
         User userIdentity = rq.getUserIdentity();
         User user = rq.getRealActor(userIdentity);
         UserDto updatedUser = userService.updateMyProfile(user, updateRequest); // `userId` 대신 객체 전달
