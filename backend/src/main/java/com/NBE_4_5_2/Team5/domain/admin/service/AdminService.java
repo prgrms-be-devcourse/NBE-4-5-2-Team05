@@ -4,7 +4,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.NBE_4_5_2.Team5.domain.admin.dto.NoticeDto;
+import com.NBE_4_5_2.Team5.domain.admin.dto.NoticeResBody;
 import com.NBE_4_5_2.Team5.domain.admin.entity.NoticePost;
 import com.NBE_4_5_2.Team5.domain.admin.repository.NoticePostRepository;
 import com.NBE_4_5_2.Team5.domain.user.entity.Role;
@@ -22,7 +22,7 @@ public class AdminService {
 	private final UserRepository userRepository;
 	private final NoticePostRepository noticePostRepository;
 
-	public NoticeDto writeNotice(@NotEmpty String title, @NotEmpty String content) {
+	public NoticeResBody writeNotice(@NotEmpty String title, @NotEmpty String content) {
 		User admin = getUser();
 
 		isAdmin(admin);
@@ -32,7 +32,7 @@ public class AdminService {
 
 		NoticePost saved = noticePostRepository.save(noticePost);
 
-		return NoticeDto.of(saved);
+		return NoticeResBody.of(saved);
 
 	}
 
