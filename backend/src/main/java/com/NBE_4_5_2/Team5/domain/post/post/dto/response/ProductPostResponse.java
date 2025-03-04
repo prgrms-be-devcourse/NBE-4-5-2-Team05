@@ -20,8 +20,8 @@ public class ProductPostResponse {
     private Float longitude;
     private List<String> categories;
 
-    public ProductPostResponse(ProductPost post) {
-        this(
+    public static ProductPostResponse fromEntity(ProductPost post) {
+        return new ProductPostResponse(
                 post.getId(),
                 post.getProductName(),
                 post.getProductPrice(),

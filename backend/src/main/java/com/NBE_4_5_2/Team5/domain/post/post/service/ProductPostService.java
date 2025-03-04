@@ -58,13 +58,20 @@ public class ProductPostService {
 
 
     public PageDto<ProductPostResponse> getPosts(int page, int pageSize, String keyword, String sort) {
+        Sort.Direction sortDirection = sort.equalsIgnoreCase("asc") ? Sort.Direction.ASC : Sort.Direction.DESC;
         Pageable pageable = PageRequest.of(page - 1, pageSize,
-                Sort.by(sort.equalsIgnoreCase("desc") ? Sort.Direction.DESC : Sort.Direction.ASC, "id"));
+                Sort.by(sortDirection, "createdAt"));
+
+        Page<ProductPost> postpage;
         String likeKeyword = "%" + keyword + "%";
 
-        // keyword가 제목에 들어간 게시물 목록
-        Page<ProductPostResponse> mappedPosts = productPostRepository.findByTitleLike(likeKeyword, pageable).map(ProductPostResponse::new);
+        if (keyword.isBlank()) {
+            postpage=productPostRepository.findAllWithCategories(pageable);
+        } else {
+            postpage = productPostRepository.findByTitleLike(likeKeyword, pageable);
+        }
 
+        Page<ProductPostResponse> mappedPosts = postpage.map(ProductPostResponse::fromEntity);
 
         return new PageDto<>(mappedPosts);
     }

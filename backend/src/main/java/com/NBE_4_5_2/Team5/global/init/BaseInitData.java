@@ -15,6 +15,7 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.core.annotation.Order;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Configuration
@@ -50,108 +51,35 @@ public class BaseInitData {
             return;
         }
 
-        List<Category> categories = categoryRepository.findAllById(List.of(1L, 2L, 3L, 4L, 5L, 6L, 7L, 8L, 9L, 10L));
+        // ✅ 카테고리 조회 (기본 10개 카테고리를 사용)
+        List<Category> categories = categoryRepository.findAll();
 
-        List<ProductPost> posts = List.of(
-                ProductPost.create(
-                        "아이폰 14 프로",
-                        1350000,
-                        "아이폰 14 프로 판매합니다.",
-                        "3개월 사용, 상태 최상",
-                        "https://example.com/image1.jpg,https://example.com/image2.jpg",
-                        37.5665f, 126.9780f
-                ),
-                ProductPost.create(
-                        "게이밍 노트북",
-                        2000000,
-                        "고사양 게이밍 노트북 팝니다.",
-                        "RTX 3070 탑재, 박스 포함",
-                        "https://example.com/laptop1.jpg,https://example.com/laptop2.jpg",
-                        37.1234f, 127.5678f
-                ),
-                ProductPost.create(
-                        "원목 책상",
-                        100000,
-                        "튼튼한 원목 책상 판매",
-                        "생활 기스 조금 있음, 직접 가져가야 함.",
-                        "https://example.com/desk1.jpg,https://example.com/desk2.jpg",
-                        36.9876f, 127.3456f
-                ),
-                ProductPost.create(
-                        "나이키 운동화",
-                        70000,
-                        "나이키 에어포스 1 판매",
-                        "사이즈 270, 거의 새 것",
-                        "https://example.com/shoes1.jpg,https://example.com/shoes2.jpg",
-                        37.0000f, 127.0000f
-                ),
-                ProductPost.create(
-                        "헬스 아령 세트",
-                        50000,
-                        "20kg 헬스 아령 세트 판매",
-                        "거의 사용 안 함",
-                        "https://example.com/dumbbell1.jpg,https://example.com/dumbbell2.jpg",
-                        36.8888f, 127.1111f
-                ),
-                ProductPost.create(
-                        "소설책 5권",
-                        25000,
-                        "추리 소설 5권 세트 판매",
-                        "읽던 책, 상태 양호",
-                        "https://example.com/book1.jpg,https://example.com/book2.jpg",
-                        37.2222f, 126.5555f
-                ),
-                ProductPost.create(
-                        "냄비 세트",
-                        40000,
-                        "스테인리스 냄비 3종 세트",
-                        "사용감 있지만 상태 좋음",
-                        "https://example.com/pot1.jpg,https://example.com/pot2.jpg",
-                        37.7777f, 127.3333f
-                ),
-                ProductPost.create(
-                        "중고 타이어 4개",
-                        150000,
-                        "자동차 타이어 4개 중고 판매",
-                        "트레드 80% 이상 남음",
-                        "https://example.com/tire1.jpg,https://example.com/tire2.jpg",
-                        36.6666f, 127.2222f
-                ),
-                ProductPost.create(
-                        "일렉 기타",
-                        300000,
-                        "펜더 일렉 기타 판매",
-                        "사용감 있지만 소리 좋음",
-                        "https://example.com/guitar1.jpg,https://example.com/guitar2.jpg",
-                        37.4444f, 126.9999f
-                ),
-                ProductPost.create(
-                        "고양이 사료 10kg",
-                        35000,
-                        "고양이 사료 대용량 판매",
-                        "유통기한 넉넉함",
-                        "https://example.com/catfood1.jpg,https://example.com/catfood2.jpg",
-                        36.5555f, 127.7777f
-                )
-        );
+        List<ProductPost> posts = new ArrayList<>();
+
+        for (int i = 1; i <= 50; i++) {
+            posts.add(ProductPost.create(
+                    "상품 " + i,
+                    (i * 10000) % 200000 + 10000, // 가격 랜덤화
+                    "제목 " + i,
+                    "이것은 테스트 상품 " + i + " 입니다.",
+                    "https://example.com/product" + i + "_1.jpg,https://example.com/product" + i + "_2.jpg",
+                    37.5f + (i % 10) * 0.01f, // 위치 랜덤화
+                    127.0f + (i % 10) * 0.01f
+            ));
+        }
 
         postRepository.saveAll(posts);
 
+        // ✅ `ProductCategory` 생성하여 게시글과 랜덤 카테고리 연결
+        List<ProductCategory> productCategories = new ArrayList<>();
 
-
-        // ✅ `ProductCategory` 생성하여 게시글과 카테고리 연결 (Builder 사용)
-        List<ProductCategory> productCategories = List.of(
-                ProductCategory.builder().productPost(posts.get(0)).category(categories.get(0)).build(), // 아이폰 → 전자제품
-                ProductCategory.builder().productPost(posts.get(1)).category(categories.get(0)).build(), // 게이밍 노트북 → 전자제품
-                ProductCategory.builder().productPost(posts.get(2)).category(categories.get(1)).build(), // 원목 책상 → 가구
-                ProductCategory.builder().productPost(posts.get(3)).category(categories.get(2)).build(), // 운동화 → 의류
-                ProductCategory.builder().productPost(posts.get(4)).category(categories.get(3)).build(), // 헬스 아령 → 스포츠 용품
-                ProductCategory.builder().productPost(posts.get(5)).category(categories.get(4)).build(), // 소설책 → 도서
-                ProductCategory.builder().productPost(posts.get(6)).category(categories.get(5)).build(), // 냄비 세트 → 생활용품
-                ProductCategory.builder().productPost(posts.get(7)).category(categories.get(6)).build(), // 중고 타이어 → 자동차 용품
-                ProductCategory.builder().productPost(posts.get(8)).category(categories.get(8)).build(), // 일렉 기타 → 악기
-                ProductCategory.builder().productPost(posts.get(9)).category(categories.get(9)).build()  // 고양이 사료 → 반려동물 용품
-        );
+        for (int i = 0; i < posts.size(); i++) {
+            Category randomCategory = categories.get(i % categories.size()); // ✅ 순환하면서 랜덤 카테고리 적용
+            productCategories.add(ProductCategory.builder()
+                    .productPost(posts.get(i))
+                    .category(randomCategory)
+                    .build());
+        }
 
         productCategoryRepository.saveAll(productCategories);
     }

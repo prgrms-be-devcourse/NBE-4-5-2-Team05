@@ -28,12 +28,10 @@ public class ProductPostController {
         // 작성자 체크 및 write에 넘겨주기 추가 필요
         ProductPost post = productPostService.write(body);
 
-        ProductPostResponse postDto = new ProductPostResponse(post);
-
         return new RsData<>(
                 "200",
                 "글 작성 성공",
-                postDto
+                ProductPostResponse.fromEntity(post)
         );
     }
 
@@ -42,7 +40,7 @@ public class ProductPostController {
     public RsData<PageDto<ProductPostResponse>> getPosts(@RequestParam(defaultValue = "1") int page,
                                                          @RequestParam(defaultValue = "10") int pageSize,
                                                          @RequestParam(defaultValue = "") String keyword,
-                                                         @RequestParam(defaultValue = "asc") String sort) {
+                                                         @RequestParam(defaultValue = "desc") String sort) {
         PageDto<ProductPostResponse> postPage = productPostService.getPosts(page, pageSize, keyword, sort);
 
         return new RsData<>(
@@ -60,7 +58,7 @@ public class ProductPostController {
         return new RsData<>(
                 "200",
                 "게시물 조회가 완료되었습니다.",
-                new ProductPostResponse(post)
+                ProductPostResponse.fromEntity(post)
         );
     }
 
@@ -81,7 +79,7 @@ public class ProductPostController {
         return new RsData<>(
                 "200",
                 "글 수정 완료.",
-                new ProductPostResponse(post)
+                ProductPostResponse.fromEntity(post)
         );
     }
 
