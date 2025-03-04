@@ -1,5 +1,5 @@
 package com.NBE_4_5_2.Team5.domain.user.controller;
-
+import com.NBE_4_5_2.Team5.global.dto.Empty;
 import com.NBE_4_5_2.Team5.domain.user.dto.*;
 import com.NBE_4_5_2.Team5.domain.user.entity.User;
 import com.NBE_4_5_2.Team5.domain.user.service.UserService;
@@ -8,6 +8,7 @@ import com.NBE_4_5_2.Team5.global.dto.RsData;
 import com.NBE_4_5_2.Team5.global.exception.ServiceException;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -99,6 +100,32 @@ public class UserController {
                 newAccessToken
         );
     }
+    //  내 정보 조회
+    @GetMapping("/me")
+    public ResponseEntity<RsData<UserDto>> getMyProfile() {
+        User userIdentity = rq.getUserIdentity(); // 현재 인증된 사용자 정보 가져오기
+        User user = rq.getRealActor(userIdentity); // 실제 사용자 정보 가져오기
+        return ResponseEntity.ok(new RsData<>("200", "내 정보 조회가 완료되었습니다.", new UserDto(user)));
+    }
+
+    //  내 정보 수정
+    @PutMapping("/me")
+    public ResponseEntity<RsData<UserDto>> updateMyProfile(@RequestBody UserUpdateRequest updateRequest) {
+        User userIdentity = rq.getUserIdentity();
+        User user = rq.getRealActor(userIdentity);
+        UserDto updatedUser = userService.updateMyProfile(user, updateRequest); // `userId` 대신 객체 전달
+        return ResponseEntity.ok(new RsData<>("200", "사용자 정보가 성공적으로 수정되었습니다.", updatedUser));
+    }
+
+    //  회원 탈퇴
+    @DeleteMapping("/me")
+    public ResponseEntity<RsData<?>> deleteMyProfile() {
+        User userIdentity = rq.getUserIdentity();
+        User user = rq.getRealActor(userIdentity);
+        userService.deleteMyProfile(user);
+        return ResponseEntity.ok(new RsData<>("200", "회원 탈퇴 성공", new Empty()));
+    }
+
 
 
 }
