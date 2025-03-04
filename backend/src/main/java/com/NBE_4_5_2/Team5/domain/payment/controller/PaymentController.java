@@ -1,6 +1,5 @@
 package com.NBE_4_5_2.Team5.domain.payment.controller;
 
-import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -27,7 +26,7 @@ public class PaymentController {
 	public RsData<PaymentMetaData> saveMetaData(@NotNull @RequestParam String id,
 		@NotNull @RequestParam Integer amount) {
 		PaymentMetaData metadata = paymentService.saveMetaData(id, amount);
-		return new RsData<>("결제 메타데이터 저장 성공.", HttpStatus.OK.toString(), metadata);
+		return new RsData<>("201-1", "결제 메타데이터 저장 성공.", metadata);
 	}
 
 
@@ -37,7 +36,7 @@ public class PaymentController {
 		@RequestParam(name = "amount") @NotNull Integer amount) {
 		paymentService.requestCharge(id, paymentKey, amount);
 
-		return new RsData<>("페이 충전 결제 요청 성공. ", HttpStatus.OK.toString(), null);
+		return new RsData<>("200-1", "페이 충전 결제 요청 성공.");
 	}
 
 
@@ -48,6 +47,6 @@ public class PaymentController {
 	public RsData<PaymentDto> purchaseItem(@RequestBody @NotNull PurchaseItemReqDto reqBody) {
 		PaymentDto purchased = paymentService.purchase(reqBody.productId());
 
-		return new RsData<>("상품 구매 성공.", HttpStatus.OK.toString(), purchased);
+		return new RsData<>("200-1", "상품 구매 성공.", purchased);
 	}
 }
