@@ -2,7 +2,10 @@ package com.NBE_4_5_2.Team5.domain.post.post.service;
 
 import com.NBE_4_5_2.Team5.domain.category.entity.Category;
 import com.NBE_4_5_2.Team5.domain.category.repository.CategoryRepository;
+import com.NBE_4_5_2.Team5.domain.post.post.dto.request.ProductPostModifyReqBody;
 import com.NBE_4_5_2.Team5.domain.post.post.dto.request.ProductPostWriteReqBody;
+import com.NBE_4_5_2.Team5.domain.post.post.dto.response.ProductPostResponse;
+import com.NBE_4_5_2.Team5.domain.post.post.entity.ProductCategory;
 import com.NBE_4_5_2.Team5.domain.post.post.entity.ProductPost;
 import com.NBE_4_5_2.Team5.domain.post.post.repository.ProductPostRepository;
 import com.NBE_4_5_2.Team5.global.dto.PageDto;
@@ -13,6 +16,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -53,14 +57,66 @@ public class ProductPostService {
     }
 
 
-    public PageDto<ProductPost> getPosts(int page, int pageSize, String keyword, String sort) {
+    public PageDto<ProductPostResponse> getPosts(int page, int pageSize, String keyword, String sort) {
         Pageable pageable = PageRequest.of(page - 1, pageSize,
                 Sort.by(sort.equalsIgnoreCase("desc") ? Sort.Direction.DESC : Sort.Direction.ASC, "id"));
         String likeKeyword = "%" + keyword + "%";
 
         // keyword가 제목에 들어간 게시물 목록
-        Page<ProductPost> mappedPosts = productPostRepository.findByTitleLike(likeKeyword, pageable);
+        Page<ProductPostResponse> mappedPosts = productPostRepository.findByTitleLike(likeKeyword, pageable).map(ProductPostResponse::new);
+
 
         return new PageDto<>(mappedPosts);
+    }
+
+    public ProductPost getPost(String id) {
+        return productPostRepository.findById(id).orElseThrow(
+                () -> new ServiceException("404", "해당 글은 존재하지 않습니다.")
+        );
+    }
+
+    public void delete(ProductPost post) {
+        productPostRepository.delete(post);
+    }
+
+    @Transactional
+    public void modify(ProductPost post, ProductPostModifyReqBody body) {
+        if (body.productName() != null) {
+            post.setProductName(body.productName());
+        }
+        if (body.productPrice() != null) {
+            post.setProductPrice(body.productPrice());
+        }
+        if (body.title() != null) {
+            post.setTitle(body.title());
+        }
+        if (body.content() != null) {
+            post.setContent(body.content());
+        }
+        if (body.imageUrlList() != null && !body.imageUrlList().isEmpty()) {
+            post.setImage_urls(String.join(",", body.imageUrlList()));
+        }
+        if (body.latitude() != null) {
+            post.setLatitude(body.latitude());
+        }
+        if (body.longitude() != null) {
+            post.setLongitude(body.longitude());
+        }
+
+        if (body.categoryIds() != null) {
+            List<Category> categories = categoryRepository.findAllById(body.categoryIds());
+            post.getProductCategories().clear(); // 기존 카테고리 삭제
+
+            List<ProductCategory> newProductCategories = categories.stream()
+                    .map(category -> ProductCategory.builder()
+                            .productPost(post)
+                            .category(category)
+                            .build())
+                    .toList();
+
+            post.getProductCategories().addAll(newProductCategories);
+        }
+
+
     }
 }

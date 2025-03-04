@@ -19,6 +19,7 @@ import java.util.stream.Collectors;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 @Builder
+@Setter
 @EntityListeners(AuditingEntityListener.class)
 public class ProductPost {
 

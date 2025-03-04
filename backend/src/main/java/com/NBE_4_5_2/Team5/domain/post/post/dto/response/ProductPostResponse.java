@@ -9,7 +9,7 @@ import java.util.stream.Collectors;
 
 @Getter
 @AllArgsConstructor
-public class ProductPostWithCategories {
+public class ProductPostResponse {
     private String id;
     private String productName;
     private Integer productPrice;
@@ -20,8 +20,8 @@ public class ProductPostWithCategories {
     private Float longitude;
     private List<String> categories;
 
-    public static ProductPostWithCategories fromEntity(ProductPost post) {
-        return new ProductPostWithCategories(
+    public ProductPostResponse(ProductPost post) {
+        this(
                 post.getId(),
                 post.getProductName(),
                 post.getProductPrice(),
