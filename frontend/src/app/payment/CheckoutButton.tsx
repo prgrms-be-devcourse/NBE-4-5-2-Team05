@@ -57,7 +57,10 @@ export default function CheckoutButton({
   // @docs https://docs.tosspayments.com/sdk/v2/js#paymentrequestpayment
   async function requestPayment() {
     const result = await fetch(
-      `http://localhost:8080/api/payments/metadata?id=${orderId}&amount=${amount.value}`
+      `http://localhost:8080/api/payments/metadata?id=${orderId}&amount=${amount.value}`,
+      {
+        credentials: "include",
+      }
     );
     console.log("amount:", amount);
     // 결제를 요청하기 전에 orderId, amount를 서버에 저장하세요.
