@@ -430,7 +430,7 @@ class UserControllerTest {
         resultActions
                 .andExpect(status().isOk())
                 .andExpect(handler().handlerType(UserController.class))
-                .andExpect(handler().methodName("me"))
+                .andExpect(handler().methodName("getMyProfile"))
                 .andExpect(jsonPath("$.code").value("200-1"))
                 .andExpect(jsonPath("$.message").value("내 정보 조회가 완료되었습니다."));
 
@@ -465,7 +465,7 @@ class UserControllerTest {
         resultActions
                 .andExpect(status().isOk())
                 .andExpect(handler().handlerType(UserController.class))
-                .andExpect(handler().methodName("me"))
+                .andExpect(handler().methodName("getMyProfile"))
                 .andExpect(jsonPath("$.code").value("200-1"))
                 .andExpect(jsonPath("$.message").value("내 정보 조회가 완료되었습니다."));
 
