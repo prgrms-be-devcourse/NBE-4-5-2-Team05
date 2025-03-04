@@ -55,9 +55,12 @@ public class UserController {
     public RsData<Void> logout() {
 
         User userIdentity = rq.getUserIdentity();
-        User user = rq.getRealActor(userIdentity);
+        userService.getRealActor(userIdentity);
 
-        userService.logout(user);
+        // 사용자 인증 정보 제거
+        rq.setLogout();
+
+        // 쿠키 인증 정보 제거
         rq.removeCookie("accessToken");
         rq.removeCookie("refreshToken");
 

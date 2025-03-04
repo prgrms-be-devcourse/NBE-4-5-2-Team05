@@ -36,6 +36,10 @@ public class Rq {
 
     }
 
+    public void setLogout() {
+        SecurityContextHolder.clearContext();
+    }
+
     public User getUserIdentity() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
@@ -101,6 +105,8 @@ public class Rq {
         cookie.setSecure(true);
         cookie.setAttribute("SameSite", "Strict");
         cookie.setMaxAge(0);
+
+        System.out.println("Removing cookie: " + name + ", MaxAge: " + cookie.getMaxAge());
 
         response.addCookie(cookie);
     }
