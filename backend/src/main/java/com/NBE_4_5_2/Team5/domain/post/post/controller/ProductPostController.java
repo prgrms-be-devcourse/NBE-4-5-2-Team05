@@ -3,7 +3,6 @@ package com.NBE_4_5_2.Team5.domain.post.post.controller;
 import com.NBE_4_5_2.Team5.domain.post.post.dto.request.ProductPostModifyForm;
 import com.NBE_4_5_2.Team5.domain.post.post.dto.request.ProductPostWriteForm;
 import com.NBE_4_5_2.Team5.domain.post.post.dto.response.ProductPostResponse;
-import com.NBE_4_5_2.Team5.domain.post.post.entity.ProductPost;
 import com.NBE_4_5_2.Team5.domain.post.post.service.ProductPostService;
 import com.NBE_4_5_2.Team5.domain.user.entity.User;
 import com.NBE_4_5_2.Team5.global.Rq;
@@ -29,13 +28,12 @@ public class ProductPostController {
     public RsData<ProductPostResponse> createPost(@Valid @RequestBody ProductPostWriteForm body) {
 
         User actor = rq.getUserIdentity();
-
-        ProductPost post = productPostService.write(actor, body);
+        ProductPostResponse postResponse = productPostService.write(actor, body);
 
         return new RsData<>(
                 "200",
                 "글 작성 성공",
-                ProductPostResponse.fromEntity(post)
+                postResponse
         );
     }
 
@@ -60,7 +58,6 @@ public class ProductPostController {
                                                            @RequestParam(defaultValue = "10") int pageSize,
                                                            @RequestParam(defaultValue = "desc") String sort) {
         User actor = rq.getUserIdentity();
-
         PageDto<ProductPostResponse> postPage = productPostService.getMyPosts(actor, page, pageSize, sort);
 
         return new RsData<>(
@@ -73,12 +70,12 @@ public class ProductPostController {
     @GetMapping("/{id}")
     @Transactional(readOnly = true)
     public RsData<ProductPostResponse> getPost(@PathVariable String id, Reader reader) {
-        ProductPost post = productPostService.getPost(id);
+        ProductPostResponse postResponse = productPostService.getPost(id);
 
         return new RsData<>(
                 "200",
                 "게시물 조회가 완료되었습니다.",
-                ProductPostResponse.fromEntity(post)
+                postResponse
         );
     }
 
@@ -87,30 +84,23 @@ public class ProductPostController {
     public RsData<ProductPostResponse> modify(
             @Valid @RequestBody ProductPostModifyForm body,
             @PathVariable String id) {
-        ProductPost post = productPostService.getPost(id);
 
         User actor = rq.getUserIdentity();
-        if (post.canModify(actor)) {
-            productPostService.modify(post, body);
-
-        }
+        ProductPostResponse postResponse = productPostService.modify(actor, id, body);
 
         return new RsData<>(
                 "200",
                 "글 수정 완료.",
-                ProductPostResponse.fromEntity(post)
+                postResponse
         );
     }
 
     @DeleteMapping("/{id}")
     @Transactional
     public RsData<Empty> delete(@PathVariable String id) {
-        User actor = rq.getUserIdentity();
-        ProductPost post = productPostService.getPost(id);
 
-        if (post.canDelete(actor)) {
-            productPostService.delete(post);
-        }
+        User actor = rq.getUserIdentity();
+        productPostService.delete(actor, id);
 
         return new RsData<>(
                 "200",

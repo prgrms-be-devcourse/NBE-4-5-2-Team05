@@ -28,7 +28,7 @@ public class ProductPostService {
     //    private final MemberRepository memberRepository;
     private final CategoryRepository categoryRepository;
 
-    public ProductPost write(User actor, ProductPostWriteForm body) {
+    public ProductPostResponse write(User actor, ProductPostWriteForm body) {
         String imageUrlStr = String.join(",", body.imageUrlList());
 
         // 글 작성
@@ -54,7 +54,7 @@ public class ProductPostService {
 
         productPostRepository.save(productPost);
 
-        return productPost;
+        return ProductPostResponse.fromEntity(productPost);
     }
 
 
@@ -89,18 +89,36 @@ public class ProductPostService {
         return new PageDto<>(mappedMyPosts);
     }
 
-    public ProductPost getPost(String id) {
-        return productPostRepository.findById(id).orElseThrow(
+    public ProductPostResponse getPost(String id) {
+        ProductPost post = productPostRepository.findById(id).orElseThrow(
                 () -> new ServiceException("404", "해당 글은 존재하지 않습니다.")
         );
+
+        return ProductPostResponse.fromEntity(post);
     }
 
-    public void delete(ProductPost post) {
+    public void delete(User actor, String postId) {
+        ProductPost post = productPostRepository.findById(postId).orElseThrow(
+                () -> new ServiceException("404", "해당 글은 존재하지 않습니다.")
+        );
+
+        if (!post.canDelete(actor)) {
+            throw new ServiceException("401", "삭제 권한이 없습니다.");
+        }
+
         productPostRepository.delete(post);
     }
 
     @Transactional
-    public void modify(ProductPost post, ProductPostModifyForm body) {
+    public ProductPostResponse modify(User actor, String postId, ProductPostModifyForm body) {
+        ProductPost post = productPostRepository.findById(postId).orElseThrow(
+                () -> new ServiceException("404", "해당 글은 존재하지 않습니다.")
+        );
+
+        if (!post.canModify(actor)) {
+            throw new ServiceException("401", "수정 권한이 없습니다.");
+        }
+
         if (body.productName() != null) {
             post.setProductName(body.productName());
         }
@@ -137,7 +155,7 @@ public class ProductPostService {
             post.getProductCategories().addAll(newProductCategories);
         }
 
-
+        return ProductPostResponse.fromEntity(post);
     }
 
 
