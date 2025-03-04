@@ -1,25 +1,48 @@
 package com.NBE_4_5_2.Team5.domain.chat.controller;
 
 import com.NBE_4_5_2.Team5.domain.chat.entity.ChatMessage;
-import com.NBE_4_5_2.Team5.domain.chat.entity.ChatRoom;
+import com.NBE_4_5_2.Team5.domain.chat.repository.ChatRoomRepository;
+import com.NBE_4_5_2.Team5.domain.chat.service.ChatService;
+import com.NBE_4_5_2.Team5.domain.user.service.AuthTokenService;
+import com.NBE_4_5_2.Team5.domain.user.service.UserService;
+import com.NBE_4_5_2.Team5.global.standard.util.Ut;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.messaging.handler.annotation.MessageMapping;
-import org.springframework.messaging.simp.SimpMessageSendingOperations;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
+@Slf4j
 @RequiredArgsConstructor
 @Controller
 public class ChatController {
 
-    private final SimpMessageSendingOperations messagingTemplate;
+    private final ChatRoomRepository chatRoomRepository;
+    private final ChatService chatService;
+    private final AuthTokenService authTokenService;
 
-    @MessageMapping("/chat/message")
-    public void message(ChatMessage message) {
-        if (ChatMessage.MessageType.ENTER.equals(message.getType()))
-            message.setMessage(message.getSender() + "님이 입장하셨습니다.");
-        messagingTemplate.convertAndSend("/sub/chat/room/" + message.getRoomId(), message);
+    /**
+     * websocket "/pub/chat/message"로 들어오는 메시징을 처리한다.
+     */
+    @MessageMapping("/api/chat/message")
+    public void message(ChatMessage message, HttpServletRequest request) {
+        String token = authTokenService.getAccessTokenFromCookies(request.getCookies()); // 쿠키에서 액세스 토큰 가져오기
+        System.out.println("token: " + token);
+        String nickname = authTokenService.getUsernameFromToken(token); // 사용자 이름 가져오기
+        System.out.println("name: " + nickname);
+
+        // 로그인 회원 정보로 대화명 설정
+        message.setSender(nickname);
+        System.out.println("이름이름이름이름이름이름이름이름이름이름이름이름이름이름이름이름이름이름이름이름: "+nickname);
+        // 채팅방 인원수 세팅
+        message.setUserCount(chatRoomRepository.getUserCount(message.getRoomId()));
+        // Websocket에 발행된 메시지를 redis로 발행(publish)
+        chatService.sendChatMessage(message);
     }
+
 }

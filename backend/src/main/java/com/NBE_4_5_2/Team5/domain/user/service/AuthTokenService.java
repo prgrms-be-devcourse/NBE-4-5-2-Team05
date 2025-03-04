@@ -9,6 +9,7 @@ import com.NBE_4_5_2.Team5.domain.user.entity.Role;
 import com.NBE_4_5_2.Team5.domain.user.entity.User;
 import com.NBE_4_5_2.Team5.global.standard.util.Ut;
 
+import jakarta.servlet.http.Cookie;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -53,5 +54,22 @@ public class AuthTokenService {
                 "username", username,
                 "role", role
         );
+    }
+
+    public String getUsernameFromToken(String accesstoken) {
+        Map<String,Object> payload = getPayload(accesstoken);
+        if(payload != null) {
+            return (String) payload.get("username");
+        }
+        return null;
+    }
+
+    public String getAccessTokenFromCookies(Cookie[] cookies) {
+        for (Cookie cookie : cookies) {
+            if ("accessToken".equals(cookie.getName())) {
+                return cookie.getValue();
+            }
+        }
+        return null;
     }
 }
