@@ -1,5 +1,6 @@
 package com.NBE_4_5_2.Team5.domain.post.post.entity;
 
+import com.NBE_4_5_2.Team5.domain.category.entity.Category;
 import com.NBE_4_5_2.Team5.domain.post.post.enums.ProductStatus;
 import jakarta.persistence.*;
 import lombok.*;
@@ -8,7 +9,10 @@ import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Entity
 @AllArgsConstructor
@@ -59,6 +63,10 @@ public class ProductPost {
     @LastModifiedDate
     private LocalDateTime modifiedAt;
 
+    @OneToMany(mappedBy = "productPost", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<ProductCategory> productCategories = new ArrayList<>();
+
 //    @ManyToOne(fetch = FetchType.LAZY)
 //    private Member member;
 
@@ -81,6 +89,17 @@ public class ProductPost {
                 .latitude(latitude)
                 .longitude(longitude)
                 .build();
+    }
+
+    public void addCategories(List<Category> categories) {
+        List<ProductCategory> productCategories = categories.stream()
+                .map(category -> ProductCategory.builder()
+                        .productPost(this)
+                        .category(category)
+                        .build())
+                .collect(Collectors.toList());
+
+        this.productCategories.addAll(productCategories);
     }
 
 }

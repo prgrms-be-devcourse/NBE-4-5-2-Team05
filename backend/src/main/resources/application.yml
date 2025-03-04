@@ -11,8 +11,6 @@ spring:
     ansi:
       enabled: always
 
-  profiles:
-    active: dev
 
   datasource:
     url: jdbc:h2:./db_dev;MODE=MySQL
@@ -40,13 +38,6 @@ logging:
     org.hibernate.orm.jdbc.bind: TRACE
     org.hibernate.orm.jdbc.extract: TRACE
     org.springframework.transaction.interceptor: TRACE
-
-
-
-custom:
-  jwt:
-    secret-key: abcdefghijklmnopqrstuvwxyz1234567890abcdefghijklmnopqrstuvwxyz1234567890
-    expire-seconds: "#{5}"
 
 
 springdoc:
