@@ -38,4 +38,6 @@ public interface ProductPostRepository extends JpaRepository<ProductPost, String
 
     @EntityGraph(attributePaths = {"productCategories.category"})
     List<ProductPost> findByBuyer(User buyer);
+
+    List<ProductPost> findByIdIn(List<String> postIds);
 }
