@@ -35,4 +35,7 @@ public interface ProductPostRepository extends JpaRepository<ProductPost, String
     //구매된(판매 완료) 상품들 조회
     @EntityGraph(attributePaths = {"productCategories.category"})
     List<ProductPost> findAllByStatus(ProductStatus status);
+
+    @EntityGraph(attributePaths = {"productCategories.category"})
+    List<ProductPost> findByBuyer(User buyer);
 }
