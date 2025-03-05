@@ -2,6 +2,7 @@ package com.NBE_4_5_2.Team5.domain.post.comment.controller;
 
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -35,5 +36,21 @@ public class PostCommentController {
 		return new RsData<>("200-1", "댓글 작성 성공.",
 			new WriteCommentResBody(commentDto.getContent(), commentDto.getAuthor()));
 
+	}
+
+	public record UpdateCommentResBody(String content, UserDto author) {
+	}
+
+	public record UpdateCommentReqBody(String content) {
+	}
+
+	@PutMapping("/{post-id}/comments")
+	public RsData<UpdateCommentResBody> updateComment(@PathVariable(name = "post-id") String postId,
+		@RequestBody UpdateCommentReqBody body) {
+
+		CommentDto commentDto = commentService.updateComment(postId, body.content);
+
+		return new RsData<>("200-1", "comment 수정 성공.",
+			new UpdateCommentResBody(commentDto.getContent(), commentDto.getAuthor()));
 	}
 }

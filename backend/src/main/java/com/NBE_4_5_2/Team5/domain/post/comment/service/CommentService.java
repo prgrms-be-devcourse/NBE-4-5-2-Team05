@@ -12,6 +12,7 @@ import com.NBE_4_5_2.Team5.domain.user.entity.User;
 import com.NBE_4_5_2.Team5.domain.user.service.UserService;
 import com.NBE_4_5_2.Team5.global.exception.ServiceException;
 
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -37,5 +38,19 @@ public class CommentService {
 
 	private User getUser() {
 		return userService.getUserIdentity();
+	}
+
+	@Transactional
+	public CommentDto updateComment(String postId, String content) {
+		User loggedInUser = getUser();
+
+		Comment comment = commentRepository.findById(postId)
+			.orElseThrow(() -> new EntityNotFoundException("id가 %s인 comment를 찾을 수 없습니다.".formatted(postId)));
+
+		comment.isMine(loggedInUser);
+
+		comment.update(content);
+
+		return CommentDto.of(comment);
 	}
 }
