@@ -27,7 +27,6 @@ public interface ProductPostRepository extends JpaRepository<ProductPost, String
     @EntityGraph(attributePaths = {"productCategories.category"})
     Page<ProductPost> findByWriter(User writer, Pageable pageable);
 
-    List<ProductPost> findByIdIn(List<String> postIds);
     // 페이징 없이 전체 조회
     @EntityGraph(attributePaths = {"productCategories.category"})
     List<ProductPost> findByWriter(User writer);
