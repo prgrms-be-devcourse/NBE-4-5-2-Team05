@@ -42,4 +42,4 @@ db.mv.db
 db.trace.db
 /*.mv.db
 /*.trace.db
-/src/test/resources/application-secret.yml
+/src/test/resources/application*.yml
