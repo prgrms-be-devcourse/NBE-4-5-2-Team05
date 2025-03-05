@@ -21,7 +21,7 @@ public class PostCommentController {
 
 	private final CommentService commentService;
 
-	public record WriteCommentResBody(String content, UserDto author) {
+	public record WriteCommentResBody(String id, String content, UserDto author) {
 	}
 
 	public record WriteCommentReqBody(String content) {
@@ -34,7 +34,7 @@ public class PostCommentController {
 		CommentDto commentDto = commentService.writeComment(postId, body.content());
 
 		return new RsData<>("200-1", "댓글 작성 성공.",
-			new WriteCommentResBody(commentDto.getContent(), commentDto.getAuthor()));
+			new WriteCommentResBody(commentDto.getId(), commentDto.getContent(), commentDto.getAuthor()));
 
 	}
 
