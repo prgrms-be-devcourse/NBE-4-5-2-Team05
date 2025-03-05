@@ -37,10 +37,6 @@ public class Rq {
 
     }
 
-    public void setLogout() {
-        SecurityContextHolder.clearContext();
-    }
-
     public User getUserIdentity() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 

@@ -760,4 +760,5 @@ class UserControllerTest {
                 .andExpect(jsonPath("$.message").value("유효하지 않은 RefreshToken입니다."));
     }
 
+
 }
