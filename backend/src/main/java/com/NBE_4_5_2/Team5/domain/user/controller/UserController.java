@@ -89,30 +89,32 @@ public class UserController {
     }
     //  내 정보 조회
     @GetMapping("/me")
-    public ResponseEntity<RsData<UserDto>> getMyProfile() {
+    public RsData<UserDto> getMyProfile() {
         User userIdentity = rq.getUserIdentity();
         User user = rq.getRealActor(userIdentity);
-        return ResponseEntity.ok(new RsData<>("200-1", "내 정보 조회가 완료되었습니다.", userService.getMyProfile(user))); // ✅ Service 활용
+        return new RsData<>("200-1", "내 정보 조회가 완료되었습니다.", UserDto.fromEntity(user)); // ✅ 컨트롤러에서 DTO 변환
     }
+
 
 
     //  내 정보 수정
     @PutMapping("/me")
-    public ResponseEntity<RsData<UserDto>> updateMyProfile(@RequestBody @Valid UserUpdateRequest updateRequest) {
+    public RsData<UserDto> updateMyProfile(@RequestBody @Valid UserUpdateRequest updateRequest) {
         User userIdentity = rq.getUserIdentity();
         User user = rq.getRealActor(userIdentity);
         UserDto updatedUser = userService.updateMyProfile(user, updateRequest); // `userId` 대신 객체 전달
-        return ResponseEntity.ok(new RsData<>("200", "사용자 정보가 성공적으로 수정되었습니다.", updatedUser));
+        return new RsData<>("200", "사용자 정보가 성공적으로 수정되었습니다.", updatedUser);
     }
 
-    //  회원 탈퇴
+    // 회원 탈퇴
     @DeleteMapping("/me")
-    public ResponseEntity<RsData<?>> deleteMyProfile() {
+    public RsData<?> deleteMyProfile() {
         User userIdentity = rq.getUserIdentity();
         User user = rq.getRealActor(userIdentity);
         userService.deleteMyProfile(user);
-        return ResponseEntity.ok(new RsData<>("200", "회원 탈퇴 성공", new Empty()));
+        return new RsData<>("200", "회원 탈퇴 성공", new Empty());
     }
+
 
 
 
