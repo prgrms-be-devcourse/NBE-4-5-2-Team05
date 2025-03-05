@@ -8,7 +8,6 @@ import org.springframework.boot.ApplicationRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Lazy;
-import org.springframework.context.annotation.Profile;
 import org.springframework.core.annotation.Order;
 
 import com.NBE_4_5_2.Team5.domain.post.category.entity.Category;
@@ -26,7 +25,6 @@ import lombok.RequiredArgsConstructor;
 
 @Configuration
 @RequiredArgsConstructor
-@Profile("!test")
 public class BaseInitData {
 	private final CategoryRepository categoryRepository;
 	private final ProductPostRepository postRepository;

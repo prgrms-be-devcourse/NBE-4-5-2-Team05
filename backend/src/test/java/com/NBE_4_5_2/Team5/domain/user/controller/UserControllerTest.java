@@ -1,9 +1,13 @@
 package com.NBE_4_5_2.Team5.domain.user.controller;
 
-import com.NBE_4_5_2.Team5.domain.user.entity.User;
-import com.NBE_4_5_2.Team5.domain.user.service.UserService;
-import jakarta.servlet.http.Cookie;
-import jakarta.transaction.Transactional;
+import static org.assertj.core.api.Assertions.*;
+import static org.hamcrest.Matchers.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+
+import java.nio.charset.StandardCharsets;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -15,14 +19,11 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
-import java.nio.charset.StandardCharsets;
+import com.NBE_4_5_2.Team5.domain.user.entity.User;
+import com.NBE_4_5_2.Team5.domain.user.service.UserService;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.hamcrest.Matchers.matchesPattern;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import jakarta.servlet.http.Cookie;
+import jakarta.transaction.Transactional;
 
 
 @SpringBootTest
@@ -55,7 +56,7 @@ class UserControllerTest {
                 .andExpect(jsonPath("$.data.nickname").value(user.getNickname()))
                 .andExpect(jsonPath("$.data.address").value(user.getAddress()))
                 .andExpect(jsonPath("$.data.profileUrl").value(user.getProfileUrl()))
-                .andExpect(jsonPath("$.data.role").value(user.getRole()))
+            .andExpect(jsonPath("$.data.role").value(user.getRole().toString()))
                 .andExpect(jsonPath("$.data.createdAt").value(matchesPattern(user.getCreatedAt().toString().replaceAll("0+$", "") + ".*")))
                 .andExpect(jsonPath("$.data.modifiedAt").value(matchesPattern(user.getModifiedAt().toString().replaceAll("0+$", "") + ".*")));
     }
@@ -277,7 +278,7 @@ class UserControllerTest {
                 .andExpect(jsonPath("$.data.item.nickname").value(user.getNickname()))
                 .andExpect(jsonPath("$.data.item.address").value(user.getAddress()))
                 .andExpect(jsonPath("$.data.item.profileUrl").value(user.getProfileUrl()))
-                .andExpect(jsonPath("$.data.item.role").value(user.getRole()))
+            .andExpect(jsonPath("$.data.item.role").value(user.getRole().toString()))
                 .andExpect(jsonPath("$.data.item.createdAt").value(matchesPattern(user.getCreatedAt().toString().replaceAll("0+$", "") + ".*")))
                 .andExpect(jsonPath("$.data.item.modifiedAt").value(matchesPattern(user.getModifiedAt().toString().replaceAll("0+$", "") + ".*")));
 
