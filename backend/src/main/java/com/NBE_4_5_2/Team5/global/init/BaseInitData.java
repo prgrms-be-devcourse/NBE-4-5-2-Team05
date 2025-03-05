@@ -1,12 +1,23 @@
 package com.NBE_4_5_2.Team5.global.init;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Lazy;
+import org.springframework.core.annotation.Order;
 
-import com.NBE_4_5_2.Team5.domain.product.dto.ProductStatus;
-import com.NBE_4_5_2.Team5.domain.product.entity.Product;
-import com.NBE_4_5_2.Team5.domain.product.repository.ProductRepository;
+import com.NBE_4_5_2.Team5.domain.category.entity.Category;
+import com.NBE_4_5_2.Team5.domain.category.repository.CategoryRepository;
+import com.NBE_4_5_2.Team5.domain.post.post.entity.ProductCategory;
+import com.NBE_4_5_2.Team5.domain.post.post.entity.ProductPost;
+import com.NBE_4_5_2.Team5.domain.post.post.repository.ProductCategoryRepository;
+import com.NBE_4_5_2.Team5.domain.post.post.repository.ProductPostRepository;
+import com.NBE_4_5_2.Team5.domain.user.entity.User;
+import com.NBE_4_5_2.Team5.domain.user.repository.UserRepository;
 import com.NBE_4_5_2.Team5.domain.user.service.UserService;
 
 import jakarta.transaction.Transactional;
@@ -15,14 +26,37 @@ import lombok.RequiredArgsConstructor;
 @Configuration
 @RequiredArgsConstructor
 public class BaseInitData {
+	private final CategoryRepository categoryRepository;
+	private final ProductPostRepository postRepository;
+	private final ProductCategoryRepository productCategoryRepository;
 	private final UserService userService;
-	private final ProductRepository productRepository;
+	private final UserRepository userRepository;
+
+	@Autowired
+	@Lazy
+	private BaseInitData self;
 
 	@Bean
-	public ApplicationRunner applicationRunner() {
+	@Order(1)
+	public ApplicationRunner applicationRunner1() {
 		return args -> {
-			userInit();
-			productInit();
+			self.userInit();
+		};
+	}
+
+	@Bean
+	@Order(2)
+	public ApplicationRunner applicationRunner2() {
+		return args -> {
+			self.categoryInit();
+		};
+	}
+
+	@Bean
+	@Order(3)
+	public ApplicationRunner applicationRunner3() {
+		return args -> {
+			self.postInit();
 		};
 	}
 
@@ -42,12 +76,73 @@ public class BaseInitData {
 
 	}
 
-	@org.springframework.transaction.annotation.Transactional
-	public void productInit() {
-		if (productRepository.count() > 0) {
+	@Transactional
+	public void categoryInit() {
+		if (categoryRepository.count() > 0) {
+			return; // 이미 카테고리가 존재하면 초기화하지 않음
+		}
+
+		List<Category> categories = List.of(
+			new Category(null, "전자제품"),
+			new Category(null, "가구"),
+			new Category(null, "의류"),
+			new Category(null, "스포츠 용품"),
+			new Category(null, "도서"),
+			new Category(null, "생활용품"),
+			new Category(null, "자동차 용품"),
+			new Category(null, "식품"),
+			new Category(null, "악기"),
+			new Category(null, "반려동물 용품"),
+			new Category(null, "뷰티/미용"),
+			new Category(null, "티켓/쿠폰"),
+			new Category(null, "수집/예술"),
+			new Category(null, "게임"),
+			new Category(null, "기타")
+		);
+
+		categoryRepository.saveAll(categories);
+	}
+
+	@Transactional
+	public void postInit() {
+		if (postRepository.count() > 0) {
 			return;
 		}
 
-		productRepository.save(new Product(ProductStatus.AVAILABLE, 5000));
+		List<User> users = userRepository.findAll();
+		System.out.println(users.size());
+		List<Category> categories = categoryRepository.findAll();
+
+		List<ProductPost> posts = new ArrayList<>();
+
+		// 0,1,2
+		for (int i = 1; i <= 50; i++) {
+			User writer = users.get((i - 1) % users.size());
+			posts.add(ProductPost.create(
+				writer,
+				"상품 " + i,
+				(i * 10000) % 200000 + 10000, // 가격 랜덤화
+				"제목 " + i,
+				"이것은 테스트 상품 " + i + " 입니다.",
+				"https://example.com/product" + i + "_1.jpg,https://example.com/product" + i + "_2.jpg",
+				37.5f + (i % 10) * 0.01f, // 위치 랜덤화
+				127.0f + (i % 10) * 0.01f
+			));
+		}
+
+		postRepository.saveAll(posts);
+
+		// ✅ `ProductCategory` 생성하여 게시글과 랜덤 카테고리 연결
+		List<ProductCategory> productCategories = new ArrayList<>();
+
+		for (int i = 0; i < posts.size(); i++) {
+			Category randomCategory = categories.get(i % categories.size()); // ✅ 순환하면서 랜덤 카테고리 적용
+			productCategories.add(ProductCategory.builder()
+				.productPost(posts.get(i))
+				.category(randomCategory)
+				.build());
+		}
+
+		productCategoryRepository.saveAll(productCategories);
 	}
 }
