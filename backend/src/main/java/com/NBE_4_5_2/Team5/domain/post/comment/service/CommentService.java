@@ -1,8 +1,8 @@
 package com.NBE_4_5_2.Team5.domain.post.comment.service;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import com.NBE_4_5_2.Team5.domain.post.comment.controller.PostCommentController;
 import com.NBE_4_5_2.Team5.domain.post.comment.dto.CommentDto;
 import com.NBE_4_5_2.Team5.domain.post.comment.entity.Comment;
 import com.NBE_4_5_2.Team5.domain.post.comment.repository.CommentRepository;
@@ -22,13 +22,14 @@ public class CommentService {
 	private final ProductPostRepository productPostRepository;
 	private final CommentRepository commentRepository;
 
-	public CommentDto writeComment(String postId, PostCommentController.WriteCommentReqBody body) {
+	@Transactional
+	public CommentDto writeComment(String postId, String content) {
 		User loggedInUser = getUser();
 
 		ProductPost productPost = productPostRepository.findById(postId)
 			.orElseThrow(() -> new ServiceException("400-1", "id가 %s인 product post는 없습니다.".formatted(postId)));
 
-		Comment comment = new Comment(body.comment(), productPost, loggedInUser);
+		Comment comment = new Comment(content, productPost, loggedInUser);
 
 		Comment saved = commentRepository.save(comment);
 		return CommentDto.of(saved);
