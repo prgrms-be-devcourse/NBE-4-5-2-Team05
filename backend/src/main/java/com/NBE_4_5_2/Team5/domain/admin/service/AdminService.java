@@ -31,6 +31,16 @@ public class AdminService {
 	private final BanListRepository banListRepository;
 	private final UserRepository userRepository;
 	private final NoticePostRepository noticePostRepository;
+	private final UserService userService;
+	private final PasswordEncoder passwordEncoder;
+
+	public User signUpAdmin(String username, String password, String email) {
+		User admin = new User(username, passwordEncoder.encode(password), email, "admin", "addr", "profile",
+			Role.ADMIN);
+		admin.setRefreshToken(UUID.randomUUID().toString());
+
+		return userRepository.save(admin);
+	}
 
 	public NoticeResBody writeNotice(@NotEmpty String title, @NotEmpty String content) {
 		User admin = getUser();
