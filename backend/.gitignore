@@ -43,3 +43,6 @@ gradle
 /db.trace.db
 /db_dev.mv.db
 /db_dev.trace.db
+/src/test/resources/application-secret.yml
+/db_test.mv.db
+/db_test.trace.db
