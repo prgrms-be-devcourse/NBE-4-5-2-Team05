@@ -35,8 +35,8 @@
         </div>
     </div>
     <ul class="list-group">
-        <li class="list-group-item" v-for="message in messages">
-            {{message.sender}} - {{message.message}}</a>
+        <li class="list-group-item" v-for="(message, index) in messages" :key="index">
+            {{ message.sender }} - {{ message.message }}  <!-- 발신자와 메시지를 표시 -->
         </li>
     </ul>
 </div>
@@ -56,7 +56,7 @@
             roomId: '',
             roomName: '',
             message: '',
-            messages: [],
+            messages: [], // 채팅 메시지를 담는 배열
             token: '',
             userCount: 0
         },
@@ -64,27 +64,53 @@
             this.roomId = localStorage.getItem('wschat.roomId');
             this.roomName = localStorage.getItem('wschat.roomName');
             var _this = this;
+
             axios.get('/api/chat/user').then(response => {
-                _this.token = response.data.token;
-                ws.connect({"token":_this.token}, function(frame) {
-                    ws.subscribe("/sub/chat/room/"+_this.roomId, function(message) {
+                _this.token = response.data.data.token; // 토큰 할당
+                console.log('Received token:', _this.token);
+
+                // WebSocket 연결 설정
+                ws.connect({"token": _this.token}, function(frame) {
+                    ws.subscribe("/sub/chat/room/" + _this.roomId, function(message) {
                         var recv = JSON.parse(message.body);
-                        _this.recvMessage(recv);
+                        _this.recvMessage(recv); // 메시지 수신 처리
                     });
                 }, function(error) {
                     alert("서버 연결에 실패 하였습니다. 다시 접속해 주십시요.");
-                    location.href="/api/chat/room";
+                    location.href = "/api/chat/room";
                 });
             });
         },
         methods: {
             sendMessage: function(type) {
-                ws.send("/pub/chat/message", {"token":this.token}, JSON.stringify({type:type, roomId:this.roomId, message:this.message}));
-                this.message = '';
+                if (this.message.trim() === "") {
+                    console.error("Empty message not sent!"); // 빈 메시지 전송 방지
+                    return;
+                }
+
+                const payload = {
+                    type: type,
+                    roomId: this.roomId,
+                    message: this.message,
+                    sender: localStorage.getItem('username') // 사용자 이름을 로컬 스토리지에서 가져옴
+                };
+
+                console.log("Sending message:", payload); // 전송할 메시지 로그
+                ws.send("/pub/chat/message", { "token": this.token }, JSON.stringify(payload));
+                this.message = ''; // 전송 후 입력칸 비우기
             },
             recvMessage: function(recv) {
-                this.userCount = recv.userCount;
-                this.messages.unshift({"type":recv.type,"sender":recv.sender,"message":recv.message})
+                console.log('Received message:', recv); // 수신된 메시지 로그
+                this.userCount = recv.userCount; // 사용자 수 업데이트
+
+                // 수신된 메시지를 messages 배열에 추가
+                this.messages.unshift({
+                    type: recv.type,
+                    sender: recv.sender,
+                    message: recv.message
+                });
+
+                console.log('Updated messages:', this.messages); // 업데이트된 메시지 배열 상태
             }
         }
     });

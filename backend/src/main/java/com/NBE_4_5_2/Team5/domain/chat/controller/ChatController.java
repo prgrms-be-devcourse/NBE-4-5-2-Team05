@@ -29,11 +29,10 @@ public class ChatController {
     /**
      * websocket "/pub/chat/message"로 들어오는 메시징을 처리한다.
      */
-    @MessageMapping("/api/chat/message")
-    public void message(ChatMessage message, HttpServletRequest request) {
-        String token = authTokenService.getAccessTokenFromCookies(request.getCookies()); // 쿠키에서 액세스 토큰 가져오기
-        System.out.println("token: " + token);
-        String nickname = authTokenService.getUsernameFromToken(token); // 사용자 이름 가져오기
+    @MessageMapping("/chat/message")
+    public void message(ChatMessage message, @Header("token") String token) {
+        System.out.println("토큰:" +token);
+        String nickname = authTokenService.getUsernameFromToken(token);
         System.out.println("name: " + nickname);
 
         // 로그인 회원 정보로 대화명 설정

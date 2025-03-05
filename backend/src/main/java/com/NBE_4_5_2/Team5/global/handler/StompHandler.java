@@ -3,16 +3,21 @@ package com.NBE_4_5_2.Team5.global.handler;
 import com.NBE_4_5_2.Team5.domain.chat.entity.ChatMessage;
 import com.NBE_4_5_2.Team5.domain.chat.repository.ChatRoomRepository;
 import com.NBE_4_5_2.Team5.domain.chat.service.ChatService;
+import com.NBE_4_5_2.Team5.domain.user.entity.User;
 import com.NBE_4_5_2.Team5.domain.user.service.AuthTokenService;
 import com.NBE_4_5_2.Team5.global.standard.util.Ut;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageChannel;
+import org.springframework.messaging.MessageHeaders;
 import org.springframework.messaging.simp.stomp.StompCommand;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.messaging.support.ChannelInterceptor;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
 import java.security.Principal;
@@ -27,17 +32,19 @@ public class StompHandler implements ChannelInterceptor {
     private final ChatRoomRepository chatRoomRepository;
     private final ChatService chatService;
     private final AuthTokenService authTokenService;
-
-    @Value("${custom.jwt.secret-key}") // YML에서 읽어들일 비밀 키
-    private String secretKey;
+//    System.out.println(jwtToken);
+//    System.out.println(authTokenService.getUsernameFromToken(jwtToken));
 
     // websocket을 통해 들어온 요청이 처리 되기전 실행된다.
     @Override
     public Message<?> preSend(Message<?> message, MessageChannel channel) {
         StompHeaderAccessor accessor = StompHeaderAccessor.wrap(message);
-        String jwtToken = accessor.getFirstNativeHeader("Authorization"); // 토큰을 처음에 가져오기
 
         if (StompCommand.CONNECT == accessor.getCommand()) { // websocket 연결요청
+            String jwtToken = (String) accessor.getSessionAttributes().get("accessToken");
+
+            System.out.println(jwtToken);
+
             log.info("CONNECT {}", jwtToken);
             // Header의 jwt token 검증
             authTokenService.getPayload(jwtToken);
@@ -51,8 +58,9 @@ public class StompHandler implements ChannelInterceptor {
             // 채팅방의 인원수를 +1한다.
             chatRoomRepository.plusUserCount(roomId);
             // 클라이언트 입장 메시지를 채팅방에 발송한다.(redis publish)
-            String nickname = authTokenService.getUsernameFromToken(jwtToken);
-//            String name = Optional.ofNullable((Principal) message.getHeaders().get("simpUser")).map(Principal::getName).orElse("UnknownUser");
+//            String nickname = authTokenService.getUsernameFromToken(jwtToken);
+            String nickname = Optional.ofNullable((Principal) message.getHeaders().get("simpUser")).map(Principal::getName).orElse("UnknownUser");
+            System.out.println("구독요청 ㅇㅇ"+nickname);
             chatService.sendChatMessage(ChatMessage.builder()
                     .type(ChatMessage.MessageType.ENTER)
                     .roomId(roomId)
@@ -66,8 +74,9 @@ public class StompHandler implements ChannelInterceptor {
             // 채팅방의 인원수를 -1한다.
             chatRoomRepository.minusUserCount(roomId);
             // 클라이언트 퇴장 메시지를 채팅방에 발송한다.(redis publish)
-//            String name = Optional.ofNullable((Principal) message.getHeaders().get("simpUser")).map(Principal::getName).orElse("UnknownUser");
-            String nickname = authTokenService.getUsernameFromToken(jwtToken);
+            String nickname = Optional.ofNullable((Principal) message.getHeaders().get("simpUser")).map(Principal::getName).orElse("UnknownUser");
+            System.out.println("구취 ㅇㅇ"+nickname);
+//            String nickname = authTokenService.getUsernameFromToken(jwtToken);
             chatService.sendChatMessage(ChatMessage.builder().type(ChatMessage.MessageType.QUIT).roomId(roomId).sender(nickname).build());
             // 퇴장한 클라이언트의 roomId 맵핑 정보를 삭제한다.
             chatRoomRepository.removeUserEnterInfo(sessionId);
