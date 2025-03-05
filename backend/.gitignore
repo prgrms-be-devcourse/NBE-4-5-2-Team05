@@ -18,7 +18,7 @@ bin/
 !**/src/test/**/bin/
 
 ### IntelliJ IDEA ###
-.idea
+.idea/
 *.iws
 *.iml
 *.ipr
@@ -29,14 +29,31 @@ out/
 ### NetBeans ###
 /nbproject/private/
 /nbbuild/
-/dist/
-/nbdist/
-/.nb-gradle/
+dist/
+nbdist/
+.nb-gradle/
 
 ### VS Code ###
 .vscode/
+*.code-workspace
+
+### 🛠 환경 설정 파일 ###
 /src/main/resources/application.properties
-/src/main/resources/*.yml
-/*.mv.db
-/*.trace.db
+
+### 🌍 OS 관련 불필요한 파일 ###
+.DS_Store
+Thumbs.db
+ehthumbs.db
+
+### 🐳 Docker 관련 ###
+docker-compose.yml
+Dockerfile
+.dockerignore
+
+### 💡 특정 데이터 폴더 무시 ###
+data/
+db_dev.mv.db  # H2 데이터베이스 파일도 무시
 gradle
+src/main/resources/application*.yml
+src/test/resources/application*.yml
+

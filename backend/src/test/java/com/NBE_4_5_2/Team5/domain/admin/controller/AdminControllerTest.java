@@ -3,8 +3,11 @@ package com.NBE_4_5_2.Team5.domain.admin.controller;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-import java.time.LocalDateTime;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
+import java.util.UUID;
 
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -13,6 +16,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.http.MediaType;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
@@ -26,6 +31,7 @@ import com.NBE_4_5_2.Team5.domain.user.repository.UserRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import config.TestConfig;
+import jakarta.servlet.http.Cookie;
 import util.Util;
 
 @SpringBootTest
@@ -46,6 +52,8 @@ class AdminControllerTest {
 	private BanListRepository banListRepository;
 	@Autowired
 	private Util util;
+	@Autowired
+	private PasswordEncoder passwordEncoder;
 
 	@BeforeEach
 	void setUp() throws Exception {
@@ -55,8 +63,20 @@ class AdminControllerTest {
 	@Test
 	void writeNotice() throws Exception {
 		//given
-		User admin = userRepository.save(new User("username", "password", "email", "nickname", "address",
-			"url", Role.ADMIN, LocalDateTime.now(), LocalDateTime.now()));
+		User admin = userRepository.save(
+			User.builder()
+				.id("user-" + UUID.randomUUID())
+				.username("username")
+				.password(passwordEncoder.encode("password"))
+				.email("email")
+				.nickname("nickname")
+				.address("address")
+				.refreshToken(UUID.randomUUID().toString())
+				.role(Role.ADMIN)
+				.profileUrl("url")
+				.build());
+		Map<String, Cookie> cookieMap = login(admin.getUsername(), "password");
+
 		ResultActions perform = mockMvc.perform(post("/api/admin/notices")
 			.content("""
 				{
@@ -64,7 +84,8 @@ class AdminControllerTest {
 					"content": "공지 내용"
 				}""")
 			.contentType("application/json")
-			.characterEncoding("utf-8"));
+			.characterEncoding("utf-8")
+			.cookie(cookieMap.get("accessToken"), cookieMap.get("refreshToken")));
 
 		String id = objectMapper.readTree(perform.andReturn().getResponse().getContentAsString())
 			.get("data").get("id").asText();
@@ -83,20 +104,61 @@ class AdminControllerTest {
 			.andExpect(jsonPath("$.data.admin.id").value(admin.getId()));
 	}
 
+	private Map<String, Cookie> login(String username, String password) throws Exception {
+		Cookie[] cookies = mockMvc.perform(post("/api/users/login")
+				.contentType(MediaType.APPLICATION_JSON)
+				.content("""
+					{
+						"username": "%s",
+						"password": "%s"
+					}""".formatted(username, password)))
+			.andExpect(status().isOk())
+			.andReturn().getResponse().getCookies();
+
+		Map<String, Cookie> cookieMap = new HashMap<>();
+
+		Arrays.stream(cookies)
+			.filter(cookie -> cookie.getName().equals("accessToken") || cookie.getName().equals("refreshToken"))
+			.forEach(cookie -> cookieMap.put(cookie.getName(), cookie));
+		return cookieMap;
+	}
+
 	@Test
 	void banUser() throws Exception {
 		//given
-		User admin = userRepository.save(new User("username", "password", "email", "nickname", "address",
-			"url", Role.ADMIN, LocalDateTime.now(), LocalDateTime.now()));
-		User user = userRepository.save(new User("user1", "password", "email", "nickname", "address",
-			"url", Role.USER, LocalDateTime.now(), LocalDateTime.now()));
+		User admin = userRepository.save(
+			User.builder()
+				.id("user-" + UUID.randomUUID())
+				.username("admin")
+				.password(passwordEncoder.encode("password"))
+				.email("email1@email.com")
+				.nickname("nickname1")
+				.address("address")
+				.refreshToken(UUID.randomUUID().toString())
+				.role(Role.ADMIN)
+				.profileUrl("url")
+				.build());
+		User user = userRepository.save(User.builder()
+			.id("user-" + UUID.randomUUID())
+			.username("username")
+			.password(passwordEncoder.encode("password"))
+			.email("email2@email.com")
+			.nickname("nickname2")
+			.address("address")
+			.profileUrl("url")
+			.role(Role.USER)
+			.refreshToken(UUID.randomUUID().toString())
+			.build());
+
+		Map<String, Cookie> cookieMap = login(admin.getUsername(), "password");
 		ResultActions perform = mockMvc.perform(post("/api/admin/users/%s/ban".formatted(user.getId()))
 			.content("""
 				{
 					"reason": "기분이 나빠서"
 				}""")
 			.contentType("application/json")
-			.characterEncoding("utf-8"));
+			.characterEncoding("utf-8")
+			.cookie(cookieMap.get("accessToken"), cookieMap.get("refreshToken")));
 
 		String id = objectMapper.readTree(perform.andReturn().getResponse().getContentAsString())
 			.get("data").get("banListId").asText();

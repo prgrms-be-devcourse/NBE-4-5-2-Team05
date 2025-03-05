@@ -3,9 +3,9 @@ server:
 
 
 spring:
-  #  jackson:
-  #    serialization:
-  #      fail-on-empty-beans: false
+  jackson:
+    serialization:
+      fail-on-empty-beans: false
 
   output:
     ansi:
@@ -22,7 +22,7 @@ spring:
 
   jpa:
     hibernate:
-      ddl-auto: create-drop
+      ddl-auto: update
     show-sql: false
     properties:
       hibernate:
