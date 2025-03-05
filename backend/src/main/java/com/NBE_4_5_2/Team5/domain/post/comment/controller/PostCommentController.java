@@ -44,11 +44,11 @@ public class PostCommentController {
 	public record UpdateCommentReqBody(String content) {
 	}
 
-	@PutMapping("/{post-id}/comments")
-	public RsData<UpdateCommentResBody> updateComment(@PathVariable(name = "post-id") String postId,
+	@PutMapping("/{post-id}/comments/{comment-id}")
+	public RsData<UpdateCommentResBody> updateComment(@PathVariable(name = "comment-id") String commentId,
 		@RequestBody UpdateCommentReqBody body) {
 
-		CommentDto commentDto = commentService.updateComment(postId, body.content);
+		CommentDto commentDto = commentService.updateComment(commentId, body.content);
 
 		return new RsData<>("200-1", "comment 수정 성공.",
 			new UpdateCommentResBody(commentDto.getContent(), commentDto.getAuthor()));
