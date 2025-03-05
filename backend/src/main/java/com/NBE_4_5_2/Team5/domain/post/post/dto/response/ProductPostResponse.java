@@ -24,9 +24,20 @@ public class ProductPostResponse {
 	private List<String> categories;
 
 	public static ProductPostResponse fromEntity(ProductPost post) {
-		return new ProductPostResponse(post.getId(), post.getWriter().getId(), post.getWriter().getNickname(),
-			post.getProductName(), post.getProductPrice(), post.getTitle(), post.getContent(), post.getImageUrls(),
-			post.getLatitude(), post.getLongitude(),
-			post.getProductCategories().stream().map(pc -> pc.getCategory().getName()).collect(Collectors.toList()));
+		return new ProductPostResponse(
+			post.getId(),
+			post.getWriter().getId(),
+			post.getWriter().getNickname(),
+			post.getProductName(),
+			post.getProductPrice(),
+			post.getTitle(),
+			post.getContent(),
+			post.getImage_urls(),
+			post.getLatitude(),
+			post.getLongitude(),
+			post.getProductCategories().stream()
+				.map(pc -> pc.getCategory().getName())
+				.collect(Collectors.toList())
+		);
 	}
 }

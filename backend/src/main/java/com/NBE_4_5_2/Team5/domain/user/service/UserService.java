@@ -27,8 +27,8 @@ public class UserService {
 	private final UserValidator userValidator;
 	private final Rq rq;
 
-	public User signup(String username, String password, String email, String nickname, String address,
-		String profileUrl) {
+	public User signup(String username, String password, String email,
+		String nickname, String address, String profileUrl) {
 
 		userValidator.duplicate(username, email, nickname);
 
@@ -81,7 +81,12 @@ public class UserService {
 		String id = (String)payload.get("id");
 		String username = (String)payload.get("username");
 
-		return Optional.of(User.builder().id(id).username(username).build());
+		return Optional.of(
+			User.builder()
+				.id(id)
+				.username(username)
+				.build()
+		);
 	}
 
 	public String getAuthToken(User user) {
@@ -111,6 +116,9 @@ public class UserService {
 
 		SecurityUser user = (SecurityUser)principal;
 
-		return User.builder().id(user.getId()).username(user.getUsername()).build();
+		return User.builder()
+			.id(user.getId())
+			.username(user.getUsername())
+			.build();
 	}
 }

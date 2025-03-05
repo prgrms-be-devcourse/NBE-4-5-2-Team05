@@ -9,7 +9,7 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-import com.NBE_4_5_2.Team5.domain.category.entity.Category;
+import com.NBE_4_5_2.Team5.domain.post.category.entity.Category;
 import com.NBE_4_5_2.Team5.domain.post.comment.entity.Comment;
 import com.NBE_4_5_2.Team5.domain.post.post.enums.ProductStatus;
 import com.NBE_4_5_2.Team5.domain.user.entity.User;
@@ -37,7 +37,6 @@ import lombok.Setter;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 @Builder
-@Setter
 @EntityListeners(AuditingEntityListener.class)
 public class ProductPost {
 
@@ -45,35 +44,46 @@ public class ProductPost {
 	@Column(updatable = false, nullable = false)
 	private String id;
 
-	@Column(nullable = false)
-	private String productName;
+    @Column(nullable = false)
+    @Setter
+    private String productName;
 
-	@Column(nullable = false)
-	private Integer productPrice;
+    @Column(nullable = false)
+    @Setter
+    private Integer productPrice;
 
-	@Column(nullable = false)
-	private String title;
+    @ManyToOne(fetch = FetchType.LAZY)
+    private User buyer; // 구매자(NULL이면 아직 구매 안 된 상태)
 
-	@Column(nullable = false, columnDefinition = "TEXT")
-	private String content;
+    @Column(nullable = false)
+    @Setter
+    private String title;
 
-	@Column(nullable = false, columnDefinition = "TEXT")
-	private String imageUrls; // 쉼표가 포함된 url 문자열
+    @Column(nullable = false, columnDefinition = "TEXT")
+    @Setter
+    private String content;
+
+    @Column(nullable = false, columnDefinition = "TEXT")
+    @Setter
+    private String image_urls; // 쉼표가 포함된 url 문자열
 
 	@Column(nullable = false)
 	@Builder.Default
 	private Integer likedCount = 0;
 
-	@Enumerated(EnumType.STRING)
-	@Column(nullable = false)
-	@Builder.Default
-	private ProductStatus status = ProductStatus.AVAILABLE;
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    @Setter
+    @Builder.Default
+    private ProductStatus status = ProductStatus.AVAILABLE;
 
-	@Column(nullable = false)
-	private Float latitude;
+    @Column(nullable = false)
+    @Setter
+    private Float latitude;
 
-	@Column(nullable = false)
-	private Float longitude;
+    @Column(nullable = false)
+    @Setter
+    private Float longitude;
 
 	@CreatedDate
 	@Column(updatable = false)
@@ -94,7 +104,7 @@ public class ProductPost {
 	private final List<Comment> commentList = new ArrayList<>();
 
 	public static ProductPost create(User writer, String productName, Integer productPrice, String title,
-		String content, String imageUrls, Float latitude, Float longitude) {
+		String content, String image_urls, Float latitude, Float longitude) {
 		return ProductPost.builder()
 			.id("ppost-" + UUID.randomUUID())
 			.writer(writer)
@@ -102,16 +112,25 @@ public class ProductPost {
 			.productPrice(productPrice)
 			.title(title)
 			.content(content)
-			.imageUrls(imageUrls)
+			.image_urls(image_urls)
 			.latitude(latitude)
 			.longitude(longitude)
 			.build();
 	}
 
-	public void addCategories(List<Category> categories) {
-		List<ProductCategory> productCategories = categories.stream()
-			.map(category -> ProductCategory.builder().productPost(this).category(category).build())
-			.toList();
+    // 구매 처리 메서드
+    public void setBuyer(User buyer) {
+        this.buyer = buyer;
+        this.status = ProductStatus.PURCHASED;
+    }
+
+    public void addCategories(List<Category> categories) {
+        List<ProductCategory> productCategories = categories.stream()
+                .map(category -> ProductCategory.builder()
+                        .productPost(this)
+                        .category(category)
+                        .build())
+                .toList();
 
 		this.productCategories.addAll(productCategories);
 	}
@@ -140,6 +159,13 @@ public class ProductPost {
 		throw new ServiceException("403-1", "자신이 작성한 글만 삭제 가능합니다.");
 	}
 
+	public boolean isAvailable() {
+		return status == ProductStatus.AVAILABLE;
+	}
+
+	public void updateStatus(ProductStatus status) {
+		this.status = status;
+	}
 	public void addComment(Comment comment) {
 		commentList.add(comment);
 	}
