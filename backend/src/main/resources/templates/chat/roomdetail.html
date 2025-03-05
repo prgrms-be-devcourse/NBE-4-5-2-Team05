@@ -2,11 +2,8 @@
 <html lang="en">
 <head>
     <title>Websocket ChatRoom</title>
-    <!-- Required meta tags -->
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-
-    <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="/webjars/bootstrap/4.3.1/dist/css/bootstrap.min.css">
     <style>
         [v-cloak] {
@@ -18,7 +15,7 @@
 <div class="container" id="app" v-cloak>
     <div class="row">
         <div class="col-md-6">
-            <h4>{{roomName}} <span class="badge badge-info badge-pill">{{userCount}}</span></h4>
+            <h4>{{ roomName }} <span class="badge badge-info badge-pill">{{ userCount }}</span></h4>
         </div>
         <div class="col-md-6 text-right">
             <a class="btn btn-primary btn-sm" href="/logout">로그아웃</a>
@@ -34,22 +31,23 @@
             <button class="btn btn-primary" type="button" @click="sendMessage('TALK')">보내기</button>
         </div>
     </div>
-    <ul class="list-group">
-        <li class="list-group-item" v-for="(message, index) in messages" :key="index">
-            {{ message.sender }} - {{ message.message }}  <!-- 발신자와 메시지를 표시 -->
+    <input type="file" @change="onFileChange" accept="image/*" class="mt-3">
+    <ul class="list-group mt-3">
+        <li class="list-group-item" v-for="(messageItem, index) in messages" :key="index">
+            <span v-if="messageItem.sender">{{ messageItem.sender }}: </span>
+            <span v-if="messageItem.message">{{ messageItem.message }}</span>
+            <img v-if="messageItem.image" :src="'data:image/png;base64,' + messageItem.image" style="max-width: 100px; max-height: 100px; display: block; margin-top: 5px;" />
         </li>
     </ul>
 </div>
-<!-- JavaScript -->
 <script src="/webjars/vue/2.5.16/dist/vue.min.js"></script>
 <script src="/webjars/axios/0.17.1/dist/axios.min.js"></script>
 <script src="/webjars/sockjs-client/1.1.2/sockjs.min.js"></script>
 <script src="/webjars/stomp-websocket/2.3.3-1/stomp.min.js"></script>
 <script>
-    // websocket & stomp initialize
+    // WebSocket 및 STOMP 초기화
     var sock = new SockJS("/ws-stomp");
     var ws = Stomp.over(sock);
-    // vue.js
     var vm = new Vue({
         el: '#app',
         data: {
@@ -76,38 +74,64 @@
                         _this.recvMessage(recv); // 메시지 수신 처리
                     });
                 }, function(error) {
-                    alert("서버 연결에 실패 하였습니다. 다시 접속해 주십시요.");
+                    alert("서버 연결에 실패하였습니다. 다시 접속해 주십시오.");
                     location.href = "/api/chat/room";
                 });
             });
         },
         methods: {
-            sendMessage: function(type) {
-                if (this.message.trim() === "") {
-                    console.error("Empty message not sent!"); // 빈 메시지 전송 방지
-                    return;
-                }
+            onFileChange(event) {
+                const file = event.target.files[0]; // 선택한 파일
+                if (file) {
+                    const formData = new FormData();
+                    formData.append('file', file); // 파일 추가
 
-                const payload = {
-                    type: type,
-                    roomId: this.roomId,
-                    message: this.message,
-                    sender: localStorage.getItem('username') // 사용자 이름을 로컬 스토리지에서 가져옴
+                    // S3에 이미지 업로드
+                    axios.post('/api/upload', formData, {
+                        headers: {
+                            'Content-Type': 'multipart/form-data',
+                        },
+                    })
+                        .then(response => {
+                            const imageUrl = response.data.imageUrl; // S3에서 받아온 이미지 URL
+                            this.sendMessage('IMAGE', imageUrl); // URL로 메시지 전송
+                        })
+                        .catch(error => {
+                            console.error("Image upload failed:", error);
+                        });
+                }
+            },
+            sendImage(base64Image) {
+                const imagePayload = {
+                    type: "IMAGE",  // 메시지 타입을 IMAGE로 설정
+                    roomId: this.roomId,  // 방 ID를 포함
+                    image: base64Image // 실제 Base64 이미지 데이터
                 };
 
-                console.log("Sending message:", payload); // 전송할 메시지 로그
+                console.log("Sending image:", imagePayload);
+                ws.send("/pub/chat/sendImage", { "token": this.token }, JSON.stringify(imagePayload));
+            },
+            sendMessage(type, imageUrl) {
+                const payload = {
+                    type: type || 'TALK',
+                    roomId: this.roomId,
+                    message: imageUrl || this.message,
+                    sender: localStorage.getItem('username')
+                };
+
                 ws.send("/pub/chat/message", { "token": this.token }, JSON.stringify(payload));
-                this.message = ''; // 전송 후 입력칸 비우기
+                this.message = ''; // 메시지 입력 필드 비우기
             },
             recvMessage: function(recv) {
-                console.log('Received message:', recv); // 수신된 메시지 로그
+                console.log('Received message:', recv); // 수신한 메시지 로그
                 this.userCount = recv.userCount; // 사용자 수 업데이트
 
                 // 수신된 메시지를 messages 배열에 추가
                 this.messages.unshift({
                     type: recv.type,
                     sender: recv.sender,
-                    message: recv.message
+                    message: recv.message,
+                    image: recv.image // 이미지 데이터 포함이 있을 수 있음
                 });
 
                 console.log('Updated messages:', this.messages); // 업데이트된 메시지 배열 상태
