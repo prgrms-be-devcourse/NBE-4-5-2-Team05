@@ -1,5 +1,6 @@
 package com.NBE_4_5_2.Team5.domain.post.comment.controller;
 
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -52,5 +53,12 @@ public class PostCommentController {
 
 		return new RsData<>("200-1", "comment 수정 성공.",
 			new UpdateCommentResBody(commentDto.getContent(), commentDto.getAuthor()));
+	}
+
+	@DeleteMapping("/{post-id}/comments/{comment-id}")
+	public RsData<Void> deleteComment(@PathVariable(name = "comment-id") String commentId) {
+		commentService.deleteComment(commentId);
+
+		return new RsData<>("204-1", "comment 삭제 성공.");
 	}
 }

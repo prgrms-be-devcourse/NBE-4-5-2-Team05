@@ -53,4 +53,15 @@ public class CommentService {
 
 		return CommentDto.of(comment);
 	}
+
+	public void deleteComment(String commentId) {
+		User loggedInUser = getUser();
+
+		Comment comment = commentRepository.findById(commentId)
+			.orElseThrow(() -> new EntityNotFoundException("id가 %s인 comment를 찾을 수 없습니다.".formatted(commentId)));
+
+		comment.isMine(loggedInUser);
+
+		commentRepository.delete(comment);
+	}
 }
