@@ -17,6 +17,7 @@ import org.springframework.security.web.header.writers.frameoptions.XFrameOption
 public class SecurityConfig {
 
     private final CustomAuthenticationFilter customAuthenticationFilter;
+//    private final CustomOAuth2UserService customOAuth2UserService;
 
     @Bean
     SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -28,14 +29,21 @@ public class SecurityConfig {
                         .permitAll()
                         .requestMatchers("/api/users/login", "/api/users/signup", "/api/users/refresh")
                         .permitAll()
+                        .requestMatchers("/login/oauth2/**", "/oauth2/**")
+                        .permitAll()
                         .anyRequest()
-                        .authenticated()
+                        .permitAll()
                 )
                 .headers((headers) -> headers
                         .addHeaderWriter(new XFrameOptionsHeaderWriter(
                                 XFrameOptionsHeaderWriter.XFrameOptionsMode.SAMEORIGIN)))
+                .oauth2Login((oauth2) -> {
+                    oauth2.successHandler(((request, response, authentication) -> {
+                        response.sendRedirect("http://localhost:3000");
+                    }));
+                })
                 .csrf(csrf -> csrf.disable())
-            .addFilterBefore(customAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(customAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .exceptionHandling(
                         exceptionHandling -> exceptionHandling
                                 .authenticationEntryPoint(
