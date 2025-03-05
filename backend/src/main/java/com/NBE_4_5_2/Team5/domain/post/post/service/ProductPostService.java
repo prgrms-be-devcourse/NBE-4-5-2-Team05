@@ -7,6 +7,7 @@ import com.NBE_4_5_2.Team5.domain.post.post.dto.request.ProductPostWriteForm;
 import com.NBE_4_5_2.Team5.domain.post.post.dto.response.ProductPostResponse;
 import com.NBE_4_5_2.Team5.domain.post.post.entity.ProductCategory;
 import com.NBE_4_5_2.Team5.domain.post.post.entity.ProductPost;
+import com.NBE_4_5_2.Team5.domain.post.post.repository.LikedPostRepository;
 import com.NBE_4_5_2.Team5.domain.post.post.repository.ProductPostRepository;
 import com.NBE_4_5_2.Team5.domain.user.entity.User;
 import com.NBE_4_5_2.Team5.global.dto.PageDto;
@@ -27,6 +28,7 @@ public class ProductPostService {
     private final ProductPostRepository productPostRepository;
     //    private final MemberRepository memberRepository;
     private final CategoryRepository categoryRepository;
+    private final LikedPostRepository likedPostRepository;
 
     public ProductPostResponse write(User actor, ProductPostWriteForm body) {
         String imageUrlStr = String.join(",", body.imageUrlList());
@@ -156,6 +158,27 @@ public class ProductPostService {
         }
 
         return ProductPostResponse.fromEntity(post);
+    }
+
+
+
+    // 내가 판매한 내역
+    public List<ProductPostResponse> getMySales(User actor) {
+        List<ProductPost> salesPosts = productPostRepository.findByWriter(actor);
+        return salesPosts.stream()
+                .map(ProductPostResponse::fromEntity)
+                .toList();
+    }
+
+    // 내가 찜한 내역
+    public List<ProductPostResponse> getMyFavorites(User actor) {
+        List<String> postIds = likedPostRepository.findAllProductPostIdsByUserId(actor.getId());
+        if(postIds.isEmpty()) return List.of();
+
+        List<ProductPost> favoritePosts = productPostRepository.findAllById(postIds);
+        return favoritePosts.stream()
+                .map(ProductPostResponse::fromEntity)
+                .toList();
     }
 
 
