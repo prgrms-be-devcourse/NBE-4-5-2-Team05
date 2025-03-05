@@ -15,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.Reader;
+import java.util.List;
 
 
 @RestController
@@ -105,6 +106,61 @@ public class ProductPostController {
         return new RsData<>(
                 "200",
                 "글 삭제 완료."
+        );
+    }
+
+    //게시글 구매하기
+    @PatchMapping("/{id}/purchase")
+    public RsData<ProductPostResponse> purchase(@PathVariable String id) {
+        User actor = rq.getUserIdentity();
+
+        // 구매 확정
+        ProductPostResponse postResponse = productPostService.purchasePost(actor, id);
+
+        return new RsData<>(
+                "200",
+                "구매가 완료되었습니다.",
+                postResponse
+        );
+    }
+
+    // 내가 구매한 내역 조회
+    @GetMapping("/my/purchases")
+    public RsData<List<ProductPostResponse>> getMyPurchases() {
+        User actor = rq.getUserIdentity();
+
+        List<ProductPostResponse> myPurchases = productPostService.getMyPurchases(actor);
+
+        return new RsData<>(
+                "200",
+                "내 구매 내역 조회 성공",
+                myPurchases
+        );
+    }
+
+    // 내가 판매한 내역
+    @GetMapping("/my/sales")
+    public RsData<List<ProductPostResponse>> getMySales() {
+        User actor = rq.getUserIdentity();
+        List<ProductPostResponse> sales = productPostService.getMySales(actor);
+
+        return new RsData<>(
+                "200",
+                "내 판매 내역 조회 성공",
+                sales
+        );
+    }
+
+    // 내가 찜한 내역
+    @GetMapping("/my/favorites")
+    public RsData<List<ProductPostResponse>> getMyFavorites() {
+        User actor = rq.getUserIdentity();
+        List<ProductPostResponse> favorites = productPostService.getMyFavorites(actor);
+
+        return new RsData<>(
+                "200",
+                "내가 찜한 내역 조회 성공",
+                favorites
         );
     }
 
