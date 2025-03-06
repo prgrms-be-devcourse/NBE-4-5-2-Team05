@@ -38,20 +38,36 @@ public class ChatService {
         if (ChatMessage.MessageType.ENTER.equals(chatMessage.getType())) {
             chatMessage.setMessage(chatMessage.getSender() + "님이 방에 입장했습니다.");
             chatMessage.setSender("[알림]");
-        // 퇴장
+            // 타임스탬프 설정
+            chatMessage.setTimestamp(chatMessage.formatTimestamp(LocalDateTime.now()));
+            // redis로 메세지 발송
+            redisTemplate.convertAndSend(channelTopic.getTopic(), chatMessage);
+
+            // 퇴장
         } else if (ChatMessage.MessageType.QUIT.equals(chatMessage.getType())) {
             chatMessage.setMessage(chatMessage.getSender() + "님이 방에서 나갔습니다.");
             chatMessage.setSender("[알림]");
-        // 이미지
+            // 타임스탬프 설정
+            chatMessage.setTimestamp(chatMessage.formatTimestamp(LocalDateTime.now()));
+            // redis로 메세지 발송
+            redisTemplate.convertAndSend(channelTopic.getTopic(), chatMessage);
+
+            // 이미지
         }else if (ChatMessage.MessageType.IMAGE.equals(chatMessage.getType())) {
             chatMessage.setMessage("");
+            // 타임스탬프 설정
+            chatMessage.setTimestamp(chatMessage.formatTimestamp(LocalDateTime.now()));
+            // redis로 메세지 발송
+            redisTemplate.convertAndSend(channelTopic.getTopic(), chatMessage);
+
+        } else if (ChatMessage.MessageType.TALK.equals(chatMessage.getType())) {
+            // 타임스탬프 설정
+            chatMessage.setTimestamp(chatMessage.formatTimestamp(LocalDateTime.now()));
+            // redis로 메세지 발송
+            redisTemplate.convertAndSend(channelTopic.getTopic(), chatMessage);
+            // DB에 저장
+            messageRepository.save(chatMessage);
         }
-        // 타임스탬프 설정
-        chatMessage.setTimestamp(chatMessage.formatTimestamp(LocalDateTime.now()));
-        // redis로 메세지 발송
-        redisTemplate.convertAndSend(channelTopic.getTopic(), chatMessage);
-        // DB에 저장
-        messageRepository.save(chatMessage);
     }
 
 
