@@ -1,5 +1,6 @@
 package com.NBE_4_5_2.Team5.domain.user.service;
 
+import com.NBE_4_5_2.Team5.domain.user.entity.Role;
 import com.NBE_4_5_2.Team5.domain.user.entity.User;
 import com.NBE_4_5_2.Team5.domain.user.repository.UserRepository;
 import com.NBE_4_5_2.Team5.global.Rq;
@@ -19,16 +20,16 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class UserService {
 
-	private final UserRepository userRepository;
-	private final AuthTokenService authTokenService;
-	private final PasswordEncoder passwordEncoder;
-	private final UserValidator userValidator;
-	private final Rq rq;
+    private final UserRepository userRepository;
+    private final AuthTokenService authTokenService;
+    private final PasswordEncoder passwordEncoder;
+    private final UserValidator userValidator;
+    private final Rq rq;
 
     public User createUser(String username, String password, String email,
                            String nickname, String address, String profileUrl) {
 
-		userValidator.duplicate(username, email, nickname);
+        userValidator.duplicate(username, email, nickname);
 
         User user = User.builder()
                 .id("user-" + UUID.randomUUID())
@@ -41,20 +42,20 @@ public class UserService {
                 .profileUrl(profileUrl)
                 .build();
 
-		return userRepository.save(user);
-	}
+        return userRepository.save(user);
+    }
 
 
     public User loginUser(String username, String password) {
         return userValidator.credentials(username, password);
     }
 
-	public void logoutUser(User user) {
-		String newRefreshToken = "user-" + UUID.randomUUID();
-		user.setRefreshToken(newRefreshToken);
+    public void logoutUser(User user) {
+        String newRefreshToken = "user-" + UUID.randomUUID();
+        user.setRefreshToken(newRefreshToken);
 
-		userRepository.save(user);
-	}
+        userRepository.save(user);
+    }
 
     public Optional<User> getUserById(String id) {
         return userRepository.findById(id);
@@ -68,59 +69,63 @@ public class UserService {
         return userRepository.findByRefreshToken(refreshToken);
     }
 
-    /*
-         이 메소드는 AccessToken payload에 저장된 id와 username만을 가진 User 객체를 반환합니다.
-         DB 조회를 하지 않기 때문에, 게시글 조회 등 사용자 id 혹은 username만 필요로 하는 경우에 효율적으로 사용할 수 있습니다.
+    /**
+     * 이 메소드는 AccessToken payload에 저장된 id와 username, role만을 가진 User 객체를 반환합니다.
+     * DB 조회를 하지 않기 때문에, 관리자 페이지, 게시글 조회 등 사용자 id 혹은 role을 필요로 하는 경우에 사용할 수 있습니다.
+     *
+     * CustomAuthenticationFilter에서 accessToken을 검증하고 setLogin 하는 과정에 사용됩니다.
     */
     public Optional<User> getUserByAccessToken(String accessToken) {
 
-		Map<String, Object> payload = authTokenService.getPayload(accessToken);
+        Map<String, Object> payload = authTokenService.getPayload(accessToken);
 
-		if (payload == null) {
-			return Optional.empty();
-		}
+        if (payload == null) {
+            return Optional.empty();
+        }
 
-		String id = (String)payload.get("id");
-		String username = (String)payload.get("username");
+        String id = (String) payload.get("id");
+        String username = (String) payload.get("username");
+        Role role = (Role) payload.get("role");
 
-		return Optional.of(
-			User.builder()
-				.id(id)
-				.username(username)
-				.build()
-		);
-	}
+        return Optional.of(
+                User.builder()
+                        .id(id)
+                        .username(username)
+                        .role(role)
+                        .build()
+        );
+    }
 
-	public String getAuthToken(User user) {
-		return user.getRefreshToken() + " " + authTokenService.generateAccessToken(user);
-	}
+    public String getAuthToken(User user) {
+        return user.getRefreshToken() + " " + authTokenService.generateAccessToken(user);
+    }
 
-	public String generateAccessToken(User user) {
-		return authTokenService.generateAccessToken(user);
-	}
+    public String generateAccessToken(User user) {
+        return authTokenService.generateAccessToken(user);
+    }
 
-	public long count() {
-		return userRepository.count();
-	}
+    public long count() {
+        return userRepository.count();
+    }
 
-	public User getUserIdentity() {
-		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+    public User getUserIdentity() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
-		if (authentication == null) {
-			throw new ServiceException("401-2", "로그인이 필요합니다.");
-		}
+        if (authentication == null) {
+            throw new ServiceException("401-2", "로그인이 필요합니다.");
+        }
 
-		Object principal = authentication.getPrincipal();
+        Object principal = authentication.getPrincipal();
 
-		if (!(principal instanceof SecurityUser)) {
-			throw new ServiceException("401-3", "잘못된 인증 정보입니다");
-		}
+        if (!(principal instanceof SecurityUser)) {
+            throw new ServiceException("401-3", "잘못된 인증 정보입니다");
+        }
 
-		SecurityUser user = (SecurityUser)principal;
+        SecurityUser user = (SecurityUser) principal;
 
-		return User.builder()
-			.id(user.getId())
-			.username(user.getUsername())
-			.build();
-	}
+        return User.builder()
+                .id(user.getId())
+                .username(user.getUsername())
+                .build();
+    }
 }
