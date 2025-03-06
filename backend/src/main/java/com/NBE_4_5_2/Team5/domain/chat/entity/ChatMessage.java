@@ -1,7 +1,6 @@
 package com.NBE_4_5_2.Team5.domain.chat.entity;
 
 
-import com.NBE_4_5_2.Team5.global.entity.BaseTime;
 import jakarta.persistence.Id;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

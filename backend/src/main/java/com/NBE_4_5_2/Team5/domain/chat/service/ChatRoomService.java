@@ -40,18 +40,8 @@ public class ChatRoomService {
         return hashOpsChatRoom.get(CHAT_ROOMS, id);
     }
 
-//    // 채팅방 생성 : 서버간 채팅방 공유를 위해 redis hash에 저장한다.
-//    public ChatRoom createChatRoom(String name) {
-//        ChatRoom chatRoom = ChatRoom.create(name);
-//        hashOpsChatRoom.put(CHAT_ROOMS, chatRoom.getRoomId(), chatRoom);
-////        chatRoomRepository.save(chatRoom);  // db 저장
-//        return chatRoom;
-//    }
-
+    // 채팅방 생성
     public ChatRoom createChatRoom(String name) {
-//        ChatRoom chatRoom = ChatRoom.builder()
-//                .name(name)
-//                .build();
         ChatRoom chatRoom = new ChatRoom(name);
         hashOpsChatRoom.put(CHAT_ROOMS, chatRoom.getRoomId(), chatRoom);    // redis에 저장
         return chatRoom;
