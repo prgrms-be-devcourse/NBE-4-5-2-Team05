@@ -1,27 +1,16 @@
 package com.NBE_4_5_2.Team5.domain.user.entity;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
-
 import com.NBE_4_5_2.Team5.domain.post.post.entity.ProductPost;
 import com.NBE_4_5_2.Team5.domain.post.post.enums.ProductStatus;
 import com.NBE_4_5_2.Team5.global.entity.BaseTime;
 import com.NBE_4_5_2.Team5.global.exception.payment.InsufficientPayMoneyException;
-
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EntityListeners;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.Table;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import jakarta.persistence.*;
+import lombok.*;
 import lombok.experimental.SuperBuilder;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
@@ -58,7 +47,8 @@ public class User extends BaseTime {
 
 	@Column(nullable = false)
 	@Builder.Default
-	private Integer role = 1;  // 0: Admin, 1: 일반 유저
+	@Enumerated(EnumType.ORDINAL)
+	private Role role = Role.USER;  // 0: Admin, 1: 일반 유저
 
 	@Column(nullable = false)
 	@Builder.Default
@@ -72,7 +62,7 @@ public class User extends BaseTime {
 	private final List<ProductPost> purchasedProducts = new ArrayList<>();
 
 	public boolean isAdmin() {
-		return this.role == 0;
+		return role.equals(Role.ADMIN);
 	}
 
 	/**
