@@ -37,6 +37,10 @@ jobs:
 
     - name: Build with Gradle Wrapper
       run: ./gradlew test
+      env:
+        JWT_SECRET: ${{secrets.JWT_SECRET}}
+        TOSS_SECRET: ${{secrets.TOSS_SECRET}}
+        KAKAO_CLIENT_ID: ${{secrets.KAKAO_CLIENT_ID}}
 
     # NOTE: The Gradle Wrapper is the default and recommended way to run Gradle (https://docs.gradle.org/current/userguide/gradle_wrapper.html).
     # If your project does not have the Gradle Wrapper configured, you can use the following configuration to run Gradle with a specified version.
