@@ -68,6 +68,3 @@ springdoc:
 custom:
   jwt:
     expire-seconds: "#{60 * 30}"
-  toss:
-    payment:
-      secret: your-secret-key-here
