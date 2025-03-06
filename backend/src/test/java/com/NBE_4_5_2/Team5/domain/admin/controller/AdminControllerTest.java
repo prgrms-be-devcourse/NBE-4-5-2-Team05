@@ -124,7 +124,7 @@ class AdminControllerTest {
 	void deletePost() throws Exception {
 		//given
 		Category category = categoryRepository.save(Category.builder().name("cat1").build());
-		User user = userService.signup("user1", "password", "email", "nickanme", "addr", "profile");
+		User user = userService.createUser("user1", "password", "email", "nickanme", "addr", "profile");
 		ProductPost post = productPostRepository.save(
 			ProductPost.create(user, "name", 5000, "title", "content", "url", 30F, 40F)
 		);
