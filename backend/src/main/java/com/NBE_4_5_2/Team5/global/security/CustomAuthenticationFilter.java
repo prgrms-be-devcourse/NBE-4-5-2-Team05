@@ -23,7 +23,7 @@ public class CustomAuthenticationFilter extends OncePerRequestFilter {
     private final UserService userService;
 
     @Override
-        protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
 
         String url = request.getRequestURI();
         if (List.of("/api/users/login", "/api/users/signup", "/api/users/refresh", "/error").contains(url)) {
@@ -38,8 +38,9 @@ public class CustomAuthenticationFilter extends OncePerRequestFilter {
             return;
         }
 
+        String accessToken = tokens.accessToken();
         String refreshToken = tokens.refreshToken();
-        User actor = refreshAccessToken(refreshToken);
+        User actor = getUserByAccessToken(accessToken, refreshToken);
 
         if (actor == null) {
             filterChain.doFilter(request, response);
@@ -79,7 +80,7 @@ public class CustomAuthenticationFilter extends OncePerRequestFilter {
             String refreshToken = tokenBits[0];
             String accessToken = tokenBits[1];
 
-            if(refreshToken.isBlank() || accessToken.isBlank()) {
+            if (refreshToken.isBlank() || accessToken.isBlank()) {
                 return null;
             }
 
@@ -97,8 +98,16 @@ public class CustomAuthenticationFilter extends OncePerRequestFilter {
 
     }
 
-    private User refreshAccessToken(String refreshToken) {
+    private User getUserByAccessToken(String accessToken, String refreshToken) {
 
+        // accessToken이 유효하다면 accessToken을 통해 user 정보를 반환
+        Optional<User> opAccessUser = userService.getUserByAccessToken(accessToken);
+
+        if (opAccessUser.isPresent()) {
+            return opAccessUser.get();
+        }
+
+        // accessToken이 만료되었다면 refreshToken을 통해 새로운 accessToken을 발급받아 user 정보를 반환
         Optional<User> opRefreshUser = userService.getUserByRefreshToken(refreshToken);
 
         if (opRefreshUser.isEmpty()) {
