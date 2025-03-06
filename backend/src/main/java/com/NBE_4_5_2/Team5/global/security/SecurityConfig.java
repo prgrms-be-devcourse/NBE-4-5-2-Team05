@@ -17,6 +17,7 @@ import org.springframework.security.web.header.writers.frameoptions.XFrameOption
 @RequiredArgsConstructor
 public class SecurityConfig {
 
+    private final CorsConfig corsConfig;
     private final CustomAuthenticationFilter customAuthenticationFilter;
     private final CustomAuthorizationRequestResolver customAuthorizationRequestResolver;
     private final CustomAuthenticationSuccessHandler customAuthenticationSuccessHandler;
@@ -36,6 +37,7 @@ public class SecurityConfig {
                         .anyRequest()
                         .permitAll()
                 )
+                .cors(cors -> cors.configurationSource(corsConfig))
                 .headers((headers) -> headers
                         .addHeaderWriter(new XFrameOptionsHeaderWriter(
                                 XFrameOptionsHeaderWriter.XFrameOptionsMode.SAMEORIGIN)))
