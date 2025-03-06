@@ -1,5 +1,18 @@
 package com.NBE_4_5_2.Team5.domain.post.post.controller;
 
+import java.util.List;
+
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
 import com.NBE_4_5_2.Team5.domain.post.post.dto.request.ProductPostModifyForm;
 import com.NBE_4_5_2.Team5.domain.post.post.dto.request.ProductPostWriteForm;
 import com.NBE_4_5_2.Team5.domain.post.post.dto.response.PreviewPostResponse;
@@ -11,12 +24,9 @@ import com.NBE_4_5_2.Team5.global.Rq;
 import com.NBE_4_5_2.Team5.global.dto.Empty;
 import com.NBE_4_5_2.Team5.global.dto.PageDto;
 import com.NBE_4_5_2.Team5.global.dto.RsData;
+
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 
 @RestController
@@ -125,21 +135,6 @@ public class ProductPostController {
         return new RsData<>(
                 "200",
                 "글 삭제 완료."
-        );
-    }
-
-    //게시글 구매하기
-    @PatchMapping("/{id}/purchase")
-    public RsData<ProductPostResponse> purchase(@PathVariable String id) {
-        User actor = rq.getUserIdentity();
-
-        // 구매 확정
-        ProductPostResponse postResponse = productPostService.purchasePost(actor, id);
-
-        return new RsData<>(
-                "200",
-                "구매가 완료되었습니다.",
-                postResponse
         );
     }
 
