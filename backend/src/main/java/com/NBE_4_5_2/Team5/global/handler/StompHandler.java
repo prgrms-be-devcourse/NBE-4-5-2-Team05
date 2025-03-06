@@ -1,28 +1,19 @@
 package com.NBE_4_5_2.Team5.global.handler;
 
 import com.NBE_4_5_2.Team5.domain.chat.entity.ChatMessage;
-import com.NBE_4_5_2.Team5.domain.chat.repository.ChatRoomRepository;
+import com.NBE_4_5_2.Team5.domain.chat.service.ChatRoomService;
 import com.NBE_4_5_2.Team5.domain.chat.service.ChatService;
-import com.NBE_4_5_2.Team5.domain.user.entity.User;
 import com.NBE_4_5_2.Team5.domain.user.service.AuthTokenService;
-import com.NBE_4_5_2.Team5.global.standard.util.Ut;
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageChannel;
-import org.springframework.messaging.MessageHeaders;
 import org.springframework.messaging.simp.stomp.StompCommand;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.messaging.support.ChannelInterceptor;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
 import java.security.Principal;
-import java.time.LocalDateTime;
-import java.util.Map;
 import java.util.Optional;
 
 @Slf4j
@@ -30,7 +21,7 @@ import java.util.Optional;
 @Component
 public class StompHandler implements ChannelInterceptor {
 
-    private final ChatRoomRepository chatRoomRepository;
+    private final ChatRoomService chatRoomService;
     private final ChatService chatService;
     private final AuthTokenService authTokenService;
 //    System.out.println(jwtToken);
@@ -55,9 +46,9 @@ public class StompHandler implements ChannelInterceptor {
             String roomId = chatService.getRoomId(Optional.ofNullable((String) message.getHeaders().get("simpDestination")).orElse("InvalidRoomId"));
             // 채팅방에 들어온 클라이언트 sessionId를 roomId와 맵핑해 놓는다.(나중에 특정 세션이 어떤 채팅방에 들어가 있는지 알기 위함)
             String sessionId = (String) message.getHeaders().get("simpSessionId");
-            chatRoomRepository.setUserEnterInfo(sessionId, roomId);
+            chatRoomService.setUserEnterInfo(sessionId, roomId);
             // 채팅방의 인원수를 +1한다.
-            chatRoomRepository.plusUserCount(roomId);
+            chatRoomService.plusUserCount(roomId);
             // 클라이언트 입장 메시지를 채팅방에 발송한다.(redis publish)
 //            String nickname = authTokenService.getUsernameFromToken(jwtToken);
             String name = Optional.ofNullable((Principal) message.getHeaders().get("simpUser")).map(Principal::getName).orElse("UnknownUser");
@@ -72,9 +63,9 @@ public class StompHandler implements ChannelInterceptor {
         } else if (StompCommand.DISCONNECT == accessor.getCommand()) { // Websocket 연결 종료
             // 연결이 종료된 클라이언트 sesssionId로 채팅방 id를 얻는다.
             String sessionId = (String) message.getHeaders().get("simpSessionId");
-            String roomId = chatRoomRepository.getUserEnterRoomId(sessionId);
+            String roomId = chatRoomService.getUserEnterRoomId(sessionId);
             // 채팅방의 인원수를 -1한다.
-            chatRoomRepository.minusUserCount(roomId);
+            chatRoomService.minusUserCount(roomId);
             // 클라이언트 퇴장 메시지를 채팅방에 발송한다.(redis publish)
             String name = Optional.ofNullable((Principal) message.getHeaders().get("simpUser")).map(Principal::getName).orElse("UnknownUser");
             String nickname=authTokenService.getNicknameFromName(name);
@@ -86,7 +77,7 @@ public class StompHandler implements ChannelInterceptor {
                     .sender(nickname)
                     .build());
             // 퇴장한 클라이언트의 roomId 맵핑 정보를 삭제한다.
-            chatRoomRepository.removeUserEnterInfo(sessionId);
+            chatRoomService.removeUserEnterInfo(sessionId);
             log.info("DISCONNECTED {}, {}", sessionId, roomId);
         }
         return message;

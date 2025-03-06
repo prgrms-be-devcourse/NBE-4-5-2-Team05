@@ -3,7 +3,7 @@ package com.NBE_4_5_2.Team5.domain.chat.controller;
 
 import com.NBE_4_5_2.Team5.domain.chat.entity.ChatRoom;
 import com.NBE_4_5_2.Team5.domain.chat.entity.LoginInfo;
-import com.NBE_4_5_2.Team5.domain.chat.repository.ChatRoomRepository;
+import com.NBE_4_5_2.Team5.domain.chat.service.ChatRoomService;
 import com.NBE_4_5_2.Team5.domain.user.service.AuthTokenService;
 import com.NBE_4_5_2.Team5.global.dto.RsData;
 import jakarta.servlet.http.HttpServletRequest;
@@ -19,8 +19,9 @@ import java.util.List;
 @RequestMapping("/api/chat")
 public class ChatRoomController {
 
-    private final ChatRoomRepository chatRoomRepository;
+    private final ChatRoomService chatRoomService;
     private final AuthTokenService authTokenService;
+
 //
 //    @GetMapping("/room")
 //    public String rooms() {
@@ -39,16 +40,26 @@ public class ChatRoomController {
     @GetMapping("/rooms")
     @ResponseBody
     public List<ChatRoom> room() {
-        List<ChatRoom> chatRooms = chatRoomRepository.findAllRoom();
-        chatRooms.stream().forEach(room -> room.setUserCount(chatRoomRepository.getUserCount(room.getRoomId())));
+        List<ChatRoom> chatRooms = chatRoomService.findAllRoom();
+        chatRooms.stream().forEach(room -> room.setUserCount(chatRoomService.getUserCount(room.getRoomId())));
         return chatRooms;
     }
 
     @PostMapping("/room")
     @ResponseBody
     public ChatRoom createRoom(@RequestParam String name) {
-        return chatRoomRepository.createChatRoom(name);
+        ChatRoom chatRoom = chatRoomService.createChatRoom(name);
+        return chatRoom;
+//        return chatRoomRepository.createChatRoom(name);
     }
+
+//    @DeleteMapping("room")
+//    @ResponseBody
+//    public void deleteRoom(@RequestParam String roomId) {
+//        ChatRoom chatRoom=chatRoomService.findRoomById(roomId);
+//        chatRoomService.delete(chatRoom);
+//    }
+
 
     @GetMapping("/room/enter/{roomId}")
     public String roomDetail(Model model, @PathVariable String roomId) {
@@ -59,7 +70,7 @@ public class ChatRoomController {
     @GetMapping("/room/{roomId}")
     @ResponseBody
     public ChatRoom roomInfo(@PathVariable String roomId) {
-        return chatRoomRepository.findRoomById(roomId);
+        return chatRoomService.findRoomById(roomId);
     }
 
 
