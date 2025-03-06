@@ -75,9 +75,9 @@ public class UserService {
     /**
      * 이 메소드는 AccessToken payload에 저장된 id와 username, role만을 가진 User 객체를 반환합니다.
      * DB 조회를 하지 않기 때문에, 관리자 페이지, 게시글 조회 등 사용자 id 혹은 role을 필요로 하는 경우에 사용할 수 있습니다.
-     *
+     * <p>
      * CustomAuthenticationFilter에서 accessToken을 검증하고 setLogin 하는 과정에 사용됩니다.
-    */
+     */
     public Optional<User> getUserByAccessToken(String accessToken) {
 
         Map<String, Object> payload = authTokenService.getPayload(accessToken);
@@ -166,4 +166,5 @@ public class UserService {
     public void deleteMyProfile(User user) {
         userRepository.delete(user);
     }
+
 }

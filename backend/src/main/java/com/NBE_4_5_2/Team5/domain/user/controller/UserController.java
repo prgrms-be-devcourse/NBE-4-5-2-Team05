@@ -20,8 +20,8 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class UserController {
 
-	private final UserService userService;
-	private final Rq rq;
+    private final UserService userService;
+    private final Rq rq;
 
     @PostMapping("/signup")
     public RsData<UserDto> createUser(@RequestBody @Valid SignUpUserForm userForm) {
@@ -29,8 +29,8 @@ public class UserController {
         User user = userService.createUser(userForm.username(), userForm.password(), userForm.email(),
                 userForm.nickname(), userForm.address(), userForm.profileUrl());
 
-		return new RsData<>("201-1", "회원 가입이 완료되었습니다.", new UserDto(user));
-	}
+        return new RsData<>("201-1", "회원 가입이 완료되었습니다.", new UserDto(user));
+    }
 
 
     record LoginUserForm(
@@ -45,40 +45,40 @@ public class UserController {
 
         User user = userService.loginUser(userForm.username(), userForm.password());
 
-		String accessToken = userService.generateAccessToken(user);
-		rq.addCookie("accessToken", accessToken);
-		rq.addCookie("refreshToken", user.getRefreshToken());
+        String accessToken = userService.generateAccessToken(user);
+        rq.addCookie("accessToken", accessToken);
+        rq.addCookie("refreshToken", user.getRefreshToken());
 
-		return new RsData<>("200-1", "%s님 환영합니다.".formatted(user.getNickname()),
-			new LoginUserDto(accessToken, user.getRefreshToken(), new UserDto(user)));
-	}
+        return new RsData<>("200-1", "%s님 환영합니다.".formatted(user.getNickname()),
+                new LoginUserDto(accessToken, user.getRefreshToken(), new UserDto(user)));
+    }
 
 
-	@PreAuthorize("isAuthenticated()")
+    @PreAuthorize("isAuthenticated()")
     @PostMapping("/logout")
     public RsData<Void> logoutUser() {
 
-		User userIdentity = rq.getUserIdentity();
-		User user = rq.getRealActor(userIdentity);
+        User userIdentity = rq.getUserIdentity();
+        User user = rq.getRealActor(userIdentity);
 
-		userService.logoutUser(user);
+        userService.logoutUser(user);
 
         rq.removeCookie("accessToken");
         rq.removeCookie("refreshToken");
 
-		return new RsData<>("200-1", "로그아웃 되었습니다.");
-	}
+        return new RsData<>("200-1", "로그아웃 되었습니다.");
+    }
 
     //내 정보 조회
-	@PreAuthorize("isAuthenticated()")
-	@GetMapping("/me")
-	public RsData<UserDto> me() {
+    @PreAuthorize("isAuthenticated()")
+    @GetMapping("/me")
+    public RsData<UserDto> me() {
 
-		User userIdentity = rq.getUserIdentity();
-		User user = rq.getRealActor(userIdentity);
+        User userIdentity = rq.getUserIdentity();
+        User user = rq.getRealActor(userIdentity);
 
-		return new RsData<>("200-1", "내 정보 조회가 완료되었습니다.", new UserDto(user));
-	}
+        return new RsData<>("200-1", "내 정보 조회가 완료되었습니다.", new UserDto(user));
+    }
 
     record RefreshUserForm(@NotBlank(message = "refreshToken을 입력해주세요.") String refreshToken) {}
 
@@ -90,14 +90,15 @@ public class UserController {
         User user = userService.getUserByRefreshToken(refreshToken)
                 .orElseThrow(() -> new ServiceException("401-2", "유효하지 않은 RefreshToken입니다."));
 
-		String newAccessToken = userService.generateAccessToken(user);
-		rq.addCookie("accessToken", newAccessToken);
-		rq.addCookie("refreshToken", refreshToken);
+        String newAccessToken = userService.generateAccessToken(user);
+        rq.addCookie("accessToken", newAccessToken);
+        rq.addCookie("refreshToken", refreshToken);
 
-		return new RsData<>("200-1", "AccessToken이 재발급되었습니다.", newAccessToken);
-	}
+        return new RsData<>("200-1", "AccessToken이 재발급되었습니다.", newAccessToken);
+    }
 
     //  내 정보 수정
+    @PreAuthorize("isAuthenticated()")
     @PutMapping("/me")
     public RsData<UserDto> updateMyProfile(@RequestBody @Valid UserUpdateRequest updateRequest) {
         User userIdentity = rq.getUserIdentity();
@@ -107,6 +108,7 @@ public class UserController {
     }
 
     // 회원 탈퇴
+    @PreAuthorize("isAuthenticated()")
     @DeleteMapping("/me")
     public RsData<?> deleteMyProfile() {
         User userIdentity = rq.getUserIdentity();
