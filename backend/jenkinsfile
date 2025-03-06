@@ -1,0 +1,19 @@
+pipeline {
+    agent any
+
+    stages {
+        stage('Checkout') {
+            steps {
+                checkout scm
+            }
+        }
+        stage('Build') {
+            steps {
+                // 'backend' 디렉터리로 이동 후, ./gradlew build 실행
+                dir('backend') {
+                    sh './gradlew build'
+                }
+            }
+        }
+    }
+}
