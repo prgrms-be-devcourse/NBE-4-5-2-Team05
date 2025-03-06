@@ -1,5 +1,6 @@
 package com.NBE_4_5_2.Team5.domain.user.controller;
 
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -50,6 +51,7 @@ public class UserController {
 			new LoginUserDto(accessToken, user.getRefreshToken(), new UserDto(user)));
 	}
 
+	@PreAuthorize("isAuthenticated()")
 	@PostMapping("/logout")
 	public RsData<Void> logout() {
 
@@ -63,6 +65,7 @@ public class UserController {
 		return new RsData<>("200-1", "로그아웃 되었습니다.");
 	}
 
+	@PreAuthorize("isAuthenticated()")
 	@GetMapping("/me")
 	public RsData<UserDto> me() {
 
@@ -72,6 +75,7 @@ public class UserController {
 		return new RsData<>("200-1", "내 정보 조회가 완료되었습니다.", new UserDto(user));
 	}
 
+	@PreAuthorize("isAuthenticated()")
 	@PostMapping("/refresh")
 	public RsData<String> refresh(@RequestBody(required = false) @Valid RefreshUserForm userForm) {
 
