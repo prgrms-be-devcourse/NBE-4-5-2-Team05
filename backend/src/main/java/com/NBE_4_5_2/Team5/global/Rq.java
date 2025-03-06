@@ -29,7 +29,7 @@ public class Rq {
 
     public void setLogin(User actor) {
 
-        UserDetails user = new SecurityUser(actor.getId(), actor.getRole(), actor.getUsername(), "", List.of());
+        UserDetails user = new SecurityUser(actor.getId(), actor.getUsername(), "", "", actor.getRole(), List.of());
 
         SecurityContextHolder.getContext().setAuthentication(
                 new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities())
@@ -59,6 +59,7 @@ public class Rq {
         return User.builder()
                 .id(user.getId())
                 .username(user.getUsername())
+                .nickname(user.getNickname())
                 .role(user.getRole())
                 .build();
     }
@@ -107,8 +108,6 @@ public class Rq {
         cookie.setSecure(true);
         cookie.setAttribute("SameSite", "Strict");
         cookie.setMaxAge(0);
-
-        System.out.println("Removing cookie: " + name + ", MaxAge: " + cookie.getMaxAge());
 
         response.addCookie(cookie);
     }

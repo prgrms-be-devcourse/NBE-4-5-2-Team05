@@ -1,11 +1,14 @@
 package com.NBE_4_5_2.Team5.domain.user.service;
 
+import com.NBE_4_5_2.Team5.domain.user.dto.UserDto;
+import com.NBE_4_5_2.Team5.domain.user.dto.UserUpdateRequest;
 import com.NBE_4_5_2.Team5.domain.user.entity.Role;
 import com.NBE_4_5_2.Team5.domain.user.entity.User;
 import com.NBE_4_5_2.Team5.domain.user.repository.UserRepository;
 import com.NBE_4_5_2.Team5.global.Rq;
 import com.NBE_4_5_2.Team5.global.exception.ServiceException;
 import com.NBE_4_5_2.Team5.global.security.SecurityUser;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -127,5 +130,40 @@ public class UserService {
                 .id(user.getId())
                 .username(user.getUsername())
                 .build();
+    }
+
+    // 내 프로필 수정
+    @Transactional
+    public UserDto updateMyProfile(User user, UserUpdateRequest updateRequest) {
+        // 닉네임 변경
+        if (updateRequest.getNickname() != null) {
+            user.setNickname(updateRequest.getNickname());
+        }
+
+        // 주소 변경
+        if (updateRequest.getAddress() != null) {
+            user.setAddress(updateRequest.getAddress());
+        }
+
+        // 프로필 이미지 변경
+        if (updateRequest.getProfileUrl() != null) {
+            user.setProfileUrl(updateRequest.getProfileUrl());
+        }
+
+        // 이메일 변경 시 중복 체크
+        if (updateRequest.getEmail() != null && !updateRequest.getEmail().equals(user.getEmail())) {
+            if (userRepository.existsByEmail(updateRequest.getEmail())) {
+                throw new ServiceException("400-EMAIL-ALREADY-EXISTS", "이미 사용 중인 이메일입니다.");
+            }
+            user.setEmail(updateRequest.getEmail());
+        }
+
+        return UserDto.fromEntity(user);
+    }
+
+    // 회원 탈퇴
+    @Transactional
+    public void deleteMyProfile(User user) {
+        userRepository.delete(user);
     }
 }
