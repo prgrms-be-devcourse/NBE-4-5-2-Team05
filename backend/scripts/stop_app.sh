@@ -4,7 +4,7 @@ PID_FILE="application.pid"
 
 if [ ! -f "$PID_FILE" ]; then
   echo "PID 파일 ($PID_FILE)이 존재하지 않습니다."
-  exit 1
+  exit 0
 fi
 
 # PID 파일에서 PID 읽기
@@ -12,7 +12,7 @@ PID=$(cat "$PID_FILE")
 
 if [ -z "$PID" ]; then
   echo "PID 파일이 비어있습니다."
-  exit 1
+  exit 0
 fi
 
 echo "PID 파일에서 읽은 PID: $PID"

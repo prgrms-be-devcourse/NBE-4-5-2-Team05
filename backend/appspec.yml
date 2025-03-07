@@ -6,7 +6,7 @@ files:
     destination: /home/ubuntu/app
 
 hooks:
-  AfterInstall:
+  ApplicationStop:
     - location: scripts/stop_app.sh
       timeout: 300
       runas: root
