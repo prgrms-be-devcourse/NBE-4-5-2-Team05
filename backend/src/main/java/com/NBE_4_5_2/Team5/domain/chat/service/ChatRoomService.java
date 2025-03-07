@@ -132,16 +132,21 @@ public class ChatRoomService {
 
     // 현재 방에 참가중인 사용자 조회
     public List<String> getParticipants(String roomId) {
-        List<String> participants = new ArrayList<>();
+        List<String> participants = new ArrayList<>();  // 참가자
+        ChatRoom chatRoom = hashOpsChatRoom.get(CHAT_ROOMS, roomId);
 
-        // 모든 사용자의 세션 Id
-        Map<String,String> entries = hashOpsEnterInfo.entries(ENTER_INFO);
-
-        for(Map.Entry<String,String> entry:entries.entrySet()){
-            if(entry.getValue().equals(roomId)){    // 탐색중인 방
-                participants.add(entry.getKey());   // 참가자의 세션 ID
+        if(chatRoom != null) {
+            System.out.println("보낸놈: "+chatRoom.getSender());
+            System.out.println("받은놈: "+chatRoom.getReceiver());
+            if(chatRoom.getSender()!=null) {
+                participants.add(chatRoom.getSender());
+            }
+            if (chatRoom.getReceiver()!=null) {
+                participants.add(chatRoom.getReceiver());
             }
         }
+        System.out.println("참가자: "+participants);
+
         return participants;
     }
 

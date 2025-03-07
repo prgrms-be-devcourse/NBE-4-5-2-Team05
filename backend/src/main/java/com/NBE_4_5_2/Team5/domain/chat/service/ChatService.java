@@ -70,19 +70,17 @@ public class ChatService {
             List<String> participants=chatRoomService.getParticipants(chatMessage.getRoomId());
 
             // 각 클라이언트의 개별 저장소
-            for(String participant:participants){
-
-                ChatMessage message=ChatMessage.builder()
+            for (String participant : participants) {
+                ChatMessage message = ChatMessage.builder()
                         .type(ChatMessage.MessageType.TALK)
                         .roomId(chatMessage.getRoomId())
-                        .client(participant)        // client 개별 저장
+                        .client(participant) // 참가자 클라이언트를 저장
                         .sender(chatMessage.getSender())
                         .message(chatMessage.getMessage())
                         .userCount(chatRoomService.getUserCount(chatMessage.getRoomId()))
                         .image(chatMessage.getImage())
                         .timestamp(chatMessage.formatTimestamp(LocalDateTime.now()))
                         .build();
-
                 // DB에 저장
                 messageRepository.save(message);
             }
