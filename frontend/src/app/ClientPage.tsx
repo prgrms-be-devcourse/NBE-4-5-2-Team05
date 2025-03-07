@@ -4,24 +4,6 @@ import { Button } from "@/components/ui/button";
 import { useState } from "react";
 
 export default function ClientPage() {
-  // 검색어 상태
-  const [searchQuery, setSearchQuery] = useState("");
-
-  // 선택된 카테고리 상태
-  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
-
-  // 카테고리 리스트 (실제 데이터 연결 X)
-  const categories = ["전자제품", "의류", "도서", "가구", "스포츠", "기타"];
-
-  // 카테고리 체크박스 변경 핸들러 (기능 구현 X)
-  const handleCategoryChange = (category: string) => {
-    setSelectedCategories((prev) =>
-      prev.includes(category)
-        ? prev.filter((c) => c !== category)
-        : [...prev, category]
-    );
-  };
-
   return (
     <div className="flex flex-col gap-4 p-4">
       {/* 상단 섹션 */}
