@@ -23,13 +23,13 @@
             <button class="btn btn-warning btn-sm" @click="clearChat(roomId)">채팅방 비우기</button>
         </div>
     </div>
-    <div class="input-group">
+    <div class="input-group mb-3">
         <div class="input-group-prepend">
             <label class="input-group-text">내용</label>
         </div>
-        <input type="text" class="form-control" v-model="message" v-on:keypress.enter="sendMessage()">
+        <input type="text" class="form-control" v-model="message" v-on:keypress.enter="sendMessage('TALK')">
         <div class="input-group-append">
-            <button class="btn btn-primary" type="button" @click="sendMessage()">보내기</button>
+            <button class="btn btn-primary" type="button" @click="sendMessage('TALK')">보내기</button>
         </div>
     </div>
 
@@ -121,15 +121,17 @@
                 const payload = {
                     type: type,
                     roomId: this.roomId,
-                    message: imageUrl ? null : this.message, // 이미지 메시지인 경우 메시지는 null
-                    image: imageUrl || null, // 이미지 URL이 있을 경우 추가
+                    message: type === 'TALK' ? this.message : null, // TALK일 때만 메시지 내용 포함
+                    image: type === 'IMAGE' ? imageUrl : null, // IMAGE일 때는 이미지 URL 포함
                     sender: localStorage.getItem('username') // 사용자 이름을 로컬 스토리지에서 가져옴
                 };
 
                 console.log("Sending message:", payload); // 전송할 메시지 로그
                 ws.send("/pub/chat/message", {"token": this.token}, JSON.stringify(payload));
                 this.message = ''; // 텍스트 메시지 전송 후 입력 공간 비우기
-                this.refreshMessages();
+                if (type === 'TALK') {
+                    this.refreshMessages();
+                }
             },
             recvMessage(recv) {
                 console.log('Received message:', recv); // 수신한 메시지 로그
@@ -165,7 +167,7 @@
                     params: { roomId: this.roomId }
                 })
                     .then(response => {
-                        _this.messages = response.data; // 기존 메시지 데이터 새로 고침
+                        _this.messages = response.data; // 서버로부터 가져온 메시지 갱신
                     })
                     .catch(error => {
                         console.error("Error fetching messages:", error);

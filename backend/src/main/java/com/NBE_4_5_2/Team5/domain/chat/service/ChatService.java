@@ -61,10 +61,21 @@ public class ChatService {
                 // 이미지
             } else if (ChatMessage.MessageType.IMAGE.equals(chatMessage.getType())) {
                 chatMessage.setMessage("");
-                // 타임스탬프 설정
-                chatMessage.setTimestamp(chatMessage.formatTimestamp(LocalDateTime.now()));
+
+                ChatMessage message=ChatMessage.builder()
+                        .type(ChatMessage.MessageType.IMAGE)
+                        .roomId(chatRoom.getRoomId()) // 동일한 roomId 사용
+                        .client(chatRoom.getId()) // 클라이언트에 맞춰 설정
+                        .sender(chatMessage.getSender()) // 원 메시지의 발신자
+                        .message(chatMessage.getMessage()) // 원 메시지 내용
+                        .userCount(chatMessage.getUserCount())
+                        .image(chatMessage.getImage())
+                        .timestamp(chatMessage.formatTimestamp(LocalDateTime.now()))
+                        .build();
+
                 // redis로 메세지 발송
-                redisTemplate.convertAndSend(channelTopic.getTopic(), chatMessage);
+                redisTemplate.convertAndSend(channelTopic.getTopic(), message);
+                messageRepository.save(message);
 
             } else if (ChatMessage.MessageType.TALK.equals(chatMessage.getType())) {
 
