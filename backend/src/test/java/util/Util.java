@@ -1,11 +1,14 @@
-package com.NBE_4_5_2.Team5;
+package util;
 
 import java.util.List;
+
+import org.springframework.stereotype.Component;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.transaction.Transactional;
 
+@Component
 public class Util {
 
 	@PersistenceContext
@@ -29,4 +32,5 @@ public class Util {
 		// 외래키 제약조건 재활성화
 		entityManager.createNativeQuery("SET REFERENTIAL_INTEGRITY TRUE").executeUpdate();
 	}
+
 }

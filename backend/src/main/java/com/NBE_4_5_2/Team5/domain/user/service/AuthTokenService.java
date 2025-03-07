@@ -15,11 +15,11 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class AuthTokenService {
 
-    @Value("${custom.jwt.secret-key}")
-    private String keyString;
+	@Value("${custom.jwt.secret-key}")
+	private String keyString;
 
-    @Value("${custom.jwt.expire-seconds}")
-    private int expireSeconds;
+	@Value("${custom.jwt.expire-seconds}")
+	private int expireSeconds;
 
     // id, username, role 정보를 담은 accessToken 생성
     String generateAccessToken(User user) {
@@ -35,7 +35,7 @@ public class AuthTokenService {
         );
     }
 
-    Map<String, Object> getPayload(String accessToken) {
+	Map<String, Object> getPayload(String accessToken) {
 
         if (!Ut.Jwt.isValidToken(keyString, accessToken)) {
             return null;
