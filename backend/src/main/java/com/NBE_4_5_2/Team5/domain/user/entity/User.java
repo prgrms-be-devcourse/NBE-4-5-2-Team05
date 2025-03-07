@@ -45,6 +45,7 @@ public class User extends BaseTime {
 	private String password;
 
 	@Column(length = 100, unique = true)
+	@Setter
 	private String refreshToken;
 
 	@Column(length = 50, nullable = false, unique = true)

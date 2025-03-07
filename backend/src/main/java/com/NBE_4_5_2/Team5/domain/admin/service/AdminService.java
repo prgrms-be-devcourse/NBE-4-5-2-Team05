@@ -14,6 +14,7 @@ import com.NBE_4_5_2.Team5.domain.admin.entity.BanList;
 import com.NBE_4_5_2.Team5.domain.admin.entity.NoticePost;
 import com.NBE_4_5_2.Team5.domain.admin.repository.BanListRepository;
 import com.NBE_4_5_2.Team5.domain.admin.repository.NoticePostRepository;
+import com.NBE_4_5_2.Team5.domain.post.post.repository.ProductPostRepository;
 import com.NBE_4_5_2.Team5.domain.user.entity.Role;
 import com.NBE_4_5_2.Team5.domain.user.entity.User;
 import com.NBE_4_5_2.Team5.domain.user.repository.UserRepository;
@@ -36,10 +37,20 @@ public class AdminService {
 	private final NoticePostRepository noticePostRepository;
 	private final UserService userService;
 	private final PasswordEncoder passwordEncoder;
+	private final ProductPostRepository productPostRepository;
 
 	public User signUpAdmin(String username, String password, String email) {
-		User admin = new User(username, passwordEncoder.encode(password), email, "admin", "addr", "profile",
-			Role.ADMIN);
+		User admin =
+			User.builder()
+				.id("user-" + UUID.randomUUID())
+				.role(Role.ADMIN)
+				.username(username)
+				.password(passwordEncoder.encode(password))
+				.email(email)
+				.nickname("admin")
+				.address("addr")
+				.profileUrl("url")
+				.build();
 		admin.setRefreshToken(UUID.randomUUID().toString());
 
 		return userRepository.save(admin);
@@ -88,5 +99,13 @@ public class AdminService {
 		if (!admin.getRole().equals(Role.ADMIN)) {
 			throw new ServiceException(HttpStatus.BAD_REQUEST.toString(), "관리자만 작성할 수 있는 글입니다.");
 		}
+	}
+
+	public void deletePost(String postId) {
+		User loggedInAdmin = getUser();
+
+		isAdmin(loggedInAdmin);
+
+		productPostRepository.deleteById(postId);
 	}
 }

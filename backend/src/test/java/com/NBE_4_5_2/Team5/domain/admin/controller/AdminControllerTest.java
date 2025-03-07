@@ -19,24 +19,31 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
+import com.NBE_4_5_2.Team5.TestConfig;
+import com.NBE_4_5_2.Team5.Util;
 import com.NBE_4_5_2.Team5.domain.admin.entity.BanList;
 import com.NBE_4_5_2.Team5.domain.admin.entity.NoticePost;
 import com.NBE_4_5_2.Team5.domain.admin.repository.BanListRepository;
 import com.NBE_4_5_2.Team5.domain.admin.repository.NoticePostRepository;
+import com.NBE_4_5_2.Team5.domain.admin.service.AdminService;
+import com.NBE_4_5_2.Team5.domain.post.category.entity.Category;
+import com.NBE_4_5_2.Team5.domain.post.category.repository.CategoryRepository;
+import com.NBE_4_5_2.Team5.domain.post.post.entity.ProductPost;
+import com.NBE_4_5_2.Team5.domain.post.post.repository.ProductPostRepository;
 import com.NBE_4_5_2.Team5.domain.user.entity.Role;
 import com.NBE_4_5_2.Team5.domain.user.entity.User;
 import com.NBE_4_5_2.Team5.domain.user.repository.UserRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import config.TestConfig;
 import jakarta.servlet.http.Cookie;
-import util.Util;
 
 @SpringBootTest
 @AutoConfigureMockMvc
+@ActiveProfiles("test")
 @Import(TestConfig.class)
 @Order(-100)
 class AdminControllerTest {
@@ -51,14 +58,20 @@ class AdminControllerTest {
 	@Autowired
 	private ObjectMapper objectMapper;
 	@Autowired
+	private CategoryRepository categoryRepository;
+	@Autowired
 	private BanListRepository banListRepository;
+	@Autowired
+	private ProductPostRepository productPostRepository;
 	@Autowired
 	private Util util;
 	@Autowired
 	private PasswordEncoder passwordEncoder;
+	@Autowired
+	private AdminService adminService;
 
 	@BeforeEach
-	void setUp() throws Exception {
+	public void setUp() throws Exception {
 		util.truncateAllTables();
 	}
 
@@ -79,6 +92,7 @@ class AdminControllerTest {
 				.build());
 		Map<String, Cookie> cookieMap = login(admin.getUsername(), "password");
 
+		// when
 		ResultActions perform = mockMvc.perform(post("/api/admin/notices")
 			.content("""
 				{
@@ -94,6 +108,7 @@ class AdminControllerTest {
 
 		NoticePost noticePost = noticePostRepository.findById(id).get();
 
+		// then
 		perform
 			.andExpect(status().isOk())
 			.andExpect(handler().handlerType(AdminController.class))
@@ -180,5 +195,25 @@ class AdminControllerTest {
 			.andExpect(jsonPath("$.data.banCount").value(foundedUser.get().getBlockedCount()));
 		Assertions.assertThat(foundedUser.get().getBlocked()).isTrue();
 		Assertions.assertThat(foundedUser.get().getBlockedCount()).isEqualTo(user.getBlockedCount() + 1);
+	}
+
+	@Test
+	void deletePost() throws Exception {
+		//given
+		Category category = categoryRepository.save(Category.builder().name("cat1").build());
+		User user = adminService.signUpAdmin("user1", "password", "email");
+		ProductPost post = productPostRepository.save(
+			ProductPost.create(user, "name", 5000, "title", "content", "url", 30F, 40F)
+		);
+
+		Map<String, Cookie> cookieMap = login("user1", "password");
+
+		//when
+		mockMvc.perform(delete("/api/admin/posts/%s".formatted(post.getId()))
+				.cookie(cookieMap.get("accessToken"), cookieMap.get("refreshToken")))
+			.andExpect(status().isOk())
+			.andExpect(handler().handlerType(AdminController.class))
+			.andExpect(handler().methodName("deletePost"));
+
 	}
 }
