@@ -3,4 +3,6 @@ db_dev.mv.db
 db_dev.trace.db
 api.json
 
+.idea
+
 frontend/src/lib/backend/api/
