@@ -27,7 +27,7 @@ public class CustomAuthenticationFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
 
         String url = request.getRequestURI();
-        if (List.of("/api/users/login", "/api/users/signup", "/api/users/refresh", "/error").contains(url)) {
+        if (List.of("/api/users/login", "/api/users/signup", "/error").contains(url)) {
             filterChain.doFilter(request, response);
             return;
         }
@@ -125,7 +125,6 @@ public class CustomAuthenticationFilter extends OncePerRequestFilter {
         }
 
         AuthToken newAuthToken = userService.generateAuthtoken(opRefreshUser.get());
-        rq.addCookie("refreshToken", newAuthToken.refreshToken());
         rq.addCookie("accessToken", newAuthToken.accessToken());
 
         return opRefreshUser.get();

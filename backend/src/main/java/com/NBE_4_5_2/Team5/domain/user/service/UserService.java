@@ -165,7 +165,7 @@ public class UserService {
         return authToken.refreshToken() + " " + authToken.accessToken();
     }
 
-    public String getRefreshTokenByUserId(String userId){
+    public String getRefreshTokenByUserId(String userId) {
         return redisService.getTokenByUserId(userId)
                 .map(RefreshToken::getRefreshToken)
                 .orElseThrow(() -> new ServiceException("401-1", "로그인이 필요합니다."));
@@ -177,12 +177,18 @@ public class UserService {
      * @param refreshToken 검증할 refreshToken
      *                     redis에 존재하지 않을 경우 Optional.empty() 반환
      * @return refreshToken을 기반으로 찾은 User 객체
-     * */
-    public Optional<User> getUserByRefreshToken(String refreshToken){
-        Optional<String> UserId = redisService.getTokenByRefreshToken(refreshToken)
-                .map(RefreshToken::getUserId);
+     */
+    public Optional<User> getUserByRefreshToken(String refreshToken) {
+        Optional<RefreshToken> tokenByRefreshToken = redisService.getTokenByRefreshToken(refreshToken);
 
-        return UserId.flatMap(userRepository::findById);
+        if (tokenByRefreshToken.isEmpty()) {
+            return Optional.empty();
+        }
+
+        String userId = tokenByRefreshToken.get()
+                .getUserId().substring("refreshToken:".length());
+
+        return userRepository.findById(userId);
     }
 
     public long count() {

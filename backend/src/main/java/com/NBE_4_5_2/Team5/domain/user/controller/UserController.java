@@ -92,7 +92,6 @@ public class UserController {
 
         AuthToken newAuthToken = userService.generateAuthtoken(user);
         rq.addCookie("accessToken", newAuthToken.accessToken());
-        rq.addCookie("refreshToken", newAuthToken.refreshToken());
 
         return new RsData<>("200-1", "AccessToken이 재발급되었습니다.", newAuthToken.accessToken());
     }
