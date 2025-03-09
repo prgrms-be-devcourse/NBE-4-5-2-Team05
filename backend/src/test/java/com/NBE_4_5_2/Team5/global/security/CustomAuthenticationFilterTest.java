@@ -1,5 +1,6 @@
 package com.NBE_4_5_2.Team5.global.security;
 
+import com.NBE_4_5_2.Team5.domain.user.dto.AuthToken;
 import com.NBE_4_5_2.Team5.domain.user.entity.User;
 import com.NBE_4_5_2.Team5.domain.user.service.UserService;
 import com.NBE_4_5_2.Team5.global.Rq;
@@ -49,8 +50,10 @@ class CustomAuthenticationFilterTest {
     @BeforeEach
     void setUp() {
         loginedUser = userService.getUserByUsername("user1").get();
-        validAccessToken = userService.generateAccessToken(loginedUser);
-        validRefreshToken = loginedUser.getRefreshToken();
+
+        AuthToken authToken = userService.generateAuthtoken(loginedUser);
+        validRefreshToken = authToken.refreshToken();
+        validAccessToken = authToken.accessToken();
     }
 
     @Test
