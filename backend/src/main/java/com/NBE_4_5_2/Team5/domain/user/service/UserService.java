@@ -65,41 +65,15 @@ public class UserService {
      * 로그아웃 처리 (redis에서 refreshToken 제거)
      *
      * redis에 저장된 refreshToken을 제거합니다.
-     * 로그인된 authentication의 UserId를 기반으로 삭제합니다.
+     * 먼저 로그인된 authentication의 UserId를 기반으로 삭제합니다.
      * 삭제 실패 시 사용자가 보유한 refreshToken을 기반으로 다시 삭제합니다.
      */
     public void logoutUser(User userIdentity) {
         boolean isDeleted = redisService.deleteByUserId(userIdentity.getId());
 
-        // 삭제가 실패했다면 refreshToken을 가져와서 다시 삭제 시도
         if (!isDeleted) {
             rq.getRefreshToken().ifPresent(redisService::deleteByRefreshToken);
         }
-    }
-
-    /**
-     * Redis에 refreshToken 저장
-     *
-     * @param user 로그인한 사용자
-     * @param refreshToken 저장할 refreshToken
-     * redis에 userId로 된 refreshToken이 존재할 경우 삭제 후 저장합니다.
-     */
-    public void saveRefreshToken(User user, String refreshToken) {
-        String userId = user.getId();
-
-        redisService.deleteByUserId(userId);
-        redisService.saveRefreshToken(user, refreshToken);
-    }
-
-    public AuthToken generateAuthtoken(User user) {
-        String refreshToken = authTokenService.generateRefreshToken();
-        String accessToken = authTokenService.generateAccessToken(user);
-
-        return new AuthToken(refreshToken, accessToken);
-    }
-
-    public String generateAccessToken(User user) {
-        return authTokenService.generateAccessToken(user);
     }
 
     public Optional<User> getUserById(String id) {
@@ -110,25 +84,8 @@ public class UserService {
         return userRepository.findByUsername(username);
     }
 
-//    /**
-//     * userId로 refreshToken을 조회하여 가져옴
-//     * @param userId 조회할 userId
-//     * @return userId에 해당하는 refreshToken
-//     * @throws ServiceException userId에 해당하는 refreshToken이 존재하지 않을 경우
-//     * */
-//    public String getRefreshTokenByUserId(String userId) {
-//        return redisService.getRefreshToken(userId)
-//                .map(RefreshToken::getRefreshToken)
-//                .orElseThrow(
-//                        () -> new ServiceException("401-1", "로그인이 필요합니다.")
-//                );
-//    }
-
     /**
-     * 이 메소드는 AccessToken payload에 저장된 id와 username, role만을 가진 User 객체를 반환합니다.
-     * DB 조회를 하지 않기 때문에, 관리자 페이지, 게시글 조회 등 사용자 id 혹은 role을 필요로 하는 경우에 사용할 수 있습니다.
-     * <p>
-     * CustomAuthenticationFilter에서 accessToken을 검증하고 setLogin 하는 과정에 사용됩니다.
+     * AccessToken payload에 저장된 id와 username, role만을 가진 User 객체를 반환
      */
     public Optional<User> getUserByAccessToken(String accessToken) {
 
@@ -151,9 +108,61 @@ public class UserService {
         );
     }
 
-    // TODO: refreshToken redis 이동 후 수정
-    public String getAuthToken(User user) {
-        return user.getRefreshToken() + " " + authTokenService.generateAccessToken(user);
+    /**
+     * Redis에 refreshToken 저장
+     *
+     * @param user         로그인한 사용자
+     * @param refreshToken 저장할 refreshToken
+     *                     기존에 userId로 저장된 refreshToken이 존재할 경우 덮어 씌웁니다.
+     */
+    public void saveRefreshToken(User user, String refreshToken) {
+        redisService.saveRefreshToken(user, refreshToken);
+    }
+
+    /**
+     * refreshToken 검증
+     *
+     * @param user         로그인한 사용자
+     * @param refreshToken 검증할 refreshToken
+     * @throws ServiceException 사용자의 userId로 된 refreshToken이 존재하지 않거나 값이 일치하지 않을 경우
+     */
+    public void validateRefreshToken(User user, String refreshToken) {
+        String userId = user.getId();
+
+        String storedRefreshToken = redisService.getRefreshTokenByUserId(userId)
+                .map(RefreshToken::getRefreshToken)
+                .orElseThrow(() -> new ServiceException("401-1", "로그인이 필요합니다."));
+
+        if (!storedRefreshToken.equals(refreshToken)) {
+            throw new ServiceException("401-2", "유효하지 않은 RefreshToken입니다.");
+        }
+    }
+
+    /**
+     * User 정보로 AuthToken을 생성하여 반환
+     * refreshToken은 redis에 저장됨
+     *
+     * @param user 로그인한 사용자
+     * @return refreshToken, accessToken을 담은 AuthToken 객체
+     */
+    public AuthToken generateAuthtoken(User user) {
+        String refreshToken = authTokenService.generateRefreshToken();
+        String accessToken = authTokenService.generateAccessToken(user);
+
+        saveRefreshToken(user, refreshToken);
+        return new AuthToken(refreshToken, accessToken);
+    }
+
+    /**
+     * User 정보로 AuthToken을 생성하여 String 형태로 반환
+     *
+     * @param user 로그인한 사용자
+     * @return refreshToken, accessToken을 공백으로 구분한 문자열
+     *        refreshToken은 redis에 저장됨
+     */
+    public String generateAuthTokenAsString(User user) {
+        AuthToken authToken = generateAuthtoken(user);
+        return authToken.refreshToken() + " " + authToken.accessToken();
     }
 
     public long count() {

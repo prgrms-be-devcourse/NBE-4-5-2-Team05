@@ -60,8 +60,8 @@ public class ProductPostControllerTest {
         buyer = userService.getUserByUsername("user2").orElseThrow();
 
         // JWT 토큰 발급
-        sellerToken = userService.getAuthToken(seller);
-        buyerToken = userService.getAuthToken(buyer);
+        sellerToken = userService.generateAuthTokenAsString(seller);
+        buyerToken = userService.generateAuthTokenAsString(buyer);
     }
 
     @Test

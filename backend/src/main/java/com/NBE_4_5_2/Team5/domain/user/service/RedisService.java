@@ -39,13 +39,13 @@ public class RedisService {
     /**
      * redis에 refreshToken 조회
      */
-    public Optional<RefreshToken> getRefreshToken(String userId) {
+    public Optional<RefreshToken> getRefreshTokenByUserId(String userId) {
         String key = REFRESH_TOKEN_KEY + userId;
         return redisRepository.findById(key);
     }
 
     /**
-     * redis에 refreshToken 삭제
+     * refreshToken 삭제
      * @param userId 삭제할 userId
      * @return 삭제 성공 여부
      */
@@ -60,7 +60,7 @@ public class RedisService {
     }
 
     /**
-     * redis에 Refresh Token 삭제
+     * Refresh Token 삭제
      * @param refreshToken 삭제할 Refresh Token
      */
     public void deleteByRefreshToken(String refreshToken) {
