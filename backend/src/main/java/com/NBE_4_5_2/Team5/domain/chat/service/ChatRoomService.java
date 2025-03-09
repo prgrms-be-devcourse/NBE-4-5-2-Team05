@@ -41,10 +41,13 @@ public class ChatRoomService {
     // roomId로 조회
     public List<ChatRoom> findByRoomId(String roomId) {
         List<ChatRoom> chatRooms = new ArrayList<>();
+
         for (String key : hashOpsChatRoom.keys(CHAT_ROOMS)) {
             if (key.startsWith(roomId)) {
                 ChatRoom chatRoom = hashOpsChatRoom.get(CHAT_ROOMS, key);
-                chatRooms.add(chatRoom);
+                if(chatRoom!=null){
+                    chatRooms.add(chatRoom);
+                }
             }
         }
 
@@ -94,10 +97,8 @@ public class ChatRoomService {
 
     // 접근 검증
     public boolean canAccess(String roomId, String username) {
-        System.out.println("사용자:"+username);
         for (ChatRoom chatRoom : findByRoomId(roomId)) {
             if (chatRoom.getRoomId().equals(roomId) && chatRoom.getClient().equals(username)) {
-                System.out.println("조회하려는 방: "+roomId);
                 return true; // 접근 허용
             }
         }
@@ -105,7 +106,7 @@ public class ChatRoomService {
     }
 
     // 참가한 채팅방 목록 조회
-    public List<ChatRoom> getRoomByUser(String username) {
+    public List<ChatRoom> findRoomByUser(String username) {
         List<ChatRoom> chatRooms = new ArrayList<>();
 
         for(ChatRoom chatRoom : findAllRoom()) {
@@ -116,6 +117,7 @@ public class ChatRoomService {
         return chatRooms;
     }
 
+    // 개별저장소 탐색
     public ChatRoom findChatRoomByClient(String roomId,String username) {
         for(ChatRoom chatRoom : findByRoomId(roomId)) {
             if(chatRoom.getClient().equals(username)) {
@@ -139,9 +141,7 @@ public class ChatRoomService {
     // 채팅방 삭제
     public void deleteChatRoom(String roomId, String username) {
         ChatRoom chatRoom= findChatRoomByClient(roomId,username);
-        System.out.println("삭제할 채팅방:"+chatRoom);
         String client=chatRoom.getId();
-        System.out.println("client:"+client);
         hashOpsChatRoom.delete(CHAT_ROOMS, roomId + "_" + username);     // redis에서 삭제
         messageRepository.deleteAllByClient(client);
     }
@@ -193,10 +193,13 @@ public class ChatRoomService {
     public String findByRoomIdByUsers(String sender, String receiver) {
         for(String key:hashOpsEnterInfo.keys(CHAT_ROOMS)) {
             ChatRoom chatRoom= hashOpsChatRoom.get(CHAT_ROOMS,key);
-
-            if(chatRoom.getSender().equals(sender) && chatRoom.getReceiver().equals(receiver)
-            || chatRoom.getSender().equals(receiver) && chatRoom.getReceiver().equals(sender)) {
-                return chatRoom.getRoomId();
+            if(chatRoom!=null){
+                if(chatRoom.getSender().equals(sender) && chatRoom.getReceiver().equals(receiver)
+                        || chatRoom.getSender().equals(receiver) && chatRoom.getReceiver().equals(sender)) {
+                    return chatRoom.getRoomId();
+                }
+            }else {
+                break;
             }
         }
         return null;

@@ -38,13 +38,11 @@ public class ChatService {
     public void sendChatMessage(ChatMessage chatMessage) {
         chatMessage.setUserCount(chatRoomService.getUserCount(chatMessage.getRoomId()));
         List<ChatRoom> chatRooms=chatRoomService.findByRoomId(chatMessage.getRoomId());
-
         // roomId에 해당하는 방이 하나만 존재
         if(chatRooms.size()==1){
             String receiver = chatRoomService.findOther(chatMessage.getRoomId(), chatMessage.getSender());
+
             String sender = chatMessage.getSender();
-            System.out.println("메세지전송자(클라이언트측): "+sender);
-            System.out.println("새로운 클라리언트: "+receiver);
             ChatRoom chatRoom=chatRoomService.createChatRoom(receiver,sender);
             chatRooms.add(chatRoom);
         }

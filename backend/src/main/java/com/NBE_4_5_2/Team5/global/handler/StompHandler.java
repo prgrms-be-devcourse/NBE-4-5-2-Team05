@@ -47,12 +47,35 @@ public class StompHandler implements ChannelInterceptor {
             chatRoomService.setUserEnterInfo(sessionId, roomId);
             // 채팅방의 인원수를 +1한다.
             chatRoomService.plusUserCount(roomId);
+            // 클라이언트 입장 메시지를 채팅방에 발송한다.(redis publish)
+//            String nickname = authTokenService.getUsernameFromToken(jwtToken);
+            String name = Optional.ofNullable((Principal) message.getHeaders().get("simpUser")).map(Principal::getName).orElse("UnknownUser");
+            String nickname=authTokenService.getNicknameFromName(name);
+            chatService.sendChatMessage(ChatMessage.builder()
+                    .type(ChatMessage.MessageType.ENTER)
+                    .roomId(roomId)
+                    .sender(nickname)
+                    .build());
+            log.info("SUBSCRIBED {}, {}", nickname, roomId);
         } else if (StompCommand.DISCONNECT == accessor.getCommand()) { // Websocket 연결 종료
             // 연결이 종료된 클라이언트 sesssionId로 채팅방 id를 얻는다.
             String sessionId = (String) message.getHeaders().get("simpSessionId");
             String roomId = chatRoomService.getUserEnterRoomId(sessionId);
             // 채팅방의 인원수를 -1한다.
-            chatRoomService.minusUserCount(roomId);        }
+            chatRoomService.minusUserCount(roomId);
+            // 클라이언트 퇴장 메시지를 채팅방에 발송한다.(redis publish)
+            String name = Optional.ofNullable((Principal) message.getHeaders().get("simpUser")).map(Principal::getName).orElse("UnknownUser");
+            String nickname=authTokenService.getNicknameFromName(name);
+//            String nickname = authTokenService.getUsernameFromToken(jwtToken);
+            chatService.sendChatMessage(ChatMessage.builder()
+                    .type(ChatMessage.MessageType.QUIT)
+                    .roomId(roomId)
+                    .sender(nickname)
+                    .build());
+            // 퇴장한 클라이언트의 roomId 맵핑 정보를 삭제한다.
+            chatRoomService.removeUserEnterInfo(sessionId);
+            log.info("DISCONNECTED {}, {}", sessionId, roomId);
+        }
         return message;
     }
 
