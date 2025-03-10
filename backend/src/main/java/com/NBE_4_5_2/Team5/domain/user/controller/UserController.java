@@ -15,6 +15,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Random;
+
 @RestController
 @RequestMapping("/api/users")
 @RequiredArgsConstructor
@@ -116,4 +118,30 @@ public class UserController {
         return new RsData<>("200", "회원 탈퇴 성공", new Empty());
     }
 
+
+    record SendEmailUserForm(String email){}
+    //이메일 전송
+    @PostMapping("/email")
+    public RsData<Void> sendEmail(@RequestBody SendEmailUserForm userForm) {
+
+        String subject = "회원가입 인증 메일입니다.";
+        Random random = new Random();
+        int code = random.nextInt(9000) + 1000;
+        String text = "인증 코드는 " + code + "입니다.";
+        userService.send(userForm.email(), subject, text, code);
+        return new RsData<>("200-1", "이메일이 발송되었습니다.");
+    }
+
+
+    record VerifyEmailUserForm(String email, String code){}
+    //이메일 인증
+    @PostMapping("/email/verify")
+    public RsData<Void> verifyEmail(@RequestBody VerifyEmailUserForm userForm) {
+        String email = userForm.email();
+        String code = userForm.code(); //사용자가 입력한 코드
+        String savedCode = userService.getVerificationCode(email); //redis에 저장된 코드
+        userService.verificationEmail(code, savedCode);
+
+        return new RsData<>("200-1", "이메일이 인증에 성공했습니다.");
+    }
 }
