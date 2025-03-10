@@ -66,7 +66,7 @@ src/main/resources/application*.yml
 
 # Generated OpenAPI Files
 apiV1.json
-frontend/src/lib/backend/api/schema.d.ts
+frontend/src/lib/backend/apiV1/schema.d.ts
 
 
 
