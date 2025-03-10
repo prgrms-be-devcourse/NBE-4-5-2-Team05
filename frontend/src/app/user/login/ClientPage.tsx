@@ -42,7 +42,7 @@ export default function ClientPage() {
 
   return (
     <>
-      <div className="flex items-center justify-center h-full">
+      <div className="flex items-center justify-center h-screen">
         <div className="flex flex-col gap-2">
           <form onSubmit={login} className="flex flex-col w-full gap-2">
             <Input

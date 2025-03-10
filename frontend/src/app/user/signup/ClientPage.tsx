@@ -61,7 +61,7 @@ export default function ClientPage() {
       <div className="flex items-center justify-center h-full">
         <div className="flex flex-col gap-2">
           <h2 className="text-xl font-bold text-center">회원가입</h2>
-          <form onSubmit={join} className="flex flex-col w-full gap-2">
+          <form onSubmit={join} className="flex flex-col w-[350px] gap-2">
             <Input
               type="text"
               name="username"
@@ -102,7 +102,7 @@ export default function ClientPage() {
               type="text"
               name="address"
               placeholder="주소"
-              className="border-2 border-black"
+              className="border-2 border-black w-[500px]"
               value={formData.address}
               onChange={handleChange}
             />
@@ -110,7 +110,7 @@ export default function ClientPage() {
               type="url"
               name="profileUrl"
               placeholder="프로필URL"
-              className="border-2 border-black w-full"
+              className="border-2 border-black w-[500px]"
               value={formData.profileUrl}
               onChange={handleChange}
             />
