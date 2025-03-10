@@ -83,6 +83,23 @@ public class ChatService {
                 redisTemplate.convertAndSend(channelTopic.getTopic(), message);
                 messageRepository.save(message);
 
+            }else if (ChatMessage.MessageType.LOCATION.equals(chatMessage.getType())) {
+                // LOCATION 타입 처리를 위한 코드 추가
+                ChatMessage message = ChatMessage.builder()
+                        .type(ChatMessage.MessageType.LOCATION)
+                        .roomId(chatRoom.getRoomId()) // 동일한 roomId 사용
+                        .client(chatRoom.getId()) // 클라이언트에 맞춰 설정
+                        .sender(chatMessage.getSender()) // 원 메시지의 발신자
+                        .message("위치 전송") // 메시지 내용
+                        .userCount(chatMessage.getUserCount())
+                        .latitude(chatMessage.getLatitude()) // 위도 설정
+                        .longitude(chatMessage.getLongitude()) // 경도 설정
+                        .timestamp(chatMessage.formatTimestamp(LocalDateTime.now()))
+                        .build();
+
+                // Redis로 메시지 발송
+                redisTemplate.convertAndSend(channelTopic.getTopic(), message);
+                messageRepository.save(message);
             }
         }
     }
