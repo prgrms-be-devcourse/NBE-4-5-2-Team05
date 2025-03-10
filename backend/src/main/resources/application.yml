@@ -33,7 +33,6 @@ spring:
         default_batch_fetch_size: 100
     open-in-view: false
   profiles:
-    active: dev
     include: secret
 
   security:
