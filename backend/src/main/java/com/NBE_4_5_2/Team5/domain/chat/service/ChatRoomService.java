@@ -40,8 +40,9 @@ public class ChatRoomService {
 
     // roomId로 조회
     public List<ChatRoom> findByRoomId(String roomId) {
-        List<ChatRoom> chatRooms = new ArrayList<>();
+        if(roomId == null) return null;
 
+        List<ChatRoom> chatRooms = new ArrayList<>();
         for (String key : hashOpsChatRoom.keys(CHAT_ROOMS)) {
             if (key.startsWith(roomId)) {
                 ChatRoom chatRoom = hashOpsChatRoom.get(CHAT_ROOMS, key);
@@ -50,7 +51,6 @@ public class ChatRoomService {
                 }
             }
         }
-
         return chatRooms;
     }
 

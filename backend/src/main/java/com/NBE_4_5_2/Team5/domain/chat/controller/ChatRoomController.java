@@ -70,7 +70,6 @@ public class ChatRoomController {
         ProductPostResponse postResponse=productPostService.getPost(postId);
 
         String receiver = postResponse.getWriterName();
-
         ChatRoom chatRoom = chatRoomService.createChatRoom(sender,receiver);
 
         return new RsData<>("200",receiver+"와의 채팅방",chatRoom);
