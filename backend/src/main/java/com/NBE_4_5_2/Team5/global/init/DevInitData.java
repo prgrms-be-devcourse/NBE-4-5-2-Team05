@@ -1,7 +1,5 @@
 package com.NBE_4_5_2.Team5.global.init;
 
-
-import org.apache.commons.lang3.SystemUtils;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -22,78 +20,64 @@ import java.util.List;
 @Profile("dev")
 @Configuration
 public class DevInitData {
+
+    private static final String API_URL = "http://localhost:8080/v3/api-docs/api";
+    private static final String API_JSON_FILE = "apiV1.json";
+
     @Bean
     public ApplicationRunner devApplicationRunner() {
-        List<String> commands;
-        if (SystemUtils.IS_OS_WINDOWS) {
-            commands = List.of("cmd.exe", "/c",
-                    "npx --package typescript --package openapi-typescript --package punycode openapi-typescript api.json -o ../frontend/src/lib/backend/api/schema.d.ts");
-        }
-        else {
-            commands = List.of("ls", "-l",
-                    "npx --package typescript --package openapi-typescript --package punycode openapi-typescript api.json -o ../frontend/src/lib/backend/api/schema.d.ts\n");
-        }
         return args -> {
-            genApiJsonFile("http://localhost:8080/v3/api-docs/api", "api.json");
-            runCmd(commands);
+            generateApiJsonFile();
+            executeCommand();
         };
     }
 
-    public void runCmd(List<String> command) {
+    private void executeCommand() {
+        List<String> tsGenCommand = getTsGenCommand();
+        ProcessBuilder processBuilder = new ProcessBuilder(tsGenCommand);
+        processBuilder.redirectErrorStream(true);
+
         try {
-            ProcessBuilder processBuilder = new ProcessBuilder(command);
-            processBuilder.redirectErrorStream(true); // 표준 에러를 표준 출력과 합침
-
             Process process = processBuilder.start();
-
-            // 명령어 실행 결과 읽기
             try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
-                String line;
-
-                while ((line = reader.readLine()) != null) {
-                    System.out.println(line);
-                }
+                reader.lines().forEach(System.out::println);
             }
 
-            // 프로세스 종료 코드 확인
             int exitCode = process.waitFor();
             System.out.println("프로세스 종료 코드: " + exitCode);
-
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (IOException | InterruptedException e) {
+            throw new RuntimeException("명령 실행 중 오류 발생: " + tsGenCommand, e);
         }
     }
 
-    public void genApiJsonFile(String url, String filename) {
-
-        Path filePath = Path.of(filename); // 저장할 파일명
-
-        // HttpClient 생성
+    private void generateApiJsonFile() {
+        Path filePath = Path.of(API_JSON_FILE);
         HttpClient client = HttpClient.newHttpClient();
-
-        // HTTP 요청 생성
-        HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(url))
-                .GET()
-                .build();
-
         try {
-            // 요청 보내고 응답 받기
+            HttpRequest request = HttpRequest.newBuilder().uri(URI.create(API_URL)).GET().build();
             HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
 
-            // 응답 상태 코드 확인
-            if (response.statusCode() == 200) {
-                // JSON 데이터 파일로 저장
-                Files.writeString(filePath, response.body(), StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
-                System.out.println("JSON 데이터가 " + filePath.toAbsolutePath() + "에 저장되었습니다.");
-            } else {
-                System.err.println("오류: HTTP 상태 코드 " + response.statusCode());
+            if (response.statusCode() != 200) {
+                throw new RuntimeException("API 요청 실패: HTTP 상태 코드 " + response.statusCode());
             }
-        } catch (IOException | InterruptedException e) {
-            e.printStackTrace();
-        }
 
+            Files.writeString(filePath, response.body(), StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
+            System.out.println("JSON 데이터가 " + filePath.toAbsolutePath() + "에 저장되었습니다.");
+        } catch (IOException | InterruptedException e) {
+            throw new RuntimeException("API JSON 파일 생성 중 오류 발생: " + API_JSON_FILE, e);
+        }
     }
 
-}
+    // ✅ OS에 따라 명령어 설정
+    private static List<String> getTsGenCommand() {
+        String os = System.getProperty("os.name").toLowerCase();
 
+        if (os.contains("win")) {
+            return List.of("cmd.exe", "/c", "npx --package typescript --package openapi-typescript --package punycode openapi-typescript "
+                    + API_JSON_FILE + " -o ../frontend/src/lib/backend/apiV1/schema.d.ts");
+        } else {
+            return List.of("sh", "-c", "npx --package typescript --package openapi-typescript --package punycode openapi-typescript "
+                    + API_JSON_FILE + " -o ../frontend/src/lib/backend/apiV1/schema.d.ts");
+        }
+    }
+}

@@ -84,7 +84,7 @@ gradle
 src/main/resources/application*.yml
 
 # Generated OpenAPI Files
-api.json
+apiV1.json
 frontend/src/lib/backend/api/schema.d.ts
 
 
