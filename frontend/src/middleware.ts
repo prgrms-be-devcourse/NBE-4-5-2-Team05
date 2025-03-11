@@ -10,6 +10,10 @@ export async function middleware(request: NextRequest) {
   const { isLogin, isExpired } = parseAccessToken(myCookie.get("accessToken"));
   const refresTokenCookie = myCookie.get("refreshToken");
 
+  if (request.nextUrl.pathname.startsWith("/user/me") && !isLogin) {
+    return NextResponse.redirect(new URL("/", request.url));
+  }
+
   if (isLogin && isExpired) {
     return refreshAccessToken(refresTokenCookie);
   }
@@ -57,3 +61,7 @@ function isProtectedRoute(pathname: string) {
     pathname.startsWith("/post/write") || pathname.startsWith("/post/edit")
   );
 }
+
+export const config = {
+  matcher: ["/user/me/:path*"], // `/user/me` 및 모든 하위 경로에 적용
+};
