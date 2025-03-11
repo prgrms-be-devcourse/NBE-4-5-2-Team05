@@ -4,6 +4,20 @@ import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import axios from "axios";
 
+// AWS S3에 파일을 업로드하는 API 엔드포인트는 "/api/uploadFile" 입니다.
+// 이 엔드포인트는 파일을 MultipartFile로 받고, 업로드된 파일 URL을 String으로 반환합니다.
+const uploadFile = async (file: File): Promise<string> => {
+  const formData = new FormData();
+  formData.append("file", file);
+  const response = await axios.post("/api/uploadFile", formData, {
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
+  });
+  // response.data는 업로드된 파일의 URL을 포함합니다.
+  return response.data;
+};
+
 export default function PostCreatePage() {
   const router = useRouter();
 
@@ -16,19 +30,20 @@ export default function PostCreatePage() {
   const [location, setLocation] = useState("");
   const [latitude, setLatitude] = useState<number | "">("");
   const [longitude, setLongitude] = useState<number | "">("");
-  // 이미지 선택 UI (현재 파일 업로드 기능은 구현하지 않음)
+  // 이미지 파일 선택 state
   const [selectedFiles, setSelectedFiles] = useState<FileList | null>(null);
 
-  // 백엔드는 이미지 URL 리스트를 받도록 설계되어 있으므로, 지금은 빈 배열로 전송합니다.
-  const imageUrlList: string[] = [];
+  // 백엔드는 이미지 URL 리스트(imageUrlList)를 받도록 설계되어 있음
+  // 여기서는 S3 업로드 후 받은 URL들을 이 배열에 저장합니다.
+  const [imageUrlList, setImageUrlList] = useState<string[]>([]);
 
-  // 카테고리 문자열을 카테고리 ID 배열로 변환하는 간단한 매핑 예시
+  // 간단한 카테고리 매핑 예시 (문자열을 카테고리 ID 배열로 변환)
   const getCategoryIds = (category: string): number[] => {
     const mapping: Record<string, number> = {
       전자제품: 1,
       가구: 2,
       의류: 3,
-      // 필요에 따라 추가
+      // 필요한 카테고리 추가
     };
     return category ? [mapping[category]] : [];
   };
@@ -37,13 +52,23 @@ export default function PostCreatePage() {
     e.preventDefault();
 
     try {
+      let uploadedUrls: string[] = [];
+      if (selectedFiles && selectedFiles.length > 0) {
+        // 선택된 파일들을 S3에 업로드하고 URL 배열 생성
+        uploadedUrls = await Promise.all(
+          Array.from(selectedFiles).map((file) => uploadFile(file))
+        );
+      }
+      setImageUrlList(uploadedUrls);
+
+      // 게시글 생성 API로 보낼 JSON 데이터 구성
       const data = {
         productName,
         productPrice: price === "" ? 0 : Number(price),
         title,
         content,
         categoryIds: getCategoryIds(category),
-        imageUrlList, // 현재는 빈 배열
+        imageUrlList: uploadedUrls,
         latitude: latitude === "" ? 0 : Number(latitude),
         longitude: longitude === "" ? 0 : Number(longitude),
       };
@@ -54,7 +79,7 @@ export default function PostCreatePage() {
         },
       });
 
-      // 글 작성 완료 후 판매물품 리스트 페이지로 이동
+      // 게시글 생성 성공 시 판매목록 페이지로 이동
       router.push("/posts");
     } catch (err) {
       console.error("게시글 작성 실패", err);
@@ -111,7 +136,7 @@ export default function PostCreatePage() {
             <option value="전자제품">전자제품</option>
             <option value="가구">가구</option>
             <option value="의류">의류</option>
-            {/* 필요한 카테고리 더 추가 */}
+            {/* 필요한 카테고리 추가 */}
           </select>
         </div>
 
@@ -162,12 +187,11 @@ export default function PostCreatePage() {
         </div>
 
         <div className="mb-4">
-          <label className="block mb-1 font-semibold">사진 추가 (미구현)</label>
+          <label className="block mb-1 font-semibold">사진 추가</label>
           <input
             type="file"
             multiple
             onChange={(e) => setSelectedFiles(e.target.files)}
-            disabled
           />
         </div>
 

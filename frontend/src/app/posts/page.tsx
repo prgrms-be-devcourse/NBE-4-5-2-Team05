@@ -4,10 +4,10 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import Link from "next/link";
-import Notice from "@/components/Notice";
-import FilterSidebar from "@/components/FilterSiderbar";
-import PostList, { Post } from "@/components/PostList";
-import Pagination from "@/components/Pagination";
+import Notice from "@/components/posts/Notice";
+import FilterSidebar from "@/components/posts/FilterSiderbar";
+import PostList, { Post } from "@/components/posts/PostList";
+import Pagination from "@/components/posts/Pagination";
 
 interface PostsResponseData {
   items: Post[];
