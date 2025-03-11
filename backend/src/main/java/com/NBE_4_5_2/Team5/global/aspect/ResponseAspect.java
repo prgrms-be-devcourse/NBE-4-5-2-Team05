@@ -16,11 +16,7 @@ import lombok.RequiredArgsConstructor;
 public class ResponseAspect {
 	private final HttpServletResponse response;
 
-	@Around("""
-		(
-		execution(* com.NBE_4_5_2.Team5..*Service.*(..)) ||
-		within(@jakarta.persistence.Entity *)
-		)""")
+	@Around("execution(* com.NBE_4_5_2.Team5..*Controller.*(..))")
 	public Object responseAspect(ProceedingJoinPoint joinPoint) throws Throwable {
 		Object result = joinPoint.proceed();
 
