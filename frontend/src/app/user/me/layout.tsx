@@ -33,7 +33,7 @@ export default function UserLayout({
       <aside className="border-r p-4 space-y-2 flex flex-col">
         <h2 className="font-bold text-xl mb-2">내 정보</h2>
 
-        <Link href="/user/me/info">
+        <Link href="/user/me/modify">
           <Button
             variant="ghost"
             className={`cursor-pointer w-full justify-start ${pathname === "/user/me/info" ? "bg-blue-100 text-blue-600" : ""}`}

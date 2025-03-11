@@ -2,60 +2,36 @@
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { components } from "@/lib/backend/apiV1/schema";
 import client from "@/lib/client";
+import { faP } from "@fortawesome/free-solid-svg-icons";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
-export default function ClientPage() {
+export default function ClientPage({
+  userInfo,
+}: {
+  userInfo: components["schemas"]["UserDto"];
+}) {
   const router = useRouter();
-  const [formData, setFormData] = useState({
-    email: "",
-    nickname: "",
-    address: "",
-    profileUrl: "",
-  });
 
-  useEffect(() => {
-    async function fetchUserData() {
-      const response = await client.GET("/api/users/me", {
-        credentials: "include",
-      });
-
-      if (response.error) {
-        alert("사용자 정보를 불러오지 못했습니다.");
-        return;
-      }
-
-      const rsData = response.data.data;
-
-      setFormData({
-        nickname: rsData.nickname || "",
-        email: rsData.email || "",
-        address: rsData.address || "",
-        profileUrl: rsData.profileUrl || "",
-      });
-    }
-
-    fetchUserData();
-  }, []);
-
-  function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    });
-  }
-
-  async function updateInfo(e: React.FormEvent) {
+  async function updateInfo(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
 
-    if (formData.nickname.length < 2 || formData.nickname.length > 20) {
-      alert("닉네임은 2~20자 사이여야 합니다.");
-      return;
-    }
+    const formData = e.target as HTMLFormElement;
+    console.log(formData);
+    const email = formData.email.value;
+    const nickname = formData.nickname.value;
+    const address = formData.address.value;
+    const profileUrl = formData.profileUrl.value;
 
     const response = await client.PUT("/api/users/me", {
-      body: formData,
+      body: {
+        email,
+        nickname,
+        address,
+        profileUrl,
+      },
       credentials: "include",
     });
 
@@ -87,9 +63,7 @@ export default function ClientPage() {
                 name="email"
                 placeholder="이메일"
                 className="border-2 border-black"
-                value={formData.email}
-                onChange={handleChange}
-                required
+                defaultValue={userInfo.email}
               />
             </div>
             <div>
@@ -105,9 +79,7 @@ export default function ClientPage() {
                 name="nickname"
                 placeholder="닉네임"
                 className="border-2 border-black"
-                value={formData.nickname}
-                onChange={handleChange}
-                required
+                defaultValue={userInfo.nickname}
               />
             </div>
             <div>
@@ -122,8 +94,7 @@ export default function ClientPage() {
                 name="address"
                 placeholder="주소"
                 className="border-2 border-black w-[500px]"
-                value={formData.address}
-                onChange={handleChange}
+                defaultValue={userInfo.address}
               />
             </div>
             <div>
@@ -138,8 +109,7 @@ export default function ClientPage() {
                 name="profileUrl"
                 placeholder="프로필URL"
                 className="border-2 border-black w-[500px]"
-                value={formData.profileUrl}
-                onChange={handleChange}
+                defaultValue={userInfo.profileUrl}
               />
             </div>
 

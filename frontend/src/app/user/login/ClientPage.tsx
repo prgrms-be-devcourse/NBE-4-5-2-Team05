@@ -4,8 +4,11 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import client from "@/lib/client";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 export default function ClientPage() {
+  const router = useRouter();
+
   async function login(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     const form = e.target as HTMLFormElement;
@@ -37,6 +40,7 @@ export default function ClientPage() {
     }
 
     alert("로그인 성공하셨습니다.");
+    router.refresh();
     window.location.href = "/";
   }
 
