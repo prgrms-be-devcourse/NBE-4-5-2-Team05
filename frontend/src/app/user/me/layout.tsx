@@ -2,7 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -17,14 +17,32 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
+import client from "@/lib/client";
 
 export default function UserLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const [showSellOptions, setShowSellOptions] = useState(false);
-  const [showBuyOptions, setShowBuyOptions] = useState(false);
+  const router = useRouter();
+
+  async function handleDeleteAccount() {
+    const confirmDelete = confirm("정말로 회원 탈퇴를 하시겠습니까?");
+    if (!confirmDelete) return;
+
+    const response = await client.DELETE("/api/users/me", {
+      credentials: "include",
+    });
+
+    if (response.error) {
+      alert(response.error.message);
+      return;
+    }
+
+    alert("회원 탈퇴가 완료되었습니다.");
+    window.location.href = "/";
+  }
+
   const pathname = usePathname();
 
   return (
@@ -123,11 +141,11 @@ export default function UserLayout({
           </AccordionItem>
         </Accordion>
 
-        <Link href="/user/me/delete">
+        <Link href="/user/me">
           <Button
+            onClick={handleDeleteAccount}
             variant="ghost"
-            className={`w-full justify-start h-[40px] px-3 ${
-              pathname === "/user/me/delete" ? "bg-blue-100 text-blue-600" : ""
+            className={`w-full justify-start h-[40px] px-3 "bg-blue-100 text-blue-600"
             }`}
           >
             <FontAwesomeIcon icon={faSignOutAlt} className="mr-2" />
