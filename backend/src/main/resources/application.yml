@@ -12,6 +12,10 @@ spring:
     ansi:
       enabled: always
 
+  data:
+    redis:
+      port: 6379
+      host: localhost
 
   datasource:
     url: jdbc:h2:./db_dev;MODE=MySQL
@@ -20,10 +24,6 @@ spring:
     driver-class-name: org.h2.Driver
     hikari:
       auto-commit: false
-  data:
-    redis:
-      host: localhost
-      port: 6379
 
   jpa:
     hibernate:
