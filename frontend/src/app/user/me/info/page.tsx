@@ -5,13 +5,5 @@ import { parseAccessToken } from "@/app/util/auth";
 import { redirect } from "next/navigation";
 
 export default async function Page() {
-  const myCookie = await cookies();
-
-  const { isLogin, payload } = parseAccessToken(myCookie.get("accessToken"));
-
-  if (!isLogin) {
-    redirect("/");
-  }
-
   return <ClientPage />;
 }

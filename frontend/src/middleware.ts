@@ -62,6 +62,7 @@ function isProtectedRoute(pathname: string) {
   );
 }
 
+// middleware 지날 곳을 향후에 더 추가
 export const config = {
   matcher: ["/user/me/:path*"], // `/user/me` 및 모든 하위 경로에 적용
 };
