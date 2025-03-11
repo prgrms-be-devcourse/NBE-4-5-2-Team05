@@ -12,7 +12,7 @@ import org.springframework.stereotype.Service;
 
 import com.NBE_4_5_2.Team5.domain.user.dto.UserDto;
 import com.NBE_4_5_2.Team5.domain.user.entity.User;
-import com.NBE_4_5_2.Team5.global.exception.ServiceException;
+import com.NBE_4_5_2.Team5.global.exception.security.AuthenticationNotValidException;
 import com.NBE_4_5_2.Team5.global.security.SecurityUser;
 
 import lombok.RequiredArgsConstructor;
@@ -46,13 +46,13 @@ public class UserAuthService {
 		 * 따라서 `authentication == null`이 아닐 수 있으므로 추가적인 확인을 진행함
 		 */
 		if (authentication == null || authentication instanceof AnonymousAuthenticationToken) {
-			throw new ServiceException("401-1", "로그인이 필요합니다.");
+			throw new AuthenticationNotValidException("401-1", "로그인이 필요합니다.");
 		}
 
 		Object principal = authentication.getPrincipal();
 
 		if (!(principal instanceof SecurityUser)) {
-			throw new ServiceException("401-3", "잘못된 인증 정보입니다");
+			throw new AuthenticationNotValidException("401-3", "잘못된 인증 정보입니다");
 		}
 
 		SecurityUser user = (SecurityUser)principal;

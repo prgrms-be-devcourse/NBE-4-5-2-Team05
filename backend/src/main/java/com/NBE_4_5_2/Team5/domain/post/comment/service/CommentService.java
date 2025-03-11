@@ -10,7 +10,7 @@ import com.NBE_4_5_2.Team5.domain.post.post.entity.ProductPost;
 import com.NBE_4_5_2.Team5.domain.post.post.repository.ProductPostRepository;
 import com.NBE_4_5_2.Team5.domain.user.entity.User;
 import com.NBE_4_5_2.Team5.domain.user.service.UserService;
-import com.NBE_4_5_2.Team5.global.exception.ServiceException;
+import com.NBE_4_5_2.Team5.global.exception.post.product.ProductPostNotFoundException;
 
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -28,7 +28,8 @@ public class CommentService {
 		User loggedInUser = getUser();
 
 		ProductPost productPost = productPostRepository.findById(postId)
-			.orElseThrow(() -> new ServiceException("400-1", "id가 %s인 product post는 없습니다.".formatted(postId)));
+			.orElseThrow(
+				() -> new ProductPostNotFoundException("400-1", "id가 %s인 product post는 없습니다.".formatted(postId)));
 
 		Comment comment = new Comment(content, productPost, loggedInUser);
 

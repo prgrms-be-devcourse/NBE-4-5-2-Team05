@@ -22,7 +22,10 @@ import com.NBE_4_5_2.Team5.domain.post.post.repository.LikedPostRepository;
 import com.NBE_4_5_2.Team5.domain.post.post.repository.ProductPostRepository;
 import com.NBE_4_5_2.Team5.domain.user.entity.User;
 import com.NBE_4_5_2.Team5.global.dto.PageDto;
-import com.NBE_4_5_2.Team5.global.exception.ServiceException;
+import com.NBE_4_5_2.Team5.global.exception.post.CategoryNotFoundException;
+import com.NBE_4_5_2.Team5.global.exception.post.product.ProductPostNotFoundException;
+import com.NBE_4_5_2.Team5.global.exception.post.product.PurchasedProductException;
+import com.NBE_4_5_2.Team5.global.exception.security.ForbiddenAccessException;
 
 import lombok.RequiredArgsConstructor;
 
@@ -53,7 +56,7 @@ public class ProductPostService {
 		List<Long> reqCategoryIdList = body.categoryIds();
 		List<Category> realCategoryList = categoryRepository.findAllById(reqCategoryIdList);
 		if (realCategoryList.size() != reqCategoryIdList.size()) {
-			throw new ServiceException("400", "존재하지 않는 카테고리가 포함되어있습니다.");
+			throw new CategoryNotFoundException("400", "존재하지 않는 카테고리가 포함되어있습니다.");
 		}
 		productPost.addCategories(realCategoryList);
 
@@ -97,7 +100,7 @@ public class ProductPostService {
 
 	public ProductPostResponse getPost(String id) {
 		ProductPost post = productPostRepository.findById(id).orElseThrow(
-			() -> new ServiceException("404", "해당 글은 존재하지 않습니다.")
+			() -> new ProductPostNotFoundException("404", "해당 글은 존재하지 않습니다.")
 		);
 
 		return ProductPostResponse.fromEntity(post);
@@ -105,12 +108,10 @@ public class ProductPostService {
 
 	public void delete(User actor, String postId) {
 		ProductPost post = productPostRepository.findById(postId).orElseThrow(
-			() -> new ServiceException("404", "해당 글은 존재하지 않습니다.")
+			() -> new ProductPostNotFoundException("404", "해당 글은 존재하지 않습니다.")
 		);
 
-		if (!post.canDelete(actor)) {
-			throw new ServiceException("401", "삭제 권한이 없습니다.");
-		}
+		post.canDelete(actor);
 
 		productPostRepository.delete(post);
 	}
@@ -118,12 +119,10 @@ public class ProductPostService {
 	@Transactional
 	public ProductPostResponse modify(User actor, String postId, ProductPostModifyForm body) {
 		ProductPost post = productPostRepository.findById(postId).orElseThrow(
-			() -> new ServiceException("404", "해당 글은 존재하지 않습니다.")
+			() -> new ProductPostNotFoundException("404", "해당 글은 존재하지 않습니다.")
 		);
 
-		if (!post.canModify(actor)) {
-			throw new ServiceException("401", "수정 권한이 없습니다.");
-		}
+		post.canModify(actor);
 
 		if (body.productName() != null) {
 			post.setProductName(body.productName());
@@ -168,16 +167,16 @@ public class ProductPostService {
 
 	public ProductPostResponse purchasePost(User buyer, String postId) {
 		ProductPost post = productPostRepository.findById(postId).orElseThrow(
-			() -> new ServiceException("404", "해당 글은 존재하지 않습니다.")
+			() -> new ProductPostNotFoundException("404", "해당 글은 존재하지 않습니다.")
 		);
 
 		// 예: 이미 구매된 상품이면 예외 처리
 		if (post.getStatus() == ProductStatus.PURCHASED) {
-			throw new ServiceException("400", "이미 판매 완료된 상품입니다.");
+			throw new PurchasedProductException("400", "이미 판매 완료된 상품입니다.");
 		}
 		// 예: 내가 쓴 글을 내가 구매하는 상황을 막고 싶으면 체크
 		if (post.getWriter().equals(buyer)) {
-			throw new ServiceException("400", "자신이 작성한 상품을 구매할 수 없습니다.");
+			throw new ForbiddenAccessException("403", "자신이 작성한 상품을 구매할 수 없습니다.");
 		}
 
 		post.setBuyer(buyer); // 여기서 status = PURCHASED 로 바뀜

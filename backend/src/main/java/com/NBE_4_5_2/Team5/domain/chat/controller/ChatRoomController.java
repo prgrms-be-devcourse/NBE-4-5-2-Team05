@@ -28,7 +28,8 @@ import com.NBE_4_5_2.Team5.domain.user.service.UserAuthService;
 import com.NBE_4_5_2.Team5.domain.user.service.UserService;
 import com.NBE_4_5_2.Team5.global.Rq;
 import com.NBE_4_5_2.Team5.global.dto.RsData;
-import com.NBE_4_5_2.Team5.global.exception.ServiceException;
+import com.NBE_4_5_2.Team5.global.exception.security.WrongRoleException;
+import com.NBE_4_5_2.Team5.global.exception.user.UserNotFoundException;
 
 import lombok.RequiredArgsConstructor;
 
@@ -109,11 +110,11 @@ public class ChatRoomController {
 		User sender = userAuthService.getRealActor(userIdentity);
 
 		User admin = userService.getUserById(adminId).orElseThrow(
-			() -> new ServiceException("404", "잘못된 ID")
+			() -> new UserNotFoundException("404", "잘못된 ID")
 		);
 
 		if (!admin.isAdmin()) {
-			throw new ServiceException("404", "옳지 않은 사용자"); // 권한 없음 예외
+			throw new WrongRoleException("404", "옳지 않은 사용자"); // 권한 없음 예외
 		}
 
 		String receiver = admin.getNickname();
@@ -189,7 +190,7 @@ public class ChatRoomController {
 	@PutMapping("/admin")
 	@ResponseBody
 	public RsData<User> grantAdmin(@RequestParam String userId) {
-		User user = userService.getUserById(userId).orElseThrow(() -> new ServiceException("404", "존재하지 않는 사용자"));
+		User user = userService.getUserById(userId).orElseThrow(() -> new UserNotFoundException("404", "존재하지 않는 사용자"));
 		user.setAdmin();
 		userRepository.save(user);
 		return new RsData<>("200", "권한부여", user);
