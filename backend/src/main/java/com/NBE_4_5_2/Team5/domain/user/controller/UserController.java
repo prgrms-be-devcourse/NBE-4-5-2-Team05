@@ -116,6 +116,10 @@ public class UserController {
         User userIdentity = rq.getUserIdentity();
         User user = rq.getRealActor(userIdentity);
         userService.deleteMyProfile(user);
+
+        rq.removeCookie("accessToken");
+        rq.removeCookie("refreshToken");
+
         return new RsData<>("200", "회원 탈퇴 성공", new Empty());
     }
 
