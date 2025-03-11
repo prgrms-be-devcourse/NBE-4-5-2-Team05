@@ -26,7 +26,7 @@ public class LogAspect {
 		""")
 	public Object responseAspect(ProceedingJoinPoint joinPoint) throws Throwable {
 		String methodName = joinPoint.getSignature().getName();
-		String className = joinPoint.getTarget().getClass().getName();
+		String className = joinPoint.getTarget().getClass().getSimpleName();
 		long startTime = System.currentTimeMillis();
 		log.debug("[{}] : {}.{} 시작", LocalDateTime.now(), className, methodName);
 
@@ -39,8 +39,9 @@ public class LogAspect {
 		}
 	}
 
-	@Around("""
-		execution(* com.NBE_4_5_2.Team5..*Controller.*(..))""")
+	@Around(value = """
+		execution(* com.NBE_4_5_2.Team5..*Controller.*(..)) &&
+		!execution(* com.NBE_4_5_2.Team5.domain.user.controller.UserController.me(..))""")
 	public Object controllerAspect(ProceedingJoinPoint joinPoint) throws Throwable {
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 		LocalDateTime now = LocalDateTime.now();
@@ -54,7 +55,7 @@ public class LogAspect {
 
 	private Object loggingAnonymousUser(ProceedingJoinPoint joinPoint, LocalDateTime now) throws Throwable {
 		String methodName = joinPoint.getSignature().getName();
-		String className = joinPoint.getTarget().getClass().getName();
+		String className = joinPoint.getTarget().getClass().getSimpleName();
 		long startTime = System.currentTimeMillis();
 		log.info("[{}] : [{}/{}] {}.{} 시작", now, "Anonymous", "Anonymous",
 			className,
@@ -72,7 +73,7 @@ public class LogAspect {
 	private Object loggingLoggedInUser(Authentication authentication, ProceedingJoinPoint joinPoint,
 		LocalDateTime now) throws Throwable {
 		String methodName = joinPoint.getSignature().getName();
-		String className = joinPoint.getTarget().getClass().getName();
+		String className = joinPoint.getTarget().getClass().getSimpleName();
 		long startTime = System.currentTimeMillis();
 		SecurityUser securityUser = (SecurityUser)authentication.getPrincipal();
 		log.info("[{}] : [{}/{}] {}.{} 시작", now, securityUser.getId(), securityUser.getRole(),
