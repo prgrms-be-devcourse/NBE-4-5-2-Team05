@@ -44,7 +44,7 @@ public class AuthTokenService {
         );
     }
 
-	Map<String, Object> getPayload(String accessToken) {
+	public Map<String, Object> getPayload(String accessToken) {
 
         if (!Ut.Jwt.isValidToken(keyString, accessToken)) {
             return null;

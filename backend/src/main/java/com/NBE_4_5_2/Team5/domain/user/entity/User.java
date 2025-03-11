@@ -211,4 +211,8 @@ public class User extends BaseTime {
 		this.profileUrl = profileUrl;
 		this.role = role;
 	}
+
+	public void setAdmin() {
+		this.role = Role.ADMIN;
+	}
 }

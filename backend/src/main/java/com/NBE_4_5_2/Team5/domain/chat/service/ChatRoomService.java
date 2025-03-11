@@ -4,13 +4,9 @@ package com.NBE_4_5_2.Team5.domain.chat.service;
 import com.NBE_4_5_2.Team5.domain.chat.entity.ChatMessage;
 import com.NBE_4_5_2.Team5.domain.chat.entity.ChatRoom;
 import com.NBE_4_5_2.Team5.domain.chat.repository.MessageRepository;
-import com.NBE_4_5_2.Team5.domain.post.post.dto.response.ProductPostResponse;
-import com.NBE_4_5_2.Team5.domain.post.post.entity.ProductPost;
 import com.NBE_4_5_2.Team5.domain.post.post.service.ProductPostService;
-import com.NBE_4_5_2.Team5.domain.user.entity.User;
 import com.NBE_4_5_2.Team5.domain.user.service.UserService;
 import com.NBE_4_5_2.Team5.global.Rq;
-import com.NBE_4_5_2.Team5.global.exception.ServiceException;
 import jakarta.annotation.Resource;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,7 +15,10 @@ import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 
 @RequiredArgsConstructor
 @Service
@@ -69,11 +68,12 @@ public class ChatRoomService {
 
     // 채팅방 생성
     public ChatRoom createChatRoom(String sender, String receiver) {
-
         String roomId=findByRoomIdByUsers(sender, receiver);
         List<ChatRoom> chatRooms=findByRoomId(roomId);
-        System.out.println("roomId:"+roomId);
         // 방이 이미 존재
+        if(roomId != null && chatRooms.size()==2){
+            return findChatRoomByClient(roomId, receiver);
+        }
         if(roomId!=null && chatRooms.size()==1) {
             // 클라이언트
             String client=chatRooms.get(0).getClient();
@@ -91,7 +91,6 @@ public class ChatRoomService {
         } else{
             // 새로운 roomId 할당
             roomId = UUID.randomUUID().toString();
-
             ChatRoom chatRoom1 = new ChatRoom(sender,receiver);
             chatRoom1.setRoomId(roomId);
             chatRoom1.setClient(sender);
@@ -159,7 +158,6 @@ public class ChatRoomService {
         String client=chatRoom.getId();
         hashOpsChatRoom.delete(CHAT_ROOMS, roomId + "_" + username);     // redis에서 삭제
         messageRepository.deleteAllByClient(client);
-
     }
 
     // 유저가 입장한 채팅방ID와 유저 세션ID 맵핑 정보 저장
@@ -207,9 +205,9 @@ public class ChatRoomService {
 
     // 현재 두 사용자가 사용중인 roomId
     public String findByRoomIdByUsers(String sender, String receiver) {
+
         for(String key:hashOpsEnterInfo.keys(CHAT_ROOMS)) {
             ChatRoom chatRoom= hashOpsChatRoom.get(CHAT_ROOMS,key);
-
             if (chatRoom == null) {
                 continue;
             }
