@@ -424,8 +424,8 @@ export interface components {
             data: components["schemas"]["ProductPostResponse"];
         };
         SignUpUserForm: {
-            username: string;
-            password: string;
+            username?: string;
+            password?: string;
             email: string;
             nickname?: string;
             address?: string;

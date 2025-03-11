@@ -7,12 +7,11 @@ import { parseAccessToken } from "./app/util/auth";
 
 export async function middleware(request: NextRequest) {
   const myCookie = await cookies();
-  const { isLogin, isExpired, payload } = parseAccessToken(
-    myCookie.get("accessToken")
-  );
+  const { isLogin, isExpired } = parseAccessToken(myCookie.get("accessToken"));
+  const refresTokenCookie = myCookie.get("refreshToken");
 
   if (isLogin && isExpired) {
-    return refreshAccessToken();
+    return refreshAccessToken(refresTokenCookie);
   }
 
   if (!isLogin && isProtectedRoute(request.nextUrl.pathname)) {
@@ -20,19 +19,26 @@ export async function middleware(request: NextRequest) {
   }
 }
 
-async function refreshAccessToken() {
-  const nextResponse = NextResponse.next();
-
+async function refreshAccessToken(refreshToken?: RequestCookie) {
   /* TODO : 리프레시 설정 후 set-cookie 설정 필요 */
 
-  // const response = await client.GET("/api/users/me", {
-  //   headers: {
-  //     cookie: (await cookies()).toString(),
-  //   },
-  // });
+  if (!refreshToken) {
+    return createUnauthorizedResponse();
+  }
 
-  // const spirngCookie = response.response.headers.getSetCookie();
-  // nextResponse.headers.set("set-cookie", String(spirngCookie));
+  const response = await client.POST("/api/users/refresh", {
+    body: { refreshToken: refreshToken.value },
+    credentials: "include",
+  });
+
+  const rsData = response.data;
+
+  const newAccessToken = rsData?.data;
+  const nextResponse = NextResponse.next();
+  nextResponse.headers.append(
+    "Set-Cookie",
+    `accessToken=${newAccessToken}; Path=/; HttpOnly; Secure; SameSite=Strict; Max-Age=3600`
+  );
 
   return nextResponse;
 }
