@@ -23,13 +23,13 @@ public class EmailService {
     private static final String EMAIL_KEY = "email:";
 
     @Value("${spring.mail.properties.auth-code-expiration-second}")
-    private Long expireMinutes;
+    private Long expireSeconds;
 
     private final JavaMailSender mailSender;
     private final StringRedisTemplate redisTemplate;
     private final BouncedEmailService bouncedEmailService;
 
-    // ✅ 이메일 인증 코드 전송 (HTML 사용)
+    // 이메일 인증 코드 전송
     public void sendAuthenticationCode(String email) {
         try {
             String code = generateVerificationCode();
@@ -63,8 +63,11 @@ public class EmailService {
     }
 
 
+    // 존재하지 않는 이메일로 발송된 경우 예외 처리 및 redis에 저장된 메일을 삭제
     public void checkBouncedEmail(String email) {
         if(!bouncedEmailService.checkBouncedEmail(email)){
+            String key = EMAIL_KEY + email;
+            redisTemplate.delete(key);
             throw new ServiceException("404-1", "존재하지않는 이메일입니다.");
         }
     }
@@ -87,11 +90,17 @@ public class EmailService {
 
     public void saveVerificationCode(String email, String code) {
         String key = EMAIL_KEY + email;
-        redisTemplate.opsForValue().set(key, code, Duration.ofMinutes(expireMinutes));
+        redisTemplate.opsForValue().set(key, code, Duration.ofSeconds(expireSeconds));
     }
 
     public void deleteVerificationCode(String email) {
         String key = EMAIL_KEY + email;
         redisTemplate.delete(key);
     }
+
+    public boolean existsEmail(String email){
+        String key = EMAIL_KEY + email;
+        return redisTemplate.hasKey(key);
+    }
+
 }

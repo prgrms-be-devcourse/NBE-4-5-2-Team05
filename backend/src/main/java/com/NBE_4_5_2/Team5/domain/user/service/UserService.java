@@ -196,10 +196,6 @@ public class UserService {
         return userRepository.findById(userId);
     }
 
-    public long count() {
-        return userRepository.count();
-    }
-
     public User getUserIdentity() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
@@ -242,9 +238,13 @@ public class UserService {
 
         // 이메일 변경 시 중복 체크
         if (updateRequest.getEmail() != null && !updateRequest.getEmail().equals(user.getEmail())) {
+            if (!emailService.existsEmail(updateRequest.getEmail())) {
+                throw new ServiceException("400-1", "이메일 인증이 완료되지 않았습니다. 인증 후 다시 시도해주세요.");
+            }
             if (userRepository.existsByEmail(updateRequest.getEmail())) {
                 throw new ServiceException("400-EMAIL-ALREADY-EXISTS", "이미 사용 중인 이메일입니다.");
             }
+
             user.setEmail(updateRequest.getEmail());
         }
 

@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
+import java.util.Enumeration;
 import java.util.Optional;
 import java.util.Properties;
 
@@ -17,14 +18,30 @@ public class BouncedEmailService {
     private final Pop3Properties pop3Properties;
     private static final String FAILED_RECIPIENTS_HEADER = "X-Failed-Recipients";
 
+
+    /**
+     * 발송된 이메일 주소가 존재하는 이메일인지 확인
+     *
+     * @param 
+     * */
     public boolean checkBouncedEmail(String email) {
         try {
-            Thread.sleep(10000); // 메일이 반송되기까지 기다릴 시간
+            Thread.sleep(3000); // 메일이 반송되기까지 기다릴 시간
             Folder emailFolder = getEmailFolder();
-            Instant untilTime = Instant.now().minusSeconds(pop3Properties.getUntilTime());
+
+            Instant untilTime = Instant.now().minusSeconds(pop3Properties.getUntilTime()); // 현재시간 - 2분
+
+            for (Message message : emailFolder.getMessages()){
+                Enumeration headers = message.getAllHeaders();
+                while (headers.hasMoreElements()) {
+                    Header header = (Header) headers.nextElement();
+                    System.out.println(header.getName() + ": " + header.getValue());
+                }
+            }
+
             for (Message message : emailFolder.getMessages()) {
-                // 지정한 시간(limitedTime) 안에 수신한 메일만 확인
-                if (untilTime.isBefore(message.getSentDate().toInstant())) {
+
+                if (untilTime.isBefore(message.getSentDate().toInstant())) { // 최근 2분내에 온 메일이라면 확인
 
                     Optional.ofNullable(message.getHeader(FAILED_RECIPIENTS_HEADER))
                             .ifPresent(recipients -> {

@@ -135,7 +135,7 @@ public class UserController {
     public RsData<Void> verifyAuthenticationCode(@RequestBody VerifyCodeRequest userForm) {
 
         String email = userForm.email();
-        String code = userForm.code(); //사용자가 입력한 코드
+        String code = userForm.code();
         userService.verifyAuthenticationCode(email, code);
 
         return new RsData<>("200-1", "이메일이 인증에 성공했습니다.");
