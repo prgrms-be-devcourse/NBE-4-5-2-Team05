@@ -10,12 +10,30 @@ const uploadFile = async (file: File): Promise<string> => {
   formData.append("file", file);
   const response = await axios.post("/api/uploadFile", formData, {
     headers: { "Content-Type": "multipart/form-data" },
+    withCredentials: true, // 쿠키 전송
   });
   return response.data;
 };
 
 export default function PostCreatePage() {
   const router = useRouter();
+
+  // 클라이언트에서 인증 상태 체크: 서버 API를 호출하여 로그인 여부 확인
+  useEffect(() => {
+    async function checkAuth() {
+      try {
+        // 서버에서 로그인 상태를 반환하는 엔드포인트 호출
+        await axios.get("/api/users/me", { withCredentials: true });
+        // 로그인되어 있다면 아무 것도 하지 않음
+      } catch (err: any) {
+        if (err.response && err.response.status === 401) {
+          alert("로그인을 먼저하세요.");
+          router.push("/user/login");
+        }
+      }
+    }
+    checkAuth();
+  }, [router]);
 
   // 입력값 state
   const [productName, setProductName] = useState("");
@@ -67,12 +85,18 @@ export default function PostCreatePage() {
 
       await axios.post("/api/posts", data, {
         headers: { "Content-Type": "application/json" },
+        withCredentials: true, // 쿠키 전송
       });
 
       router.push("/posts");
-    } catch (err) {
+    } catch (err: any) {
       console.error("게시글 작성 실패", err);
-      alert("게시글 작성 중 오류가 발생했습니다.");
+      if (err.response && err.response.status === 401) {
+        alert("로그인을 먼저하세요.");
+        router.push("/user/login");
+      } else {
+        alert("게시글 작성 중 오류가 발생했습니다.");
+      }
     }
   };
 
@@ -170,7 +194,7 @@ export default function PostCreatePage() {
           />
         </div>
 
-        {/* 파일 입력 부분: 기본 파일 입력은 숨기고, 버튼으로 파일 선택 */}
+        {/* 파일 입력 부분: 버튼으로 파일 선택 및 선택 파일 목록 표시 */}
         <div className="mb-4">
           <label className="block mb-1 font-semibold">사진 추가</label>
           <input
@@ -186,6 +210,16 @@ export default function PostCreatePage() {
           >
             파일 선택
           </label>
+          {selectedFiles && selectedFiles.length > 0 && (
+            <div className="mt-2">
+              <p className="text-sm font-medium">선택한 파일:</p>
+              <ul className="list-disc list-inside text-sm">
+                {Array.from(selectedFiles).map((file, index) => (
+                  <li key={index}>{file.name}</li>
+                ))}
+              </ul>
+            </div>
+          )}
         </div>
 
         <button
