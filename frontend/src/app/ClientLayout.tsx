@@ -8,36 +8,20 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { FaStore } from "react-icons/fa";
-import {
-  LoginMemberContext,
-  useLoginMember,
-} from "./stores/auth/loginMemberStore";
 
 export default function ClientLayout({
   children,
+  fontVariable,
+  fontClassName,
+  me,
 }: Readonly<{
   children: React.ReactNode;
+  fontVariable: string;
+  fontClassName: string;
+  me: components["schemas"]["UserDto"];
 }>) {
   const router = useRouter();
-  const {
-    setLoginMember,
-    isLogin,
-    loginMember,
-    removeLoginMember,
-    isLoginMemberPending,
-    isAdmin,
-    setNoLoginMember,
-  } = useLoginMember();
-
-  const loginMemberContextValue = {
-    loginMember,
-    setLoginMember,
-    removeLoginMember,
-    isLogin,
-    isLoginMemberPending,
-    isAdmin,
-    setNoLoginMember,
-  };
+  const isLogin = me.id !== "";
 
   async function handleLogout(e: React.MouseEvent<HTMLButtonElement>) {
     e.preventDefault();
@@ -47,60 +31,40 @@ export default function ClientLayout({
 
     if (response.error) {
       alert(response.error.message);
-      removeLoginMember();
-      router.replace("/user/login");
-      return;
+      router.push("/user/login");
     }
 
-    alert("로그아웃 되었습니다.");
-    removeLoginMember();
-    router.replace("/");
+    window.location.href = "/";
   }
-
-  async function fetchLoginMember() {
-    const response = await client.GET("/api/users/me", {
-      credentials: "include",
-    });
-
-    if (response.error) {
-      setNoLoginMember();
-      return;
-    }
-
-    setLoginMember(response.data.data);
-  }
-
-  useEffect(() => {
-    fetchLoginMember();
-  }, []);
 
   return (
-    <LoginMemberContext.Provider value={loginMemberContextValue}>
-      <header className="flex justify-between">
-        <Link href="/" className="flex items-center gap-2">
-          <Button>
-            <FaStore className="text-lg" />
-            길게 볼 장터
-          </Button>
-        </Link>
-        {isLogin && (
-          <div className="flex items-center gap-2">
-            <Link href="/user/me">
-              <Button>내 정보</Button>
-            </Link>
-            <Button className="cursor-pointer" onClick={handleLogout}>
-              로그아웃
+    <html lang="en" className={`${fontVariable}`}>
+      <body className={`min-h-[100dvh] flex flex-col ${fontClassName}`}>
+        <header className="flex justify-between">
+          <Link href="/" className="flex items-center gap-2">
+            <Button>
+              <FaStore className="text-lg" />
+              길게 볼 장터
             </Button>
-          </div>
-        )}
-        {!isLogin && (
-          <Link href="/user/login">
-            <Button>로그인 및 회원가입</Button>
           </Link>
-        )}
-      </header>
-      <div className="flex-grow">{children}</div>
-      <footer>푸터</footer>
-    </LoginMemberContext.Provider>
+          {isLogin ? (
+            <div className="flex items-center gap-2">
+              <Link href="/user/me">
+                <Button>내 정보</Button>
+              </Link>
+              <Button className="cursor-pointer" onClick={handleLogout}>
+                로그아웃
+              </Button>
+            </div>
+          ) : (
+            <Link href="/user/login">
+              <Button>로그인 및 회원가입</Button>
+            </Link>
+          )}
+        </header>
+        <div className="flex-grow">{children}</div>
+        <footer>푸터</footer>
+      </body>
+    </html>
   );
 }

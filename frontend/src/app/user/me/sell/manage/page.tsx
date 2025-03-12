@@ -2,8 +2,6 @@ import client from "@/lib/client";
 import ClientPage from "./ClientPage";
 import { redirect } from "next/navigation";
 import { cookies } from "next/headers";
-import RequireAuthenticated from "@/components/auth/RequireAuthenticated";
-import { useLoginMember } from "@/app/stores/auth/loginMemberStore";
 
 export default async function Page({
   searchParams,
@@ -31,12 +29,11 @@ export default async function Page({
     },
   });
 
-  if (response.error) {
-    console.log("서버 오류 : " + response.error.message);
-    return;
-  }
-
   const rsData = response.data;
+
+  if (!rsData) {
+    redirect("/");
+  }
 
   const postInfo = rsData.data.items;
   const pageInfo = {

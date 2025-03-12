@@ -625,8 +625,8 @@ export interface components {
             writtenProducts?: components["schemas"]["ProductPost"][];
             wroteComments?: components["schemas"]["Comment"][];
             memberAuthoritiesAsString?: string[];
-            admin?: boolean;
             authorities?: components["schemas"]["GrantedAuthority"][];
+            admin?: boolean;
         };
         SignUpUserForm: {
             username?: string;
@@ -804,22 +804,6 @@ export interface components {
             code: string;
             message: string;
             data: components["schemas"]["ProductPostResponse"][];
-        };
-        PageDtoProductPostResponse: {
-            items: components["schemas"]["ProductPostResponse"][];
-            /** Format: int32 */
-            totalPages: number;
-            /** Format: int32 */
-            totalItems: number;
-            /** Format: int32 */
-            curPageNo: number;
-            /** Format: int32 */
-            pageSize: number;
-        };
-        RsDataPageDtoProductPostResponse: {
-            code: string;
-            message: string;
-            data: components["schemas"]["PageDtoProductPostResponse"];
         };
         PaymentMetaData: {
             paymentId?: string;
@@ -1696,10 +1680,7 @@ export interface operations {
     };
     getMyPurchases: {
         parameters: {
-            query?: {
-                page?: number;
-                pageSize?: number;
-            };
+            query?: never;
             header?: never;
             path?: never;
             cookie?: never;
@@ -1712,7 +1693,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json;charset=UTF-8": components["schemas"]["RsDataPageDtoProductPostResponse"];
+                    "application/json;charset=UTF-8": components["schemas"]["RsDataListProductPostResponse"];
                 };
             };
             /** @description Internal Server Error */
@@ -1728,10 +1709,7 @@ export interface operations {
     };
     getMyFavorites: {
         parameters: {
-            query?: {
-                page?: number;
-                pageSize?: number;
-            };
+            query?: never;
             header?: never;
             path?: never;
             cookie?: never;
@@ -1744,7 +1722,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json;charset=UTF-8": components["schemas"]["RsDataPageDtoPreviewPostResponse"];
+                    "application/json;charset=UTF-8": components["schemas"]["RsDataListProductPostResponse"];
                 };
             };
             /** @description Internal Server Error */
