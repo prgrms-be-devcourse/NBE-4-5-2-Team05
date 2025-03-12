@@ -1,6 +1,8 @@
 package com.NBE_4_5_2.Team5.global.config;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -9,7 +11,11 @@ import org.springframework.mail.javamail.JavaMailSenderImpl;
 import java.util.Properties;
 
 @Configuration
+@RequiredArgsConstructor
+@EnableConfigurationProperties(Pop3Properties.class)
 public class EmailConfig {
+
+    private final Pop3Properties pop3Properties;
 
     @Value("${spring.mail.host}") private String host;
     @Value("${spring.mail.port}") private int port;
@@ -43,6 +49,21 @@ public class EmailConfig {
         properties.put("mail.smtp.connectiontimeout", connectionTimeout);
         properties.put("mail.smtp.timeout", timeout);
         properties.put("mail.smtp.writetimeout", writeTimeout);
+
+        return properties;
+    }
+
+    @Bean
+    public Properties pop3MailProperties() {
+        Properties properties = new Properties();
+
+        properties.put("mail.pop3.host", pop3Properties.getHost());
+        properties.put("mail.pop3.port", String.valueOf(pop3Properties.getPort()));
+        properties.put("mail.pop3.protocol", pop3Properties.getProtocol());
+        properties.put("mail.pop3.folder", pop3Properties.getFolder());
+        properties.put("mail.pop3.username", pop3Properties.getUsername());
+        properties.put("mail.pop3.password", pop3Properties.getPassword());
+        properties.put("mail.pop3.untilTime", String.valueOf(pop3Properties.getUntilTime()));
 
         return properties;
     }

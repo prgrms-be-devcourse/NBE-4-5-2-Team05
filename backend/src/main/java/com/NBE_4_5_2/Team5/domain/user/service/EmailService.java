@@ -27,6 +27,7 @@ public class EmailService {
 
     private final JavaMailSender mailSender;
     private final StringRedisTemplate redisTemplate;
+    private final BouncedEmailService bouncedEmailService;
 
     // ✅ 이메일 인증 코드 전송 (HTML 사용)
     public void sendAuthenticationCode(String email) {
@@ -59,6 +60,13 @@ public class EmailService {
     private String loadHtmlTemplate(String path) throws IOException {
         ClassPathResource resource = new ClassPathResource(path);
         return new String(Files.readAllBytes(resource.getFile().toPath()), StandardCharsets.UTF_8);
+    }
+
+
+    public void checkBouncedEmail(String email) {
+        if(!bouncedEmailService.checkBouncedEmail(email)){
+            throw new ServiceException("404-1", "존재하지않는 이메일입니다.");
+        }
     }
 
     // 인증 코드 생성

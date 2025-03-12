@@ -261,6 +261,7 @@ public class UserService {
         }
 
         emailService.sendAuthenticationCode(email);
+        emailService.checkBouncedEmail(email);
     }
 
     public void verifyAuthenticationCode(String email, String code) {
@@ -271,7 +272,6 @@ public class UserService {
         if (!verified) {
             throw new ServiceException("400-1", "인증코드가 틀렸습니다.");
         }
-
         emailService.deleteVerificationCode(email);
     }
 }
