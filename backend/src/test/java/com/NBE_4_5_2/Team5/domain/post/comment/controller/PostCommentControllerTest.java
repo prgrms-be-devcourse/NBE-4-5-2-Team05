@@ -8,7 +8,6 @@ import java.util.Objects;
 import java.util.Optional;
 
 import org.assertj.core.api.Assertions;
-import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,7 +20,6 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
-import org.testcontainers.junit.jupiter.Testcontainers;
 
 import com.NBE_4_5_2.Team5.TestConfig;
 import com.NBE_4_5_2.Team5.Util;
@@ -41,10 +39,9 @@ import jakarta.servlet.http.Cookie;
 @SpringBootTest
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
-@Import({TestConfig.class, RedisTestContainerConfig.class})
-@Testcontainers
+@Import({TestConfig.class})
 @TestPropertySource(properties = "custom.refreshToken.expire-seconds=3600")
-class PostCommentControllerTest {
+class PostCommentControllerTest extends RedisTestContainerConfig {
 
 	@Autowired
 	private Util util;
@@ -66,11 +63,6 @@ class PostCommentControllerTest {
 	@BeforeEach
 	void setUp() {
 		util.truncateAllTables();
-	}
-
-	@AfterAll
-	static void stopRedisContainer() {
-		RedisTestContainerConfig.stopContainer();
 	}
 
 	@Test

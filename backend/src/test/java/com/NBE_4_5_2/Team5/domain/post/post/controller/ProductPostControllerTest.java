@@ -5,20 +5,17 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.transaction.annotation.Transactional;
-import org.testcontainers.junit.jupiter.Testcontainers;
 
 import com.NBE_4_5_2.Team5.domain.post.post.entity.LikedPost;
 import com.NBE_4_5_2.Team5.domain.post.post.entity.ProductPost;
@@ -36,10 +33,8 @@ import com.NBE_4_5_2.Team5.global.config.RedisTestContainerConfig;
 @ActiveProfiles("test")
 @AutoConfigureMockMvc
 @Transactional
-@Import(RedisTestContainerConfig.class)
-@Testcontainers
 @TestPropertySource(properties = "custom.refreshToken.expire-seconds=3600")
-public class ProductPostControllerTest {
+public class ProductPostControllerTest extends RedisTestContainerConfig {
 
 	@Autowired
 	private MockMvc mvc;
@@ -70,11 +65,6 @@ public class ProductPostControllerTest {
 		// JWT 토큰 발급
 		sellerToken = userService.generateAuthTokenAsString(seller);
 		buyerToken = userService.generateAuthTokenAsString(buyer);
-	}
-
-	@AfterAll
-	static void stopRedisContainer() {
-		RedisTestContainerConfig.stopContainer();
 	}
 
 	@Test

@@ -14,7 +14,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.Import;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -22,7 +21,6 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
-import org.testcontainers.junit.jupiter.Testcontainers;
 
 import com.NBE_4_5_2.Team5.domain.user.user.dto.AuthToken;
 import com.NBE_4_5_2.Team5.domain.user.user.entity.User;
@@ -37,10 +35,9 @@ import jakarta.transaction.Transactional;
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
 @Transactional
-@Testcontainers
-@Import(RedisTestContainerConfig.class)
 @TestPropertySource(properties = "custom.refreshToken.expire-seconds=3600")
-class CustomAuthenticationFilterTest {
+class CustomAuthenticationFilterTest extends RedisTestContainerConfig {
+
 	@Autowired
 	private MockMvc mvc;
 

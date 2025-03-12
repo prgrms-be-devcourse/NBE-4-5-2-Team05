@@ -4,16 +4,13 @@ import static org.assertj.core.api.Assertions.*;
 
 import java.util.Map;
 
-import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
-import org.testcontainers.junit.jupiter.Testcontainers;
 
 import com.NBE_4_5_2.Team5.domain.user.user.entity.User;
 import com.NBE_4_5_2.Team5.domain.user.user.service.AuthTokenService;
@@ -25,11 +22,9 @@ import jakarta.transaction.Transactional;
 
 @SpringBootTest
 @ActiveProfiles("test")
-@Testcontainers
 @Transactional
-@Import(RedisTestContainerConfig.class)
 @TestPropertySource(properties = "custom.refreshToken.expire-seconds=3600")
-public class AuthTokenServiceTest {
+public class AuthTokenServiceTest extends RedisTestContainerConfig {
 
 	@Autowired
 	private AuthTokenService authTokenService;
@@ -39,11 +34,6 @@ public class AuthTokenServiceTest {
 
 	@Value("${custom.jwt.secret-key}")
 	private String keyString;
-
-	@AfterAll
-	static void stopRedisContainer() {
-		RedisTestContainerConfig.stopContainer();
-	}
 
 	@Test
 	@DisplayName("user1 - accessToken 생성 성공")

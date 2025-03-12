@@ -10,7 +10,6 @@ import java.util.Optional;
 import java.util.UUID;
 
 import org.assertj.core.api.Assertions;
-import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -52,10 +51,10 @@ import jakarta.servlet.http.Cookie;
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
 @Order(-100)
-@Import({TestConfig.class, RedisTestContainerConfig.class})
+@Import({TestConfig.class})
 @Testcontainers
 @TestPropertySource(properties = "custom.refreshToken.expire-seconds=3600")
-class AdminControllerTest {
+class AdminControllerTest extends RedisTestContainerConfig {
 
 	@Autowired
 	private MockMvc mockMvc;
@@ -84,11 +83,6 @@ class AdminControllerTest {
 	@BeforeEach
 	public void setUp() throws Exception {
 		util.truncateAllTables();
-	}
-
-	@AfterAll
-	static void stopRedisContainer() {
-		RedisTestContainerConfig.stopContainer();
 	}
 
 	@Test

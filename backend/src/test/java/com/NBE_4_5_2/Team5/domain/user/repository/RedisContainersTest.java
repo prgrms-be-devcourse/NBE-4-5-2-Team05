@@ -4,15 +4,12 @@ import static org.assertj.core.api.Assertions.*;
 
 import java.util.Optional;
 
-import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
-import org.testcontainers.junit.jupiter.Testcontainers;
 
 import com.NBE_4_5_2.Team5.domain.user.user.entity.RefreshToken;
 import com.NBE_4_5_2.Team5.domain.user.user.repository.RedisRepository;
@@ -20,18 +17,11 @@ import com.NBE_4_5_2.Team5.global.config.RedisTestContainerConfig;
 
 @SpringBootTest
 @ActiveProfiles("test")
-@Import(RedisTestContainerConfig.class)
-@Testcontainers
 @TestPropertySource(properties = "custom.refreshToken.expire-seconds=3600")
-class RedisContainersTest {
+class RedisContainersTest extends RedisTestContainerConfig {
 
 	@Autowired
 	private RedisRepository redisRepository;
-
-	@AfterAll
-	static void stopRedisContainer() {
-		RedisTestContainerConfig.stopContainer();
-	}
 
 	@Test
 	@DisplayName("RefreshToken을 저장하고 조회할 수 있어야 한다.")
