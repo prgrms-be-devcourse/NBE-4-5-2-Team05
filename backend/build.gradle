@@ -52,6 +52,10 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
 
 
+    // https://mvnrepository.com/artifact/com.mysql/mysql-connector-j
+    implementation 'com.mysql:mysql-connector-j:9.2.0'
+
+
     // 소켓
     implementation 'org.springframework.boot:spring-boot-starter-freemarker'
     implementation 'org.springframework.boot:spring-boot-starter-websocket'
