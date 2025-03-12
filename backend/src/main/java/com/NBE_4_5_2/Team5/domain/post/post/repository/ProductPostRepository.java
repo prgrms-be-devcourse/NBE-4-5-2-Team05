@@ -8,7 +8,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Repository;
 
@@ -36,12 +35,9 @@ public interface ProductPostRepository extends JpaRepository<ProductPost, String
 	List<ProductPost> findAllByStatus(ProductStatus status);
 
 	@EntityGraph(attributePaths = {"productCategories.category"})
-	Page<ProductPost> findByBuyer(User buyer,Pageable pageable);
+	List<ProductPost> findByBuyer(User buyer);
 
 	List<ProductPost> findByIdIn(List<String> postIds);
 
 	Page<ProductPost> findByWriterAndStatus(User writer, ProductStatus status, Pageable pageable);
-
-	@Query("SELECT p from  ProductPost  p WHERE p.id IN :postIds")
-	Page<ProductPost> findAllByIds(@Param("postIds") List<String> postIds, Pageable pageable);
 }
