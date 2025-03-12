@@ -255,6 +255,11 @@ public class UserService {
     }
 
     public void sendAuthenticationCode(String email) {
+
+        if(userRepository.existsByEmail(email)){
+            throw new ServiceException("400-1", "이미 사용 중인 이메일입니다.");
+        }
+
         emailService.sendAuthenticationCode(email);
     }
 
