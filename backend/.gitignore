@@ -41,9 +41,6 @@ nbdist/
 gradle
 
 ### custom ###
-gradlew
-db_dev.mv.db
-db_dev.trace.db
 
 ### 🌍 OS 관련 불필요한 파일 ###
 .DS_Store
@@ -57,5 +54,6 @@ Dockerfile
 
 ### 💡 특정 데이터 폴더 무시 ###
 data/
-
-apiV1.json
+**/*.mv.db
+**/*.trace.db
+**/apiV1.json
