@@ -1,23 +1,10 @@
 package com.NBE_4_5_2.Team5.domain.post.post.controller;
 
-import java.util.List;
-
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
-
 import com.NBE_4_5_2.Team5.domain.post.post.dto.request.ProductPostModifyForm;
 import com.NBE_4_5_2.Team5.domain.post.post.dto.request.ProductPostWriteForm;
 import com.NBE_4_5_2.Team5.domain.post.post.dto.response.PreviewPostResponse;
 import com.NBE_4_5_2.Team5.domain.post.post.dto.response.ProductPostResponse;
+import com.NBE_4_5_2.Team5.domain.post.post.enums.ProductStatus;
 import com.NBE_4_5_2.Team5.domain.post.post.service.ProductPostService;
 import com.NBE_4_5_2.Team5.domain.post.post.service.RecentlyViewedService;
 import com.NBE_4_5_2.Team5.domain.user.entity.User;
@@ -25,9 +12,13 @@ import com.NBE_4_5_2.Team5.global.Rq;
 import com.NBE_4_5_2.Team5.global.dto.Empty;
 import com.NBE_4_5_2.Team5.global.dto.PageDto;
 import com.NBE_4_5_2.Team5.global.dto.RsData;
-
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 
 @RestController
@@ -70,11 +61,14 @@ public class ProductPostController {
 	@PreAuthorize("isAuthenticated()")
 	@GetMapping("/my")
 	@Transactional(readOnly = true)
-	public RsData<PageDto<PreviewPostResponse>> getMyPosts(@RequestParam(defaultValue = "1") int page,
-		@RequestParam(defaultValue = "10") int pageSize,
-		@RequestParam(defaultValue = "desc") String sort) {
+	public RsData<PageDto<PreviewPostResponse>> getMyPosts(
+			@RequestParam(defaultValue = "1") int page,
+			@RequestParam(defaultValue = "10") int pageSize,
+			@RequestParam(defaultValue = "desc") String sort,
+			@RequestParam(required = false) ProductStatus status) {
 		User actor = rq.getUserIdentity();
-		PageDto<PreviewPostResponse> postPage = productPostService.getMyPosts(actor, page, pageSize, sort);
+		User realActor = rq.getRealActor(actor);
+		PageDto<PreviewPostResponse> postPage = productPostService.getMyPosts(realActor, page, pageSize, sort,status);
 
 		return new RsData<>(
 			"200",
@@ -163,7 +157,8 @@ public class ProductPostController {
 	@GetMapping("/my/sales")
 	public RsData<List<ProductPostResponse>> getMySales() {
 		User actor = rq.getUserIdentity();
-		List<ProductPostResponse> sales = productPostService.getMySales(actor);
+		User realActor = rq.getRealActor(actor);
+		List<ProductPostResponse> sales = productPostService.getMySales(realActor);
 
 		return new RsData<>(
 			"200",
