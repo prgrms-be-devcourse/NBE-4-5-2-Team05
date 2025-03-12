@@ -20,6 +20,7 @@ export default function ClientLayout({
   fontClassName: string;
   me: components["schemas"]["UserDto"];
 }>) {
+  const router = useRouter();
   const isLogin = me.id !== "";
 
   async function handleLogout(e: React.MouseEvent<HTMLButtonElement>) {
@@ -30,7 +31,7 @@ export default function ClientLayout({
 
     if (response.error) {
       alert(response.error.message);
-      return;
+      router.push("/user/login");
     }
 
     window.location.href = "/";
