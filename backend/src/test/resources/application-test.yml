@@ -9,8 +9,11 @@ spring:
   output:
     ansi:
       enabled: always
-  
-  
+  data:
+    redis:
+      host: localhost
+      port: 6379
+
   datasource:
     url: jdbc:h2:./db_dev;MODE=MySQL
     username: sa
@@ -30,10 +33,6 @@ spring:
         use_sql_comments: true
         default_batch_fetch_size: 100
     open-in-view: false
-  data:
-    redis:
-      host: localhost
-      port: 6379
 
   security:
     oauth2:
