@@ -3,7 +3,7 @@ package com.NBE_4_5_2.Team5.global.security;
 import com.NBE_4_5_2.Team5.domain.user.dto.AuthToken;
 import com.NBE_4_5_2.Team5.domain.user.entity.User;
 import com.NBE_4_5_2.Team5.domain.user.service.UserService;
-import com.NBE_4_5_2.Team5.global.config.BaseTest;
+import com.NBE_4_5_2.Team5.global.config.BaseTestConfig;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.Cookie;
 import org.assertj.core.api.Assertions;
@@ -28,7 +28,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @AutoConfigureMockMvc
-class CustomAuthenticationFilterTest extends BaseTest {
+@BaseTestConfig
+class CustomAuthenticationFilterTest {
     @Autowired
     private MockMvc mvc;
 

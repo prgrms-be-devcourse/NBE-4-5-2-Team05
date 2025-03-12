@@ -1,14 +1,16 @@
 package com.NBE_4_5_2.Team5.domain.user.service;
 
-import com.NBE_4_5_2.Team5.global.config.BaseTest;
+import com.NBE_4_5_2.Team5.global.config.BaseTestConfig;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.redis.core.StringRedisTemplate;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+
 @SpringBootTest
-class EmailServiceTest extends BaseTest {
+@BaseTestConfig
+class EmailServiceTest {
     @Autowired
     private EmailService emailService;
 

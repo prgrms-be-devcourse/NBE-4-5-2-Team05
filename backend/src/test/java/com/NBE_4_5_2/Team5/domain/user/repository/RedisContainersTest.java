@@ -1,7 +1,7 @@
 package com.NBE_4_5_2.Team5.domain.user.repository;
 
 import com.NBE_4_5_2.Team5.domain.user.entity.RefreshToken;
-import com.NBE_4_5_2.Team5.global.config.BaseTest;
+import com.NBE_4_5_2.Team5.global.config.BaseTestConfig;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,7 +15,8 @@ import java.util.Optional;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
-class RedisContainersTest extends BaseTest {
+@BaseTestConfig
+class RedisContainersTest {
 
     @Autowired
     private RedisRepository redisRepository;

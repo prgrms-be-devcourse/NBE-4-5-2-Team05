@@ -3,7 +3,7 @@ package com.NBE_4_5_2.Team5.domain.user.controller;
 import com.NBE_4_5_2.Team5.domain.user.dto.AuthToken;
 import com.NBE_4_5_2.Team5.domain.user.entity.User;
 import com.NBE_4_5_2.Team5.domain.user.service.UserService;
-import com.NBE_4_5_2.Team5.global.config.BaseTest;
+import com.NBE_4_5_2.Team5.global.config.BaseTestConfig;
 import com.NBE_4_5_2.Team5.global.init.BaseInitData;
 import jakarta.servlet.http.Cookie;
 import jakarta.transaction.Transactional;
@@ -26,7 +26,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @AutoConfigureMockMvc
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class UserControllerTest extends BaseTest {
+@BaseTestConfig
+class UserControllerTest{
 
     @Autowired
     private MockMvc mvc;
