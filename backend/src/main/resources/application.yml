@@ -42,7 +42,6 @@ spring:
   profiles:
     active: dev
     include: secret
-    active: dev
 
   security:
     oauth2:
