@@ -9,6 +9,14 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
 import com.NBE_4_5_2.Team5.domain.base.entity.BaseTime;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+
 import com.NBE_4_5_2.Team5.domain.post.comment.entity.Comment;
 import com.NBE_4_5_2.Team5.domain.post.post.entity.ProductPost;
 import com.NBE_4_5_2.Team5.domain.post.post.enums.ProductStatus;
@@ -51,7 +59,7 @@ public class User extends BaseTime {
 	@Setter
 	private String email;
 
-	@Column(length = 20, nullable = false, unique = true)
+	@Column(length = 50, nullable = false, unique = true)
 	@Setter
 	private String nickname;
 
