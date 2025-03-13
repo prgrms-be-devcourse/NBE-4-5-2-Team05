@@ -9,11 +9,13 @@ import com.NBE_4_5_2.Team5.domain.chat.entity.ChatRoom;
 import com.NBE_4_5_2.Team5.domain.chat.service.ChatRoomService;
 import com.NBE_4_5_2.Team5.domain.post.post.dto.response.ProductPostResponse;
 import com.NBE_4_5_2.Team5.domain.post.post.service.ProductPostService;
+import com.NBE_4_5_2.Team5.domain.user.dto.UserDto;
 import com.NBE_4_5_2.Team5.domain.user.entity.User;
 import com.NBE_4_5_2.Team5.domain.user.repository.UserRepository;
 import com.NBE_4_5_2.Team5.domain.user.service.AuthTokenService;
 import com.NBE_4_5_2.Team5.domain.user.service.UserService;
 import com.NBE_4_5_2.Team5.global.Rq;
+import com.NBE_4_5_2.Team5.global.dto.Empty;
 import com.NBE_4_5_2.Team5.global.dto.RsData;
 import com.NBE_4_5_2.Team5.global.exception.ServiceException;
 import lombok.RequiredArgsConstructor;
@@ -121,7 +123,6 @@ public class ChatRoomController {
         User user = rq.getRealActor(userIdentity);
 
         List<ChatRoom> chatRoomsList=chatRoomService.findRoomByUser(user.getNickname());
-
         List<ChatRoomDto> response=chatRoomsList.stream()
                 .map(chatRoom -> new ChatRoomDto(
                         chatRoom.getId(),
@@ -141,24 +142,26 @@ public class ChatRoomController {
         User userIdentity = rq.getUserIdentity();
         User user = rq.getRealActor(userIdentity);
         List<ChatMessage> messages= chatRoomService.getMessagesByUser(roomId,user.getNickname());
+        String other=chatRoomService.findOther(roomId,user.getNickname());
         List<MessageDto> response=messages.stream()
                 .map(chatMessage -> new MessageDto(
+                        chatMessage.getMessageId(),
                         chatMessage.getSender(),
                         chatMessage.getMessage(),
                         chatMessage.getImage(),
                         chatMessage.getTimestamp()))
                 .toList();
-        return new RsData<>("200",roomId+"의 대화 목록",response);
+        return new RsData<>("200",other+"와의 대화방",response);
     }
 
     // 채팅방 삭제
     @DeleteMapping("/message")
     @ResponseBody
-    public RsData<String> deleteRoom(@RequestParam String roomId) {
+    public RsData<?> deleteRoom(@RequestParam String roomId) {
         User userIdentity = rq.getUserIdentity();
         User user = rq.getRealActor(userIdentity);
         chatRoomService.deleteChatRoom(roomId,user.getNickname());
-        return new RsData<>("200","삭제 완료");
+        return new RsData<>("200","삭제 완료",new Empty());
     }
 
     // 특정 사용자와의 채팅방 검색
@@ -179,10 +182,12 @@ public class ChatRoomController {
     // 권한부여(임시)
     @PutMapping("/admin")
     @ResponseBody
-    public RsData<User> grantAdmin(@RequestParam String userId) {
+    @Transactional
+    public RsData<UserDto> grantAdmin(@RequestParam String userId) {
         User user=userService.getUserById(userId).orElseThrow(()->new ServiceException("404","존재하지 않는 사용자"));
         user.setAdmin();
         userRepository.save(user);
-        return new RsData<>("200","권한부여",user);
+        UserDto userDto=new UserDto(user);
+        return new RsData<>("200","권한부여",userDto);
     }
 }
