@@ -18,7 +18,7 @@ export default async function Page(
     const token = (await cookies()).get("accessToken")?.value;
     console.log("token: ",token);
     const cookieHeader=(await cookies()).toString();
-    
+
     const response=await client.GET("/api/posts/{id}",{
         headers: {
             cookie: cookieHeader,
