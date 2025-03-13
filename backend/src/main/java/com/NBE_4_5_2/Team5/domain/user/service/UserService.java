@@ -234,7 +234,7 @@ public class UserService {
         String updateNickname = updateRequest.getNickname();
         if (updateNickname != null && !updateNickname.equals(user.getNickname())) {
             if (userRepository.existsByNickname(updateNickname)) {
-                throw new ServiceException("400-NICKNAME-ALREADY-EXISTS", "이미 사용 중인 닉네임입니다.");
+                throw new ServiceException("400-NICKNAME-ALREADY-EXISTS", "이미 사용중인 닉네임입니다.");
             }
             user.setNickname(updateNickname);
         }
@@ -269,7 +269,7 @@ public class UserService {
     public void sendAuthenticationCode(String email) {
 
         if (userRepository.existsByEmail(email)) {
-            throw new ServiceException("400-1", "이미 사용 중인 이메일입니다.");
+            throw new ServiceException("400-1", "이미 사용중인 이메일입니다.");
         }
 
         emailService.sendAuthenticationCode(email);

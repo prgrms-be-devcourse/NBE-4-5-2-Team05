@@ -17,11 +17,11 @@ public class UserValidator {
     public void duplicate(String username, String nickname) {
 
         if (userRepository.existsByUsername(username)) {
-            throw new ServiceException("409-1", "이미 사용중인 아이디입니다.");
+            throw new ServiceException("400-USERNAME-ALREADY-EXISTS", "이미 사용중인 아이디입니다.");
         }
 
         if(userRepository.existsByNickname(nickname)) {
-            throw new ServiceException("409-3", "이미 사용중인 닉네임입니다.");
+            throw new ServiceException("400-NICKNAME-ALREADY-EXISTS", "이미 사용중인 닉네임입니다.");
         }
 
     }
@@ -41,7 +41,7 @@ public class UserValidator {
     public void emailVerified(String email) {
 
         if (userRepository.existsByEmail(email)) {
-            throw new ServiceException("400-EMAIL-ALREADY-EXISTS", "이미 사용 중인 이메일입니다.");
+            throw new ServiceException("400-EMAIL-ALREADY-EXISTS", "이미 사용중인 이메일입니다.");
         }
 
         // 해당 이메일에 대한 인증이 완료되었는지 검증
