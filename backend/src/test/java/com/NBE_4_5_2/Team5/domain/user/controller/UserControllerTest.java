@@ -598,11 +598,11 @@ class UserControllerTest extends RedisTestContainerConfig {
 			.contentType(new MediaType(MediaType.APPLICATION_JSON, StandardCharsets.UTF_8))).andDo(print());
 	}
 
-	@Test
-	@DisplayName("토큰 재발급 - 성공 - 헤더 인증")
-	void refreshAccessToken1() throws Exception {
+    @Test
+    @DisplayName("토큰 재발급 - 성공")
+    void refreshAccessToken1() throws Exception {
 
-		ResultActions resultActions = refreshAccessTokenHeaderRequest(validRefreshToken, validToken);
+        ResultActions resultActions = refreshAccessTokenRequest(validRefreshToken);
 
 		resultActions.andExpect(status().isOk())
 			.andExpect(handler().handlerType(UserController.class))
@@ -639,11 +639,11 @@ class UserControllerTest extends RedisTestContainerConfig {
 			.andExpect(jsonPath("$.message").value("값을 입력해주세요."));
 	}
 
-	@Test
-	@DisplayName("토큰 재발급 - 실패 - refreshToken이 빈 문자열")
-	void refreshAccessToken3() throws Exception {
-		String token = " ";
-		ResultActions resultActions = refreshAccessTokenHeaderRequest(token, validToken);
+    @Test
+    @DisplayName("토큰 재발급 - 실패 - refreshToken이 빈 문자열")
+    void refreshAccessToken3() throws Exception {
+        String token = " ";
+        ResultActions resultActions = refreshAccessTokenRequest(token);
 
 		resultActions.andExpect(status().isBadRequest())
 			.andExpect(jsonPath("$.code").value("400-1"))
@@ -655,12 +655,13 @@ class UserControllerTest extends RedisTestContainerConfig {
 	void refreshAccessToken4() throws Exception {
 		String fakeRefreshToken = "invalid_refresh_token";
 
-		ResultActions resultActions = refreshAccessTokenHeaderRequest(fakeRefreshToken, validToken);
+        ResultActions resultActions = refreshAccessTokenRequest(fakeRefreshToken);
 
-		resultActions.andExpect(status().isUnauthorized())
-			.andExpect(jsonPath("$.code").value("401-2"))
-			.andExpect(jsonPath("$.message").value("유효하지 않은 RefreshToken입니다."));
-	}
+        resultActions
+                .andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("$.code").value("401-1"))
+                .andExpect(jsonPath("$.message").value("유효하지 않은 RefreshToken입니다."));
+    }
 
 	@Test
 	@DisplayName("내 정보 수정 - 성공")
