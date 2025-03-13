@@ -27,7 +27,7 @@ public class AuthTokenServiceTest {
     private String keyString;
 
     @Test
-    @DisplayName("user1 - accessToken 생성 성공")
+    @DisplayName("jwt : accessToken : user1 accessToken 생성 성공")
     void accessToken() {
         // Given
         User user = userService.getUserByUsername("user1").orElseThrow();
@@ -41,7 +41,7 @@ public class AuthTokenServiceTest {
     }
 
     @Test
-    @DisplayName("jwt 유효성 체크")
+    @DisplayName("jwt : 토큰 유효성 체크")
     void checkValid() {
         // Given
         User user = userService.getUserByUsername("user1").orElseThrow();

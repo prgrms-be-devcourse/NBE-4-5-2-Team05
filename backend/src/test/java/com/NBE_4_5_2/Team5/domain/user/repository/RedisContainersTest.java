@@ -28,21 +28,21 @@ class RedisContainersTest {
     private RedisTemplate<String, String> redisTemplate;
 
     @Test
-    @DisplayName("TestContainers Redis 정상 동작 확인")
-    void redisTestContainersIsRunning() {
+    @DisplayName("redis : TestContainers 정상 동작 확인")
+    void test1() {
         String pingResponse = redisTemplate.execute(RedisConnectionCommands::ping);
         assertThat(pingResponse).isEqualTo("PONG");
     }
 
     @Test
-    @DisplayName("RedisConnectionFactory가 동일한지 확인")
-    void testRedisConnectionFactory() {
+    @DisplayName("redis : 동일한 ConnectionFactory를 사용하는지 확인")
+    void test2() {
         assertThat(redisTemplate.getConnectionFactory()).isSameAs(stringRedisTemplate.getConnectionFactory());
     }
 
     @Test
-    @DisplayName("StringRedisTemplate을 저장 및 조회 테스트")
-    void testStringRedisTemplate() {
+    @DisplayName("redis : StringRedisTemplate : 저장 및 조회 테스트")
+    void test3() {
         // Given
         String key = "test-key";
         String value = "test-value";
@@ -57,7 +57,7 @@ class RedisContainersTest {
 
     @Test
     @DisplayName("redis : RedisTemplate : 저장 및 조회 테스트")
-    void testRedisTemplate() {
+    void test4() {
         // Given
         String key = "redis-template-key";
         String value = "redis-template-value";
@@ -72,7 +72,7 @@ class RedisContainersTest {
 
     @Test
     @DisplayName("redis : RedisRepository : RefreshToken 저장 조회 테스트")
-    void test1() {
+    void test5() {
         // Given
         String userId = "user123";
         String refreshToken = "refresh-token-abc";
@@ -96,8 +96,8 @@ class RedisContainersTest {
     }
 
     @Test
-    @DisplayName("RedisRepository, StringRedisTemplate, RedisTemplate이 같은 Redis를 사용하는지 확인")
-    void testRedisSharedStorage() {
+    @DisplayName("redis : RedisRepository, StringRedisTemplate, RedisTemplate : 같은 Redis를 사용하는지 확인")
+    void test6() {
         // Given
         String key = "shared-key";
         String value = "shared-value";
@@ -117,8 +117,8 @@ class RedisContainersTest {
     }
 
     @Test
-    @DisplayName("redis : RefreshToken 삭제 테스트")
-    void test2() {
+    @DisplayName("redis : redisRepository : RefreshToken 삭제 테스트")
+    void test7() {
         // Given
         String userId = "userToDelete";
 
@@ -139,8 +139,8 @@ class RedisContainersTest {
     }
 
     @Test
-    @DisplayName("redis : RefreshToken으로 조회 테스트")
-    void test3() {
+    @DisplayName("redis : redisRepository : RefreshToken으로 조회 테스트")
+    void test8() {
         String userId = "userWithRefreshToken";
         String refreshToken = "unique-refresh-token";
         RefreshToken token = RefreshToken.builder()
