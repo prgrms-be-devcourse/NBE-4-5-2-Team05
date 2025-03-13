@@ -1,5 +1,5 @@
 // components/Notice.tsx
-//공지사항 컴포넌트트
+//공지사항 컴포넌트
 "use client";
 
 import React from "react";

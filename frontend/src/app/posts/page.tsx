@@ -1,4 +1,3 @@
-// app/posts/page.tsx
 "use client";
 
 import React, { useEffect, useState } from "react";
@@ -23,16 +22,27 @@ interface RsData<T> {
   data: T;
 }
 
+// 공지사항 데이터 인터페이스
+interface NoticeData {
+  title: string;
+  content: string;
+}
+
+// 카테고리 인터페이스 (백엔드 Category 엔티티와 일치)
+interface Category {
+  id: number;
+  name: string;
+}
+
 export default function PostsPage() {
-  const [notice, setNotice] = useState<{
-    title: string;
-    content: string;
-  } | null>(null);
+  // 최신 공지사항 5개 상태
+  const [noticeList, setNoticeList] = useState<NoticeData[]>([]);
   const [posts, setPosts] = useState<Post[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
+  const [categories, setCategories] = useState<Category[]>([]);
 
-  // 필터 상태 (검색 키워드, 금액, 카테고리, 정렬)
+  // 필터 상태
   const [filters, setFilters] = useState({
     keyword: "",
     minPrice: null as number | null,
@@ -41,19 +51,36 @@ export default function PostsPage() {
     sort: "desc",
   });
 
-  /* // 공지사항 로드 (미구현 시 주석 처리)
+  // 공지사항 로드 (관리자 공지사항 조회 엔드포인트)
   useEffect(() => {
     (async () => {
       try {
-        const res = await axios.get<RsData<{ title: string; content: string }>>(
-          "/api/notices/latest"
+        const res = await axios.get<RsData<NoticeData[]>>(
+          "/api/admin/notices/latest",
+          {
+            withCredentials: true,
+          }
         );
-        setNotice(res.data.data);
+        setNoticeList(res.data.data);
       } catch (err) {
         console.error("공지사항 로드 실패", err);
       }
     })();
-  }, []); */
+  }, []);
+
+  // 카테고리 목록 로드 (백엔드에서 전체 카테고리 조회)
+  useEffect(() => {
+    (async () => {
+      try {
+        const res = await axios.get<RsData<Category[]>>("/api/categories", {
+          withCredentials: true,
+        });
+        setCategories(res.data.data);
+      } catch (err) {
+        console.error("카테고리 로드 실패", err);
+      }
+    })();
+  }, []);
 
   // 게시글 로드 함수
   const fetchPosts = async () => {
@@ -68,6 +95,7 @@ export default function PostsPage() {
           maxPrice: filters.maxPrice || undefined,
           category: filters.category || undefined,
         },
+        withCredentials: true,
       });
       const { items, totalPages } = res.data.data;
       setPosts(items);
@@ -77,7 +105,7 @@ export default function PostsPage() {
     }
   };
 
-  // currentPage 또는 필터가 바뀔 때마다 게시글 로드
+  // currentPage 또는 필터 변경 시 게시글 로드
   useEffect(() => {
     fetchPosts();
   }, [currentPage, filters]);
@@ -89,9 +117,19 @@ export default function PostsPage() {
   return (
     <>
       <div className="flex space-x-4">
-        {/* 왼쪽: 메인 영역 (검색 결과) */}
+        {/* 왼쪽: 메인 영역 (공지사항 및 게시글 목록) */}
         <div className="flex-grow">
-          {notice && <Notice title={notice.title} content={notice.content} />}
+          {noticeList.length > 0 && (
+            <div className="mb-4 space-y-4">
+              {noticeList.map((notice, index) => (
+                <Notice
+                  key={index}
+                  title={notice.title}
+                  content={notice.content}
+                />
+              ))}
+            </div>
+          )}
           <h1 className="text-2xl font-bold mb-4">판매물품 리스트</h1>
           <PostList posts={posts} />
           <Pagination
@@ -105,12 +143,13 @@ export default function PostsPage() {
         <FilterSidebar
           onFilterChange={(newFilters) => {
             setFilters(newFilters);
-            setCurrentPage(1); // 필터 변경 시 첫 페이지로 이동
+            setCurrentPage(1);
           }}
+          categories={categories}
         />
       </div>
 
-      {/* 오른쪽 하단에 "작성하기" 버튼 추가 */}
+      {/* 오른쪽 하단 "작성하기" 버튼 */}
       <div className="fixed bottom-4 right-4">
         <Link href="/posts/new">
           <button className="px-4 py-2 bg-blue-600 text-white rounded shadow-lg">

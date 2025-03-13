@@ -15,16 +15,20 @@ const uploadFile = async (file: File): Promise<string> => {
   return response.data;
 };
 
+// 카테고리 인터페이스 (백엔드의 Category 엔티티와 일치)
+interface Category {
+  id: number;
+  name: string;
+}
+
 export default function PostCreatePage() {
   const router = useRouter();
 
-  // 클라이언트에서 인증 상태 체크: 서버 API를 호출하여 로그인 여부 확인
+  // 로그인 체크
   useEffect(() => {
     async function checkAuth() {
       try {
-        // 서버에서 로그인 상태를 반환하는 엔드포인트 호출
         await axios.get("/api/users/me", { withCredentials: true });
-        // 로그인되어 있다면 아무 것도 하지 않음
       } catch (err: any) {
         if (err.response && err.response.status === 401) {
           alert("로그인을 먼저하세요.");
@@ -39,7 +43,8 @@ export default function PostCreatePage() {
   const [productName, setProductName] = useState("");
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
-  const [category, setCategory] = useState("");
+  // 선택한 카테고리 id (문자열로 받아서 후에 number로 변환)
+  const [selectedCategory, setSelectedCategory] = useState("");
   const [price, setPrice] = useState<number | "">("");
   const [location, setLocation] = useState("");
   const [latitude, setLatitude] = useState<number | "">("");
@@ -48,17 +53,29 @@ export default function PostCreatePage() {
   const [selectedFiles, setSelectedFiles] = useState<FileList | null>(null);
   // 업로드된 이미지 URL 리스트
   const [imageUrlList, setImageUrlList] = useState<string[]>([]);
+  // 백엔드에서 불러온 카테고리 목록 state
+  const [categories, setCategories] = useState<Category[]>([]);
 
-  // 간단한 카테고리 매핑 예시
-  const getCategoryIds = (category: string): number[] => {
-    const mapping: Record<string, number> = {
-      전자제품: 1,
-      가구: 2,
-      의류: 3,
-    };
-    return category ? [mapping[category]] : [];
-  };
+  // 백엔드에서 카테고리 목록 불러오기
+  useEffect(() => {
+    async function fetchCategories() {
+      try {
+        const res = await axios.get<{
+          code: string;
+          message: string;
+          data: Category[];
+        }>("/api/categories", {
+          withCredentials: true,
+        });
+        setCategories(res.data.data);
+      } catch (err) {
+        console.error("카테고리 로드 실패", err);
+      }
+    }
+    fetchCategories();
+  }, []);
 
+  // 게시글 생성 처리
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -71,13 +88,16 @@ export default function PostCreatePage() {
       }
       setImageUrlList(uploadedUrls);
 
+      // 선택한 카테고리 id를 숫자로 변환하여 배열에 넣음
+      const categoryIds = selectedCategory ? [Number(selectedCategory)] : [];
+
       // 게시글 생성 API로 보낼 JSON 데이터 구성
       const data = {
         productName,
         productPrice: price === "" ? 0 : Number(price),
         title,
         content,
-        categoryIds: getCategoryIds(category),
+        categoryIds: categoryIds,
         imageUrlList: uploadedUrls,
         latitude: latitude === "" ? 0 : Number(latitude),
         longitude: longitude === "" ? 0 : Number(longitude),
@@ -142,13 +162,15 @@ export default function PostCreatePage() {
           <label className="block mb-1 font-semibold">카테고리</label>
           <select
             className="border w-full p-2"
-            value={category}
-            onChange={(e) => setCategory(e.target.value)}
+            value={selectedCategory}
+            onChange={(e) => setSelectedCategory(e.target.value)}
           >
             <option value="">카테고리 선택</option>
-            <option value="전자제품">전자제품</option>
-            <option value="가구">가구</option>
-            <option value="의류">의류</option>
+            {categories.map((cat) => (
+              <option key={cat.id} value={cat.id}>
+                {cat.name}
+              </option>
+            ))}
           </select>
         </div>
         <div className="mb-4">

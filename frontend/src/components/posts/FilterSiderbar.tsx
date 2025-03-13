@@ -1,5 +1,3 @@
-// components/FilterSidebar.tsx
-//검색/필터 컴포넌트트
 "use client";
 
 import React, { useState } from "react";
@@ -12,9 +10,13 @@ interface FilterSidebarProps {
     category: string;
     sort: string;
   }) => void;
+  categories: { id: number; name: string }[];
 }
 
-export default function FilterSidebar({ onFilterChange }: FilterSidebarProps) {
+export default function FilterSidebar({
+  onFilterChange,
+  categories,
+}: FilterSidebarProps) {
   const [keyword, setKeyword] = useState("");
   const [minPrice, setMinPrice] = useState<string>("");
   const [maxPrice, setMaxPrice] = useState<string>("");
@@ -73,10 +75,11 @@ export default function FilterSidebar({ onFilterChange }: FilterSidebarProps) {
             className="w-full border rounded p-1"
           >
             <option value="">전체</option>
-            <option value="전자제품">전자제품</option>
-            <option value="가구">가구</option>
-            <option value="의류">의류</option>
-            {/* 필요한 카테고리 추가 */}
+            {categories.map((cat) => (
+              <option key={cat.id} value={cat.name}>
+                {cat.name}
+              </option>
+            ))}
           </select>
         </div>
         <div>

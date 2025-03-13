@@ -63,16 +63,14 @@ export default function PostDetailPage() {
     <div className="p-4">
       {/* 배너 영역 */}
       <div className="bg-gray-800 text-white p-4 rounded mb-4">
-        <h1 className="text-2xl font-bold">
-          배너 영역 (예: 사이트명, 로고 등)
-        </h1>
+        <h1 className="text-2xl font-bold">길게 볼 장터</h1>
       </div>
 
       {/* 상단 레이아웃: 사진 + 유저 정보 */}
       <div className="flex flex-col md:flex-row gap-4">
         {/* 사진 영역 */}
         <div className="flex-1 bg-gray-100 rounded p-4">
-          <h2 className="text-xl font-semibold mb-2">대표 사진</h2>
+          <h2 className="text-xl font-semibold mb-2">사진</h2>
           {images.length > 0 ? (
             <img
               src={images[0]}
