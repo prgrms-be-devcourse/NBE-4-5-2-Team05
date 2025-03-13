@@ -37,11 +37,9 @@ public class UserController {
     record LoginUserForm(
             @NotBlank(message = "아이디는 필수 입력값입니다.") String username,
             @NotBlank(message = "비밀번호는 필수 입력값입니다.") String password
-    ) {
-    }
+    ) {}
 
-    record LoginUserDto(String accessToken, String refreshToken, UserDto item) {
-    }
+    record LoginUserDto(String accessToken, String refreshToken, UserDto item) {}
 
     @PostMapping("/login")
     public RsData<LoginUserDto> loginUser(@RequestBody @Valid LoginUserForm userForm) {
@@ -82,14 +80,15 @@ public class UserController {
     }
 
 
-    record RefreshUserForm(@NotBlank(message = "refreshToken을 입력해주세요.") String refreshToken) {
-    }
+    record RefreshUserForm(@NotBlank(message = "refreshToken을 입력해주세요.") String refreshToken) {}
 
     @PostMapping("/refresh")
     public RsData<String> refreshAccessToken(@RequestBody @Valid RefreshUserForm userForm) {
+
         String refreshToken = userForm.refreshToken();
         String newAccessToken = userService.refreshAccessToken(refreshToken);
         rq.addCookie("accessToken", newAccessToken);
+
         return new RsData<>("200-1", "AccessToken이 재발급되었습니다.", newAccessToken);
     }
 
