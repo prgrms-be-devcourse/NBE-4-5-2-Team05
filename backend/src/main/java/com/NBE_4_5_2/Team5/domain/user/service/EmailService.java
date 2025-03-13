@@ -31,10 +31,11 @@ public class EmailService {
 
     // 이메일 인증 코드 전송
     public void sendAuthenticationCode(String email) {
+
         try {
             String code = generateVerificationCode();
             String subject = "요청하신 이메일 변경 인증 코드는 %s입니다.".formatted(code);
-            String htmlContent = loadHtmlTemplate("templates/email-template.html").replace("{{CODE}}", code);
+            String htmlContent = loadHtmlTemplate("templates/email/email-template.html").replace("{{CODE}}", code);
 
             sendHtmlEmail(email, subject, htmlContent);
             saveVerificationCode(email, code); // 인증 코드 Redis 저장

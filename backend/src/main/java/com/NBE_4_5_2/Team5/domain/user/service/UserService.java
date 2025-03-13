@@ -222,8 +222,13 @@ public class UserService {
     @Transactional
     public UserDto updateMyProfile(User user, UserUpdateRequest updateRequest) {
         // 닉네임 변경
-        if (updateRequest.getNickname() != null) {
-            user.setNickname(updateRequest.getNickname());
+        String updateNickname = updateRequest.getNickname();
+        if (updateNickname != null && !updateNickname.equals(user.getNickname())) {
+            // 닉네임 중복 체크
+            if (userRepository.existsByNickname(updateNickname)) {
+                throw new ServiceException("400-NICKNAME-ALREADY-EXISTS", "이미 사용 중인 닉네임입니다.");
+            }
+            user.setNickname(updateNickname);
         }
 
         // 주소 변경
@@ -237,12 +242,17 @@ public class UserService {
         }
 
         // 이메일 변경 시 중복 체크
-        if (updateRequest.getEmail() != null && !updateRequest.getEmail().equals(user.getEmail())) {
-            if (!emailService.existsEmail(updateRequest.getEmail())) {
-                throw new ServiceException("400-1", "이메일 인증이 완료되지 않았습니다. 인증 후 다시 시도해주세요.");
-            }
-            if (userRepository.existsByEmail(updateRequest.getEmail())) {
+        String updateEmail = updateRequest.getEmail();
+        if (updateEmail != null && !updateEmail.equals(user.getEmail())) {
+
+            if (userRepository.existsByEmail(updateEmail)) {
                 throw new ServiceException("400-EMAIL-ALREADY-EXISTS", "이미 사용 중인 이메일입니다.");
+            }
+
+            // 이메일 인증이 완료되면 redis에 "verified" 형태로 저장됨, 검증된 이메일이 아닐 경우 예외처리
+            String verificationCode = emailService.getVerificationCode(updateEmail);
+            if (verificationCode == null || !verificationCode.equals("verified")) {
+                throw new ServiceException("400-1", "이메일 인증이 완료되지 않았습니다. 인증 후 다시 시도해주세요.");
             }
 
             user.setEmail(updateRequest.getEmail());
@@ -267,6 +277,13 @@ public class UserService {
         emailService.checkBouncedEmail(email);
     }
 
+    /**
+     * 사용자가 입력한 인증코드를 검증하여 일치할 경우 해당 이메일을 verified로 저장
+     *
+     * @param email 검증할 이메일
+     * @param code 사용자가 입력한 인증 코드
+     * @exception ServiceException 인증코드가 일치하지 않는 경우
+     * */
     public void verifyAuthenticationCode(String email, String code) {
 
         String savedCode = emailService.getVerificationCode(email);
@@ -275,6 +292,7 @@ public class UserService {
         if (!verified) {
             throw new ServiceException("400-1", "인증코드가 틀렸습니다.");
         }
-        emailService.deleteVerificationCode(email);
+
+        emailService.saveVerificationCode(email, "verified");
     }
 }
