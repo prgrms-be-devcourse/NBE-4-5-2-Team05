@@ -624,9 +624,9 @@ export interface components {
             purchasedProducts?: components["schemas"]["ProductPost"][];
             writtenProducts?: components["schemas"]["ProductPost"][];
             wroteComments?: components["schemas"]["Comment"][];
-            memberAuthoritiesAsString?: string[];
             authorities?: components["schemas"]["GrantedAuthority"][];
             admin?: boolean;
+            memberAuthoritiesAsString?: string[];
         };
         SignUpUserForm: {
             username?: string;

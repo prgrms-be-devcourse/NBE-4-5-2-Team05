@@ -3,7 +3,7 @@
 import { Button } from "@/components/ui/button";
 import { components } from "@/lib/backend/apiV1/schema";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useState } from "react";
+import { use, useState } from "react";
 import {
   Select,
   SelectContent,
@@ -21,6 +21,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import Link from "next/link";
+import { LoginMemberContext } from "@/app/stores/auth/loginMemberStore";
 
 export default function ClientPage({
   postInfo,
@@ -42,7 +43,6 @@ export default function ClientPage({
   const [pageSize, setPageSize] = useState<number>(
     Number(searchParams.get("pageSize")) || 10
   );
-
   const [sort, setSort] = useState<string>(searchParams.get("sort") || "desc");
 
   const handleSortChange = (newSort: string) => {

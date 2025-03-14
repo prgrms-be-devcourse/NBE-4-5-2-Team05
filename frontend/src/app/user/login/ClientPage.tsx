@@ -1,13 +1,16 @@
 "use client";
 
+import { LoginMemberContext } from "@/app/stores/auth/loginMemberStore";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import client from "@/lib/client";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { use } from "react";
 
 export default function ClientPage() {
   const router = useRouter();
+  const { setLoginMember } = use(LoginMemberContext);
 
   async function login(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -40,8 +43,10 @@ export default function ClientPage() {
     }
 
     alert("로그인 성공하셨습니다.");
-    router.refresh();
-    window.location.href = "/";
+    if (response.data.data.item) {
+      setLoginMember(response.data.data.item);
+    }
+    router.replace("/");
   }
 
   return (
