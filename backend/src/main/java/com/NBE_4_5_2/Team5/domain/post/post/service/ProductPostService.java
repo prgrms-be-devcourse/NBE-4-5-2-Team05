@@ -89,8 +89,7 @@ public class ProductPostService {
         Page<ProductPost> postPage;
         if (status != null) {
             postPage = productPostRepository.findByWriterAndStatus(actor, status, pageable);
-        }
-        else postPage = productPostRepository.findByWriter(actor, pageable);
+        } else postPage = productPostRepository.findByWriter(actor, pageable);
 
         Page<PreviewPostResponse> mappedMyPosts = postPage.map(PreviewPostResponse::fromEntity);
 
@@ -190,9 +189,9 @@ public class ProductPostService {
 
     //내가 구매한 내역
     @Transactional(readOnly = true)
-    public PageDto<ProductPostResponse> getMyPurchases(User actor,int page,int pageSize) {
+    public PageDto<ProductPostResponse> getMyPurchases(User actor, int page, int pageSize) {
         Pageable pageable = PageRequest.of(page - 1, pageSize);
-        Page<ProductPost> postPage = productPostRepository.findByBuyer(actor,pageable);
+        Page<ProductPost> postPage = productPostRepository.findByBuyer(actor, pageable);
 
         Page<ProductPostResponse> mappedMyPurchases = postPage.map(ProductPostResponse::fromEntity);
 
@@ -208,15 +207,14 @@ public class ProductPostService {
     }
 
     // 내가 찜한 내역
-    public List<ProductPostResponse> getMyFavorites(User actor) {
+    public PageDto<ProductPostResponse> getMyFavorites(User actor, int page, int pageSize) {
+        Pageable pageable = PageRequest.of(page - 1, pageSize);
         List<String> postIds = likedPostRepository.findAllProductPostIdsByUserId(actor.getId());
-        if (postIds.isEmpty())
-            return List.of();
 
-        List<ProductPost> favoritePosts = productPostRepository.findAllById(postIds);
-        return favoritePosts.stream()
-                .map(ProductPostResponse::fromEntity)
-                .toList();
+        Page<ProductPost> posts = productPostRepository.findAllByIds(postIds, pageable);
+        Page<ProductPostResponse> mappedPosts = posts.map(ProductPostResponse::fromEntity);
+
+        return new PageDto<>(mappedPosts);
     }
 
 }
