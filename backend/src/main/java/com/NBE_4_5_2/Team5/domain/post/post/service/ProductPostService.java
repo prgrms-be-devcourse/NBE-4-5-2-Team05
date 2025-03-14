@@ -85,12 +85,16 @@ public class ProductPostService {
 		return new PageDto<>(mappedPosts);
 	}
 
-	public PageDto<PreviewPostResponse> getMyPosts(User actor, int page, int pageSize, String sort) {
+	public PageDto<PreviewPostResponse> getMyPosts(User actor, int page, int pageSize, String sort,ProductStatus status) {
 		Sort.Direction sortDirection = sort.equalsIgnoreCase("asc") ? Sort.Direction.ASC : Sort.Direction.DESC;
 		Pageable pageable = PageRequest.of(page - 1, pageSize,
 			Sort.by(sortDirection, "createdAt"));
 
-		Page<ProductPost> postPage = productPostRepository.findByWriter(actor, pageable);
+		Page<ProductPost> postPage;
+		if (status!=null) {
+			postPage=productPostRepository.findByWriterAndStatus(actor,status,pageable);
+		}
+		else postPage = productPostRepository.findByWriter(actor, pageable);
 
 		Page<PreviewPostResponse> mappedMyPosts = postPage.map(PreviewPostResponse::fromEntity);
 
