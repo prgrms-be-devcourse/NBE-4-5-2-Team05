@@ -227,7 +227,10 @@ public class UserService {
                 .build();
     }
 
-
+    public User getUserByIdentity(User userIdentity) {
+        String userId = userIdentity.getId();
+        return userRepository.findById(userId).get();
+    }
 
     // 내 프로필 수정
     @Transactional

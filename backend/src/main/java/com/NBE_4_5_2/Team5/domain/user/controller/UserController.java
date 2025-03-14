@@ -74,7 +74,7 @@ public class UserController {
     public RsData<UserDto> me() {
 
         User userIdentity = userService.getUserIdentity();
-        User user = rq.getRealActor(userIdentity);
+        User user = userService.getUserByIdentity(userIdentity);
 
         return new RsData<>("200-1", "내 정보 조회가 완료되었습니다.", new UserDto(user));
     }
@@ -98,7 +98,7 @@ public class UserController {
     @Transactional
     public RsData<UserDto> updateMyProfile(@RequestBody @Valid UserUpdateRequest updateRequest) {
         User userIdentity = userService.getUserIdentity();
-        User user = rq.getRealActor(userIdentity);
+        User user = userService.getUserByIdentity(userIdentity);
         UserDto updatedUser = userService.updateMyProfile(user, updateRequest); // `userId` 대신 객체 전달
         return new RsData<>("200", "사용자 정보가 성공적으로 수정되었습니다.", updatedUser);
     }
@@ -108,7 +108,7 @@ public class UserController {
     @DeleteMapping("/me")
     public RsData<?> deleteMyProfile() {
         User userIdentity = userService.getUserIdentity();
-        User user = rq.getRealActor(userIdentity);
+        User user = userService.getUserByIdentity(userIdentity);
         userService.deleteMyProfile(user);
 
         rq.removeCookie("accessToken");

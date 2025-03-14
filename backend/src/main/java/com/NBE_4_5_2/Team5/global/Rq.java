@@ -1,7 +1,6 @@
 package com.NBE_4_5_2.Team5.global;
 
 import com.NBE_4_5_2.Team5.domain.user.entity.User;
-import com.NBE_4_5_2.Team5.domain.user.service.UserService;
 import com.NBE_4_5_2.Team5.global.security.SecurityUser;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
@@ -23,7 +22,6 @@ public class Rq {
 
     private final HttpServletResponse response;
     private final HttpServletRequest request;
-    private final UserService userService;
 
     public void setLogin(User actor) {
 
@@ -47,10 +45,6 @@ public class Rq {
         }
 
         return Optional.of(refreshToken);
-    }
-
-    public User getRealActor(User actor) {
-        return userService.getUserById(actor.getId()).get();
     }
 
     public String getValueFromCookie(String name) {
