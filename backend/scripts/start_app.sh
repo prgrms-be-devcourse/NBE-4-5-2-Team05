@@ -43,6 +43,8 @@ export REDIS_HOST=$(aws ssm get-parameter --name /team5/REDIS_HOST --with-decryp
 export DB_URL=$(aws ssm get-parameter --name /team5/DB_URL --with-decryption --query "Parameter.Value" --output text)
 export DB_USERNAME=$(aws ssm get-parameter --name /team5/DB_USERNAME --with-decryption --query "Parameter.Value" --output text)
 export DB_PASSWORD=$(aws ssm get-parameter --name /team5/DB_PASSWORD --with-decryption --query "Parameter.Value" --output text)
+export SERVER_HOST=$(aws ssm get-parameter --name /team5/SERVER_HOST --with-decryption --query "Parameter.Value" --output text)
+
 
 
 # Start your .jar in background (example)
