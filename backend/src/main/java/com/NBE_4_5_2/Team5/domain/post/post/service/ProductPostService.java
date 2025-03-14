@@ -207,12 +207,12 @@ public class ProductPostService {
     }
 
     // 내가 찜한 내역
-    public PageDto<ProductPostResponse> getMyFavorites(User actor, int page, int pageSize) {
+    public PageDto<PreviewPostResponse> getMyFavorites(User actor, int page, int pageSize) {
         Pageable pageable = PageRequest.of(page - 1, pageSize);
         List<String> postIds = likedPostRepository.findAllProductPostIdsByUserId(actor.getId());
 
         Page<ProductPost> posts = productPostRepository.findAllByIds(postIds, pageable);
-        Page<ProductPostResponse> mappedPosts = posts.map(ProductPostResponse::fromEntity);
+        Page<PreviewPostResponse> mappedPosts = posts.map(PreviewPostResponse::fromEntity);
 
         return new PageDto<>(mappedPosts);
     }

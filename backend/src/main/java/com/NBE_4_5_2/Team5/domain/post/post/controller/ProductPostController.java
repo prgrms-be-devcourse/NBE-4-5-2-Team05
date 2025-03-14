@@ -172,10 +172,10 @@ public class ProductPostController {
 	// 내가 찜한 내역
 	@PreAuthorize("isAuthenticated()")
 	@GetMapping("/my/favorites")
-	public RsData<PageDto<ProductPostResponse>> getMyFavorites(@RequestParam(defaultValue = "1") int page,
+	public RsData<PageDto<PreviewPostResponse>> getMyFavorites(@RequestParam(defaultValue = "1") int page,
 															@RequestParam(defaultValue = "5") int pageSize) {
 		User actor = rq.getUserIdentity();
-		PageDto<ProductPostResponse> favorites = productPostService.getMyFavorites(actor,page,pageSize);
+		PageDto<PreviewPostResponse> favorites = productPostService.getMyFavorites(actor,page,pageSize);
 
 		return new RsData<>(
 			"200",
