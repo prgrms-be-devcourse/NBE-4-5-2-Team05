@@ -190,11 +190,13 @@ public class ProductPostService {
 
     //내가 구매한 내역
     @Transactional(readOnly = true)
-    public List<ProductPostResponse> getMyPurchases(User actor) {
-        List<ProductPost> purchasedPosts = productPostRepository.findByBuyer(actor);
-        return purchasedPosts.stream()
-                .map(ProductPostResponse::fromEntity)
-                .toList();
+    public PageDto<ProductPostResponse> getMyPurchases(User actor,int page,int pageSize) {
+        Pageable pageable = PageRequest.of(page - 1, pageSize);
+        Page<ProductPost> postPage = productPostRepository.findByBuyer(actor,pageable);
+
+        Page<ProductPostResponse> mappedMyPurchases = postPage.map(ProductPostResponse::fromEntity);
+
+        return new PageDto<>(mappedMyPurchases);
     }
 
     // 내가 판매한 내역
