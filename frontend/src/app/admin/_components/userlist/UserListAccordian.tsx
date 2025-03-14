@@ -66,7 +66,7 @@ export default function UserListAccordian({
             value={String(item.id)}
             className="border rounded-lg border-gray-300 my-2 "
           >
-            <AccordionTrigger className="w-full h-full flex justify-between px-3 text-xl hover:cursor-pointer py-4">
+            <AccordionTrigger className="w-full flex justify-between px-3 text-xl hover:cursor-pointer py-4">
               <p>{item.id}</p>
               <ChevronDown className="ml-2" size={20} />
             </AccordionTrigger>
