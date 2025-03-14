@@ -221,7 +221,7 @@ public class ChatRoomService {
     }
 
     // 현재 두 사용자가 사용중인 roodId(개별저장소)
-    public String findByRoomIdByClients(String sender, String receiver) {
+    public ChatRoom findByRoomIdByClients(String sender, String receiver) {
         for(String key:hashOpsEnterInfo.keys(CHAT_ROOMS)) {
             ChatRoom chatRoom= hashOpsChatRoom.get(CHAT_ROOMS,key);
 
@@ -232,7 +232,7 @@ public class ChatRoomService {
             if(chatRoom.getSender().equals(sender) && chatRoom.getReceiver().equals(receiver)
                     || chatRoom.getSender().equals(receiver) && chatRoom.getReceiver().equals(sender)) {
                 if(chatRoom.getClient().equals(sender)) {
-                    return chatRoom.getRoomId();
+                    return chatRoom;
                 }
             }
         }

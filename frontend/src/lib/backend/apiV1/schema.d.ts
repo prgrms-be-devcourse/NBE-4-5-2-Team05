@@ -551,83 +551,6 @@ export interface components {
             message: string;
             data: components["schemas"]["ProductPostResponse"];
         };
-        Category: {
-            /** Format: int64 */
-            id?: number;
-            name?: string;
-        };
-        Comment: {
-            id?: string;
-            content?: string;
-            target?: components["schemas"]["ProductPost"];
-            author?: components["schemas"]["User"];
-        };
-        GrantedAuthority: {
-            authority?: string;
-        };
-        ProductCategory: {
-            /** Format: int64 */
-            id?: number;
-            productPost?: components["schemas"]["ProductPost"];
-            category?: components["schemas"]["Category"];
-        };
-        ProductPost: {
-            id?: string;
-            productName?: string;
-            /** Format: int32 */
-            productPrice?: number;
-            buyer?: components["schemas"]["User"];
-            title?: string;
-            content?: string;
-            image_urls?: string;
-            /** Format: int32 */
-            likedCount?: number;
-            /** @enum {string} */
-            status?: "RESERVED" | "AVAILABLE" | "PURCHASED";
-            /** Format: float */
-            latitude?: number;
-            /** Format: float */
-            longitude?: number;
-            /** Format: date-time */
-            createdAt?: string;
-            /** Format: date-time */
-            modifiedAt?: string;
-            productCategories?: components["schemas"]["ProductCategory"][];
-            writer?: components["schemas"]["User"];
-            commentList?: components["schemas"]["Comment"][];
-            available?: boolean;
-        };
-        RsDataUser: {
-            code: string;
-            message: string;
-            data: components["schemas"]["User"];
-        };
-        User: {
-            id?: string;
-            /** Format: date-time */
-            createdAt?: string;
-            /** Format: date-time */
-            modifiedAt?: string;
-            username?: string;
-            password?: string;
-            email?: string;
-            nickname?: string;
-            address?: string;
-            profileUrl?: string;
-            /** Format: int32 */
-            cash?: number;
-            /** @enum {string} */
-            role?: "ADMIN" | "USER";
-            blocked?: boolean;
-            /** Format: int32 */
-            blockedCount?: number;
-            purchasedProducts?: components["schemas"]["ProductPost"][];
-            writtenProducts?: components["schemas"]["ProductPost"][];
-            wroteComments?: components["schemas"]["Comment"][];
-            authorities?: components["schemas"]["GrantedAuthority"][];
-            admin?: boolean;
-            memberAuthoritiesAsString?: string[];
-        };
         SignUpUserForm: {
             username?: string;
             password?: string;
@@ -827,13 +750,18 @@ export interface components {
             /** Format: int64 */
             userCount?: number;
         };
+        RsDataChatRoomDto: {
+            code: string;
+            message: string;
+            data: components["schemas"]["ChatRoomDto"];
+        };
         RsDataListChatRoomDto: {
             code: string;
             message: string;
             data: components["schemas"]["ChatRoomDto"][];
         };
         MessageDto: {
-            messageId?:string;
+            messageId?: string;
             sender?: string;
             message?: string;
             image?: string;
@@ -843,6 +771,11 @@ export interface components {
             code: string;
             message: string;
             data: components["schemas"]["MessageDto"][];
+        };
+        Category: {
+            /** Format: int64 */
+            id?: number;
+            name?: string;
         };
         RsDataListCategory: {
             code: string;
@@ -1140,7 +1073,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json;charset=UTF-8": components["schemas"]["RsDataUser"];
+                    "application/json;charset=UTF-8": components["schemas"]["RsDataUserDto"];
                 };
             };
             /** @description Internal Server Error */
@@ -1843,7 +1776,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json;charset=UTF-8": components["schemas"]["RsDataString"];
+                    "application/json;charset=UTF-8": components["schemas"]["RsDataChatRoomDto"];
                 };
             };
             /** @description Internal Server Error */
@@ -1934,7 +1867,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json;charset=UTF-8": components["schemas"]["RsDataString"];
+                    "application/json;charset=UTF-8": components["schemas"]["RsDataObject"];
                 };
             };
             /** @description Internal Server Error */

@@ -1,11 +1,26 @@
 import { cookies } from "next/headers";
 import ClientPage from "./ClientPage";
 import client from "@/lib/backend/client";
+import { components } from "@/lib/backend/apiV1/schema";
 
-export default async function Page(){
+export default async function Page(
+  { searchParams }:
+  {
+     searchParams: { 
+      receiver: string 
+    };
+  }
+){
+
+  const {
+    receiver=""
+  } = await searchParams;
+
+  const cookie = (await cookies()).toString();
+
   const response= await client.GET("/api/chat/rooms",{
     headers:{
-      cookie:(await cookies()).toString(),
+      cookie:cookie,
     },
     credentials:"include",
   });
@@ -17,6 +32,27 @@ export default async function Page(){
   
   const rsData=response.data!!;
   const chatRoom=rsData.data;  
+  let searchChatRoomDto=chatRoom;
+  if(receiver){
+    const searchResponse = await client.GET("/api/chat/search",{
+      headers:{
+        cookie:cookie,
+      },
+      params:{
+        query:{
+          receiver: receiver,
+        },
+      },
+      credentials:"include",
+    });
+  
+    if(searchResponse.error){
+      console.error("검색 오류, ",searchResponse.error.message);
+    }else{
+      const data = searchResponse.data.data;
+      searchChatRoomDto = Array.isArray(data) ? data : data ? [data] : [];
+    }
+  }
 
-  return (<ClientPage chatRoom={chatRoom}/>);
+  return (<ClientPage chatRoom={chatRoom} searchChatRoomDto={searchChatRoomDto} receiver={receiver}/>);
 }

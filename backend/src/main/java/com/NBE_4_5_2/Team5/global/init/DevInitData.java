@@ -76,6 +76,7 @@ public class DevInitData {
             return List.of("cmd.exe", "/c", "npx --package typescript --package openapi-typescript --package punycode openapi-typescript "
                     + API_JSON_FILE + " -o /frontend/src/lib/backend/apiV1/schema.d.ts");
         } else {
+            System.out.println("ㅋㅋㅋ");
             return List.of("sh", "-c", "npx --package typescript --package openapi-typescript --package punycode openapi-typescript "
                     + API_JSON_FILE + " -o /frontend/src/lib/backend/apiV1/schema.d.ts");
         }

@@ -167,16 +167,17 @@ public class ChatRoomController {
     // 특정 사용자와의 채팅방 검색
     @GetMapping("/search")
     @ResponseBody
-    public RsData<String> findChatRooms(@RequestParam String receiver) {
+    public RsData<ChatRoomDto> findChatRooms(@RequestParam String receiver) {
         User userIdentity = rq.getUserIdentity();
         User user = rq.getRealActor(userIdentity);
         System.out.println("name:"+user.getNickname());
-        String roomId=chatRoomService.findByRoomIdByClients(user.getNickname(),receiver);
-
-        if (roomId == null) {
+        ChatRoom chatRoom=chatRoomService.findByRoomIdByClients(user.getNickname(),receiver);
+//        ChatRoom chatRoom=chatRoomService.findChatRoomByClient(roomId,user.getNickname());
+        if (chatRoom == null) {
             return new RsData<>("404", "존재하지 않는 대화방입니다.");
         }
-        return new RsData<>("200","success","roomId: "+roomId);
+        ChatRoomDto chatRoomDto=new ChatRoomDto(chatRoom);
+        return new RsData<>("200","success",chatRoomDto);
     }
 
     // 권한부여(임시)

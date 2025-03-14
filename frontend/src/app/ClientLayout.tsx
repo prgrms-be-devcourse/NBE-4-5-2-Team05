@@ -41,7 +41,6 @@ export default function ClinetLayout({
               const response=await client.POST("/api/users/logout",{
                 credentials:"include",
               });
-
               if(response.error){
                 alert(response.error.message);
                 return;
@@ -50,6 +49,8 @@ export default function ClinetLayout({
               router.push("/");
               }}>로그아웃</Link>
           )}          
+          {isLogined && <Link href="/chat">채팅방</Link>}
+
           {isLogined && <Link href="/member/me">내정보</Link>}
         </header>
         <div>
