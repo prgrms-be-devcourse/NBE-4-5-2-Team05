@@ -5,5 +5,9 @@ import { redirect } from "next/navigation";
 import RequireAuthenticated from "@/components/auth/RequireAuthenticated";
 
 export default async function Page() {
-  return <ClientPage />;
+  return (
+    <RequireAuthenticated>
+      <ClientPage />
+    </RequireAuthenticated>
+  );
 }
