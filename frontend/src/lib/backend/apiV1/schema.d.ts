@@ -1744,7 +1744,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json;charset=UTF-8": components["schemas"]["RsDataPageDtoPreviewPostResponse"];
+                    "application/json;charset=UTF-8": components["schemas"]["RsDataPageDtoProductPostResponse"];
                 };
             };
             /** @description Internal Server Error */

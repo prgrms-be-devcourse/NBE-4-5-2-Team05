@@ -75,7 +75,7 @@ export default function ClientPage() {
           </Link>
           <Button variant="ghost" className="w-full mt-4 p-0">
             <Link
-              href="http://localhost:8080/oauth2/authorization/kakao?redirectUrl=http://localhost:3000"
+              href="http://3.35.108.184:8080/oauth2/authorization/kakao?redirectUrl=http://localhost:3000"
               className="w-full"
             >
               <img src="/kakao_login.png" className="w-full" />
