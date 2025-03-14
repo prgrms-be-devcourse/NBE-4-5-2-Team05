@@ -87,13 +87,10 @@ public class UserController {
 
     @PostMapping("/refresh")
     public RsData<String> refreshAccessToken(@RequestBody @Valid RefreshUserForm userForm) {
-
         String refreshToken = userForm.refreshToken();
         String newAccessToken = userService.refreshAccessToken(refreshToken);
         rq.addCookie("accessToken", newAccessToken);
-
-
-        return new RsData<>("200-1", "AccessToken이 재발급되었습니다.", newAccessToken );
+        return new RsData<>("200-1", "AccessToken이 재발급되었습니다.", newAccessToken);
     }
 
     //  내 정보 수정
