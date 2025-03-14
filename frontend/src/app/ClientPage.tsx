@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import RecentlyViewedSection from "@/components/posts/RecentlyViewedSection";
+import RecentlyUploadedSection from "@/components/posts/RecentlyUploadedSection";
 
 interface ClientPageProps {
   me: {
@@ -74,24 +75,9 @@ export default function ClientPage({ me }: ClientPageProps) {
         <RecentlyViewedSection />
       </section>
 
-      {/* 최근 올라온 상품 섹션 (하드코딩 예시) */}
+      {/* 최근 올라온 상품 섹션 */}
       <section className="border p-4">
-        <h2 className="font-bold text-lg mb-2">🔥 최근 올라온 상품</h2>
-        <div className="flex flex-wrap gap-4">
-          <div className="border p-2 min-w-[100px] text-center">상품 1</div>
-          <div className="border p-2 min-w-[100px] text-center">상품 2</div>
-          <div className="border p-2 min-w-[100px] text-center">상품 3</div>
-          <div className="border p-2 min-w-[100px] text-center">상품 4</div>
-          <div className="border p-2 min-w-[100px] text-center">상품 5</div>
-          <div className="border p-2 min-w-[100px] text-center">상품 6</div>
-          <div className="border p-2 min-w-[100px] text-center">상품 7</div>
-          <div className="border p-2 min-w-[100px] text-center">상품 8</div>
-          <div className="border p-2 min-w-[100px] text-center">상품 9</div>
-          <div className="border p-2 min-w-[100px] text-center">상품 10</div>
-        </div>
-        <div className="h-10 flex items-center justify-center">
-          <p className="text-gray-500">로딩 중...</p>
-        </div>
+        <RecentlyUploadedSection />
       </section>
 
       {/* 하단 고정 버튼 */}
