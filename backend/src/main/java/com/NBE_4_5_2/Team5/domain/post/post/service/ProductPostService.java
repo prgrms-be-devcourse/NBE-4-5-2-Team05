@@ -165,6 +165,7 @@ public class ProductPostService {
         return ProductPostResponse.fromEntity(post);
     }
 
+
     // 특정 게시글을 로그인 유저가 구매 확정
 
     public ProductPostResponse purchasePost(User buyer, String postId) {

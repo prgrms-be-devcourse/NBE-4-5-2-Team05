@@ -13,9 +13,14 @@ import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface ProductPostRepository extends JpaRepository<ProductPost, String> {
+
+	@EntityGraph(attributePaths = {"writer", "productCategories.category"})
+	@Query("select p from ProductPost p where p.id = :id")
+	Optional<ProductPost> findByIdWithWriter(String id);
 
 	@EntityGraph(attributePaths = {"productCategories.category"})
 	Page<ProductPost> findByTitleLike(String title, Pageable pageable);
@@ -34,6 +39,9 @@ public interface ProductPostRepository extends JpaRepository<ProductPost, String
 	//구매된(판매 완료) 상품들 조회
 	@EntityGraph(attributePaths = {"productCategories.category"})
 	List<ProductPost> findAllByStatus(ProductStatus status);
+
+	@EntityGraph(attributePaths = {"productCategories.category"})
+	List<ProductPost> findByBuyer(User buyer);
 
 	@EntityGraph(attributePaths = {"productCategories.category"})
 	Page<ProductPost> findByBuyer(User buyer,Pageable pageable);
