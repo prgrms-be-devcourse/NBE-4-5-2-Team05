@@ -1728,7 +1728,10 @@ export interface operations {
     };
     getMyFavorites: {
         parameters: {
-            query?: never;
+            query?: {
+                page?: number;
+                pageSize?: number;
+            };
             header?: never;
             path?: never;
             cookie?: never;
@@ -1741,7 +1744,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json;charset=UTF-8": components["schemas"]["RsDataListProductPostResponse"];
+                    "application/json;charset=UTF-8": components["schemas"]["RsDataPageDtoPreviewPostResponse"];
                 };
             };
             /** @description Internal Server Error */
