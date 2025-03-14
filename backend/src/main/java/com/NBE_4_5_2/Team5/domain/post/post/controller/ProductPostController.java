@@ -140,10 +140,12 @@ public class ProductPostController {
 
     // 내가 구매한 내역 조회
     @GetMapping("/my/purchases")
-    public RsData<List<ProductPostResponse>> getMyPurchases() {
+    public RsData<PageDto<ProductPostResponse>> getMyPurchases(
+			@RequestParam(defaultValue = "1") int page,
+			@RequestParam(defaultValue = "10") int pageSize) {
         User actor = rq.getUserIdentity();
 
-		List<ProductPostResponse> myPurchases = productPostService.getMyPurchases(actor);
+		PageDto<ProductPostResponse> myPurchases = productPostService.getMyPurchases(actor,page,pageSize);
 
 		return new RsData<>(
 			"200",
