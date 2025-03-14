@@ -88,20 +88,21 @@ export default function ClientPage({
           {pageDto.items.map((item) => {
             return (
               <li className="border-3 border-red-500 my-2 p-2" key={item.id}>
-                <div>id : {item.id}</div>
-                <div>productName : {item.productName}</div>
-                <div>title : {item.title}</div>
-                <div>price : {item.productPrice}</div>
-                <div>writerName : {item.writerName}</div>
-                <div>writerId : {item.writerId}</div>
-                <div>
-                    <strong>Location</strong>
-                     <div>latitude: {item.latitude}</div>
-                     <div>longitude: {item.longitude}</div>
-                </div>
-                <div>thumbNail : {item.thumbNail}</div>
-                <div>createdAt : {item.createdAt}</div>
-
+                <Link href={`/post/${item.id}`}> {/* 클릭 시 해당 post의 상세 페이지로 이동 */}
+                  <div>id : {item.id}</div>
+                  <div>productName : {item.productName}</div>
+                  <div>title : {item.title}</div>
+                  <div>price : {item.productPrice}</div>
+                  <div>writerName : {item.writerName}</div>
+                  <div>writerId : {item.writerId}</div>
+                  <div>
+                      <strong>Location</strong>
+                      <div>latitude: {item.latitude}</div>
+                      <div>longitude: {item.longitude}</div>
+                  </div>
+                  <div>thumbNail : {item.thumbNail}</div>
+                  <div>createdAt : {item.createdAt}</div>
+                </Link>
               </li>
             );
           })}

@@ -30,11 +30,30 @@ export default async function Page(
         },
         credentials:"include",
     });
-
     console.log("API Response:", response);
 
     const rsData=response.data!!;
     const post=rsData.data;
-    return <ClientPage post={post} />
+
+    const createResponse=await client.POST("/api/chat/room",{
+        headers: {
+            cookie: cookieHeader,
+        },
+        params:{
+            query: {
+                postId:id,
+            },
+        },
+        credentials:"include",
+    });
+    console.log("Create Response: ",createResponse);
+    const createData=createResponse.data!!;
+    if(createData.code!="200"){
+        alert("채팅방 생성 실패")
+        console.log(createData.message);
+    }
+    const chatRoom=createData.data;
+
+    return <ClientPage post={post} chatRoom={chatRoom}/>
     
 }
