@@ -8,7 +8,6 @@ import { parseAccessToken } from "./app/util/auth";
 export async function middleware(request: NextRequest) {
   const myCookie = await cookies();
   const accessTokenCookie = myCookie.get("accessToken");
-  const refreshTokenCookie = myCookie.get("refreshToken");
 
   const { isLogin, isExpired } = parseAccessToken(accessTokenCookie);
 
@@ -20,13 +19,8 @@ export async function middleware(request: NextRequest) {
 
   // ✅ 3. 로그인 상태인데 만료됨 → RefreshToken 존재 여부 확인
   if (isLogin && isExpired) {
-    if (!refreshTokenCookie) {
-      console.log("❌ RefreshToken 다씀 → 강제 로그아웃 실행");
-      return forceLogout(request, "/user/login");
-    }
-
     console.log("🔄 AccessToken 만료 → RefreshToken으로 재발급 시도");
-    return refreshAccessToken(refreshTokenCookie);
+    return refreshAccessToken();
   }
 }
 
@@ -46,7 +40,7 @@ function forceLogout(request: NextRequest, redirectUrl: string = "/") {
 }
 
 // 🔄 RefreshToken을 사용해 AccessToken 재발급
-async function refreshAccessToken(refreshTokenCookie: RequestCookie) {
+async function refreshAccessToken() {
   const nextResponse = NextResponse.next();
 
   const response = await client.GET("/api/users/me", {
