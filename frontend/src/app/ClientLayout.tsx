@@ -46,7 +46,7 @@ export default function ClientLayout({
     });
 
     if (response.error) {
-      alert(response.error.message);
+      alert("로그아웃 되었습니다.");
       removeLoginMember();
       router.replace("/user/login");
       return;

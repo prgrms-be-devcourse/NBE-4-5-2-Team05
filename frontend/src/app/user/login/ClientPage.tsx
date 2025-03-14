@@ -37,6 +37,8 @@ export default function ClientPage() {
       credentials: "include",
     });
 
+    console.log(response);
+
     if (response.error) {
       alert(response.error.message);
       return;

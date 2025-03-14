@@ -152,7 +152,7 @@ export default function ClientPage({
               <TableHead>가격</TableHead>
               <TableHead>찜</TableHead>
               <TableHead>판매 상태</TableHead>
-              <TableHead>최근 수정일</TableHead>
+              <TableHead>작성 날짜</TableHead>
               <TableHead>수정하기</TableHead>
             </TableRow>
           </TableHeader>
@@ -206,7 +206,7 @@ export default function ClientPage({
 
                   {/* 최근 수정일 */}
                   <TableCell>
-                    {post.modifiedAt ? new Date().toLocaleDateString() : "-"}
+                    {post.createdAt ? new Date().toLocaleDateString() : "-"}
                   </TableCell>
 
                   {/* 수정하기 */}
