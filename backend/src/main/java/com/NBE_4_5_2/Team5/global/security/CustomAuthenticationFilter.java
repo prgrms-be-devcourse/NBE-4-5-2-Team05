@@ -30,7 +30,7 @@ public class CustomAuthenticationFilter extends OncePerRequestFilter {
 		FilterChain filterChain) throws ServletException, IOException {
 
 		String url = request.getRequestURI();
-		if (List.of("/api/users/login", "/api/users/signup", "/error", "/actuator/**").contains(url)) {
+		if (List.of("/api/users/login", "/api/users/signup", "/error", "/actuator/**", "/api/users/refresh" ).contains(url)) {
 			filterChain.doFilter(request, response);
 			return;
 		}

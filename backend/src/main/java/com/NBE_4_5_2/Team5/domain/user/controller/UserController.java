@@ -13,6 +13,7 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -81,24 +82,20 @@ public class UserController {
 
     record RefreshUserForm(@NotBlank(message = "refreshToken을 입력해주세요.") String refreshToken) {}
 
-    @PreAuthorize("isAuthenticated()")
     @PostMapping("/refresh")
     public RsData<String> refreshAccessToken(@RequestBody @Valid RefreshUserForm userForm) {
 
-        User userIdentity = rq.getUserIdentity();
-        userService.validateRefreshToken(userIdentity, userForm.refreshToken());
+        String refreshToken = userForm.refreshToken();
+        String newAccessToken = userService.refreshAccessToken(refreshToken);
+        rq.addCookie("accessToken", newAccessToken);
 
-        User user = rq.getRealActor(userIdentity);
-
-        AuthToken newAuthToken = userService.generateAuthtoken(user);
-        rq.addCookie("accessToken", newAuthToken.accessToken());
-
-        return new RsData<>("200-1", "AccessToken이 재발급되었습니다.", newAuthToken.accessToken());
+        return new RsData<>("200-1", "AccessToken이 재발급되었습니다.", newAccessToken);
     }
 
     //  내 정보 수정
     @PreAuthorize("isAuthenticated()")
     @PutMapping("/me")
+    @Transactional
     public RsData<UserDto> updateMyProfile(@RequestBody @Valid UserUpdateRequest updateRequest) {
         User userIdentity = rq.getUserIdentity();
         User user = rq.getRealActor(userIdentity);
@@ -113,6 +110,10 @@ public class UserController {
         User userIdentity = rq.getUserIdentity();
         User user = rq.getRealActor(userIdentity);
         userService.deleteMyProfile(user);
+
+        rq.removeCookie("accessToken");
+        rq.removeCookie("refreshToken");
+
         return new RsData<>("200", "회원 탈퇴 성공", new Empty());
     }
 
