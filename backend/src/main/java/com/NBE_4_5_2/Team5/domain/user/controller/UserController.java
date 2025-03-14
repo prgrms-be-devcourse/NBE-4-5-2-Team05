@@ -59,7 +59,7 @@ public class UserController {
     @PostMapping("/logout")
     public RsData<Void> logoutUser() {
 
-        User userIdentity = rq.getUserIdentity();
+        User userIdentity = userService.getUserIdentity();
         userService.logoutUser(userIdentity);
 
         rq.removeCookie("accessToken");
@@ -73,7 +73,7 @@ public class UserController {
     @GetMapping("/me")
     public RsData<UserDto> me() {
 
-        User userIdentity = rq.getUserIdentity();
+        User userIdentity = userService.getUserIdentity();
         User user = rq.getRealActor(userIdentity);
 
         return new RsData<>("200-1", "내 정보 조회가 완료되었습니다.", new UserDto(user));
@@ -97,7 +97,7 @@ public class UserController {
     @PutMapping("/me")
     @Transactional
     public RsData<UserDto> updateMyProfile(@RequestBody @Valid UserUpdateRequest updateRequest) {
-        User userIdentity = rq.getUserIdentity();
+        User userIdentity = userService.getUserIdentity();
         User user = rq.getRealActor(userIdentity);
         UserDto updatedUser = userService.updateMyProfile(user, updateRequest); // `userId` 대신 객체 전달
         return new RsData<>("200", "사용자 정보가 성공적으로 수정되었습니다.", updatedUser);
@@ -107,7 +107,7 @@ public class UserController {
     @PreAuthorize("isAuthenticated()")
     @DeleteMapping("/me")
     public RsData<?> deleteMyProfile() {
-        User userIdentity = rq.getUserIdentity();
+        User userIdentity = userService.getUserIdentity();
         User user = rq.getRealActor(userIdentity);
         userService.deleteMyProfile(user);
 

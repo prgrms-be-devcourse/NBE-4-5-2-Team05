@@ -41,7 +41,7 @@ public class CustomAuthenticationSuccessHandler implements AuthenticationSuccess
          *  refreshToken을 새로 생성하여 redis에 저장하고 쿠키에 넣어주는 방식으로 변경하였습니다.
          * */
 
-        User user = rq.getUserIdentity();
+        User user = userService.getUserIdentity();
 
 //      기존 로직
 //      User realActor = rq.getRealActor(user);

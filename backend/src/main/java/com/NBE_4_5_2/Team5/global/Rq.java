@@ -2,15 +2,12 @@ package com.NBE_4_5_2.Team5.global;
 
 import com.NBE_4_5_2.Team5.domain.user.entity.User;
 import com.NBE_4_5_2.Team5.domain.user.service.UserService;
-import com.NBE_4_5_2.Team5.global.exception.ServiceException;
 import com.NBE_4_5_2.Team5.global.security.SecurityUser;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
@@ -36,33 +33,6 @@ public class Rq {
                 new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities())
         );
 
-    }
-
-    public User getUserIdentity() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-
-        /**
-         * Spring Security에서는 인증되지 않은 사용자를 자동으로 `AnonymousAuthenticationToken`으로 설정
-         * 따라서 `authentication == null`이 아닐 수 있으므로 추가적인 확인을 진행함
-         */
-        if (authentication == null || authentication instanceof AnonymousAuthenticationToken) {
-            throw new ServiceException("401-1", "로그인이 필요합니다.");
-        }
-
-        Object principal = authentication.getPrincipal();
-
-        if (!(principal instanceof SecurityUser)) {
-            throw new ServiceException("", "잘못된 인증 정보입니다");
-        }
-
-        SecurityUser user = (SecurityUser) principal;
-
-        return User.builder()
-                .id(user.getId())
-                .username(user.getUsername())
-                .nickname(user.getNickname())
-                .role(user.getRole())
-                .build();
     }
 
     public String getHeader(String name) {

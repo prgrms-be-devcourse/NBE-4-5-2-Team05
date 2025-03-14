@@ -64,7 +64,7 @@ public class ChatRoomController {
     @ResponseBody
     public RsData<AccessProvider> getUserInfo() {
         String token=rq.getValueFromCookie("accessToken");
-        User userIdentity = rq.getUserIdentity();
+        User userIdentity = userService.getUserIdentity();
         User user = rq.getRealActor(userIdentity);
 
         AccessProvider access = AccessProvider.builder()
@@ -80,7 +80,7 @@ public class ChatRoomController {
     @ResponseBody
     @Transactional
     public RsData<ChatRoom> createRoom(@RequestParam String postId) {
-        User userIdentity = rq.getUserIdentity();
+        User userIdentity = userService.getUserIdentity();
         User sender = rq.getRealActor(userIdentity);
 
         ProductPostResponse postResponse=productPostService.getPost(postId);
@@ -95,7 +95,7 @@ public class ChatRoomController {
     @ResponseBody
     @Transactional
     public RsData<ChatRoom> createRoomAdmin(@PathVariable String adminId) {
-        User userIdentity = rq.getUserIdentity();
+        User userIdentity = userService.getUserIdentity();
         User sender = rq.getRealActor(userIdentity);
 
         User admin = userService.getUserById(adminId).orElseThrow(
@@ -117,7 +117,7 @@ public class ChatRoomController {
     @GetMapping("/rooms")
     @ResponseBody
     public RsData<List<ChatRoomDto>> getUserRooms() {
-        User userIdentity = rq.getUserIdentity();
+        User userIdentity = userService.getUserIdentity();
         User user = rq.getRealActor(userIdentity);
 
         List<ChatRoom> chatRoomsList=chatRoomService.findRoomByUser(user.getNickname());
@@ -138,7 +138,7 @@ public class ChatRoomController {
     @GetMapping("/message")
     @ResponseBody
     public RsData<List<MessageDto>> getMessages(@RequestParam String roomId) {
-        User userIdentity = rq.getUserIdentity();
+        User userIdentity = userService.getUserIdentity();
         User user = rq.getRealActor(userIdentity);
         List<ChatMessage> messages= chatRoomService.getMessagesByUser(roomId,user.getNickname());
         List<MessageDto> response=messages.stream()
@@ -155,7 +155,7 @@ public class ChatRoomController {
     @DeleteMapping("/message")
     @ResponseBody
     public RsData<String> deleteRoom(@RequestParam String roomId) {
-        User userIdentity = rq.getUserIdentity();
+        User userIdentity = userService.getUserIdentity();
         User user = rq.getRealActor(userIdentity);
         chatRoomService.deleteChatRoom(roomId,user.getNickname());
         return new RsData<>("200","삭제 완료");
@@ -165,7 +165,7 @@ public class ChatRoomController {
     @GetMapping("/search")
     @ResponseBody
     public RsData<String> findChatRooms(@RequestParam String receiver) {
-        User userIdentity = rq.getUserIdentity();
+        User userIdentity = userService.getUserIdentity();
         User user = rq.getRealActor(userIdentity);
         System.out.println("name:"+user.getNickname());
         String roomId=chatRoomService.findByRoomIdByClients(user.getNickname(),receiver);
