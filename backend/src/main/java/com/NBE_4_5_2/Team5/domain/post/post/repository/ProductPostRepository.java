@@ -46,6 +46,8 @@ public interface ProductPostRepository extends JpaRepository<ProductPost, String
 	@EntityGraph(attributePaths = {"productCategories.category"})
 	Page<ProductPost> findByBuyer(User buyer,Pageable pageable);
 
+	List<ProductPost> findByIdIn(List<String> postIds);
+
 	Page<ProductPost> findByIdIn(List<String> postIds,Pageable pageable);
 
 	Page<ProductPost> findByWriterAndStatus(User writer, ProductStatus status, Pageable pageable);
