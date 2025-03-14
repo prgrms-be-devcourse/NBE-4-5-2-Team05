@@ -81,4 +81,10 @@ public class AdminController {
 		return new RsData<>("200-1", "유저 리스트 조회 성공.", users);
 	}
 
+	@PreAuthorize("isAuthenticated()")
+	@GetMapping("/notices")
+	public RsData<Page<NoticeResBody>> getNotices(@PageableDefault(size = 10, page = 0) Pageable pageable) {
+		Page<NoticeResBody> notices = adminService.getNotices(pageable);
+		return new RsData<>("200-1", "공지사항 리스트 조회 성공.", notices);
+	}
 }

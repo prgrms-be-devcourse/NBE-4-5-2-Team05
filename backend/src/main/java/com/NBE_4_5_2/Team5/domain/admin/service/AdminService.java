@@ -151,4 +151,12 @@ public class AdminService {
 	private void removeBanInfo(String userId) {
 		banListRepository.deleteByBannedUser_Id(userId);
 	}
+
+	public Page<NoticeResBody> getNotices(Pageable pageable) {
+		User loggedInAdmin = getUser();
+		isAdmin(loggedInAdmin);
+
+		Page<NoticePost> all = noticePostRepository.findAll(pageable);
+		return all.map(notice -> NoticeResBody.of(notice));
+	}
 }
