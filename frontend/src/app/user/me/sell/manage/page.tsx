@@ -46,9 +46,5 @@ export default async function Page({
     pageSize,
   };
 
-  return (
-    <RequireAuthenticated>
-      <ClientPage postInfo={postInfo} pageInfo={pageInfo} />
-    </RequireAuthenticated>
-  );
+  return <ClientPage postInfo={postInfo} pageInfo={pageInfo} />;
 }
