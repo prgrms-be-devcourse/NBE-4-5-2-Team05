@@ -3,7 +3,7 @@
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { useState } from "react";
+import { use, useEffect, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faUser,
@@ -18,6 +18,7 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import client from "@/lib/client";
+import { LoginMemberContext } from "@/app/stores/auth/loginMemberStore";
 
 export default function UserLayout({
   children,
@@ -25,6 +26,8 @@ export default function UserLayout({
   children: React.ReactNode;
 }) {
   const router = useRouter();
+  const pathname = usePathname();
+  const { isLogin, isLoginMemberPending } = use(LoginMemberContext);
 
   async function handleDeleteAccount() {
     const confirmDelete = confirm("정말로 회원 탈퇴를 하시겠습니까?");
@@ -42,8 +45,6 @@ export default function UserLayout({
     alert("회원 탈퇴가 완료되었습니다.");
     window.location.href = "/";
   }
-
-  const pathname = usePathname();
 
   return (
     <div className="flex min-h-screen p-6">
@@ -78,22 +79,6 @@ export default function UserLayout({
                   className={`w-full justify-start ${pathname === "/user/me/sell/manage" ? "bg-blue-100 text-blue-600" : ""}`}
                 >
                   내 상품 관리
-                </Button>
-              </Link>
-              <Link href="/user/me/sell/history">
-                <Button
-                  variant="ghost"
-                  className={`w-full justify-start ${pathname === "/user/me/sell/history" ? "bg-blue-100 text-blue-600" : ""}`}
-                >
-                  판매 내역
-                </Button>
-              </Link>
-              <Link href="/user/me/sell/shipping">
-                <Button
-                  variant="ghost"
-                  className={`w-full justify-start ${pathname === "/user/me/sell/shipping" ? "bg-blue-100 text-blue-600" : ""}`}
-                >
-                  배송 신청
                 </Button>
               </Link>
             </AccordionContent>

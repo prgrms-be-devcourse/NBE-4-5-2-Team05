@@ -3,15 +3,12 @@ import ClientPage from "./ClientPage";
 import { cookies } from "next/headers";
 import { parseAccessToken } from "@/app/util/auth";
 import { redirect } from "next/navigation";
+import RequireAuthenticated from "@/components/auth/RequireAuthenticated";
 
 export default async function Page() {
-  const myCookie = await cookies();
-
-  const { isLogin, payload } = parseAccessToken(myCookie.get("accessToken"));
-
-  if (!isLogin) {
-    redirect("/");
-  }
-
-  return <ClientPage />;
+  return (
+    <RequireAuthenticated>
+      <ClientPage />
+    </RequireAuthenticated>
+  );
 }
