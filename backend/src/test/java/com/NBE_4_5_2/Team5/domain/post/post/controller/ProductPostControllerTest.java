@@ -123,8 +123,8 @@ public class ProductPostControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.code").value("200"))
                 .andExpect(jsonPath("$.message").value("내가 찜한 내역 조회 성공"))
-                .andExpect(jsonPath("$.data[0].id").value(post.getId()))
-                .andExpect(jsonPath("$.data[0].writerId").value(seller.getId()));
+                .andExpect(jsonPath("$.data.items[0].id").value(post.getId()))
+                .andExpect(jsonPath("$.data.items[0].writerId").value(seller.getId()));
     }
 
     @Test
@@ -147,8 +147,8 @@ public class ProductPostControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.code").value("200"))
                 .andExpect(jsonPath("$.message").value("내 구매 내역 조회 성공"))
-                .andExpect(jsonPath("$.data[0].id").value(post.getId()))
-                .andExpect(jsonPath("$.data[0].writerId").value(seller.getId()));
+                .andExpect(jsonPath("$.data.items[0].id").value(post.getId()))
+                .andExpect(jsonPath("$.data.items[0].writerId").value(seller.getId()));
     }
 
     // ---------------------------
