@@ -39,6 +39,24 @@ export default function NoticeAdmin() {
     setNotices(response.data!.data.content!);
     setTotalPageSize(response.data!.data.totalPages!);
   };
+
+  const deleteNotice = async (notice: NoticeListItem) => {
+    const response = await client.DELETE("/api/admin/notices/{notice-id}", {
+      params: {
+        path: {
+          "notice-id": notice.id!,
+        },
+      },
+      credentials: "include",
+    });
+    if (response.error) {
+      console.log(response.error);
+      return;
+    }
+    alert("삭제 성공.");
+    window.location.reload();
+  };
+
   useEffect(() => {
     if (currentView == "list") {
       getNotices();
@@ -77,6 +95,15 @@ export default function NoticeAdmin() {
             onEdit={(notice) => {
               setEditNotice(notice);
               setCurrentView("form");
+            }}
+            onDelete={(notice) => {
+              const userConfirmed = window.confirm("정말로 삭제하시겠습니까?");
+              if (userConfirmed) {
+                deleteNotice(notice);
+                // 여기에 실행할 동작을 추가하세요
+              } else {
+                console.log("사용자가 취소를 클릭했습니다.");
+              }
             }}
           />
           <Pagination

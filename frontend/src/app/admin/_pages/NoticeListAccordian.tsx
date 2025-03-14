@@ -10,9 +10,11 @@ import { ChevronDown } from "lucide-react";
 export default function NoticeListAccordian({
   items,
   onEdit,
+  onDelete,
 }: {
   items: NoticeListItem[];
   onEdit: (notice: NoticeListItem) => void;
+  onDelete: (notice: NoticeListItem) => void;
 }) {
   return (
     <div className="flex-1  overflow-y-auto border rounded-lg px-2">
@@ -38,12 +40,23 @@ export default function NoticeListAccordian({
                 <p>작성자 : {item.admin?.nickname}</p>
               </div>
 
-              <button
-                className="px-3 py-1 bg-yellow-500 text-white rounded"
-                onClick={() => onEdit(item)}
-              >
-                수정
-              </button>
+              <div className="flex gap-2">
+                <button
+                  className="px-3 py-1 bg-yellow-500 text-white rounded"
+                  onClick={() => onEdit(item)}
+                >
+                  수정
+                </button>
+                <button
+                  className="px-3 py-1 bg-red-500 text-white rounded"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    onDelete(item);
+                  }}
+                >
+                  삭제
+                </button>
+              </div>
             </AccordionContent>
           </AccordionItem>
         ))}

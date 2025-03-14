@@ -172,4 +172,10 @@ public class AdminService {
 
 		return NoticeResBody.of(noticePost.update(body.title(), body.content()));
 	}
+
+	public void deleteNotice(String noticeId) {
+		User user = getUser();
+		isAdmin(user);
+		noticePostRepository.deleteById(noticeId);
+	}
 }

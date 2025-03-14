@@ -99,4 +99,11 @@ public class AdminController {
 		NoticeResBody res = adminService.updateNotice(noticeId, body);
 		return new RsData<>("200-1", "공지사항 업데이트 성공.", res);
 	}
+
+	@PreAuthorize("isAuthenticated()")
+	@DeleteMapping("/notices/{notice-id}")
+	public RsData<Void> deleteNotice(@PathVariable(name = "notice-id") String noticeId) {
+		adminService.deleteNotice(noticeId);
+		return new RsData<>("200-1", "공지사항 삭제 완료.");
+	}
 }
