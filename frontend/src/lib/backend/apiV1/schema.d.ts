@@ -624,9 +624,9 @@ export interface components {
             purchasedProducts?: components["schemas"]["ProductPost"][];
             writtenProducts?: components["schemas"]["ProductPost"][];
             wroteComments?: components["schemas"]["Comment"][];
-            authorities?: components["schemas"]["GrantedAuthority"][];
-            admin?: boolean;
             memberAuthoritiesAsString?: string[];
+            admin?: boolean;
+            authorities?: components["schemas"]["GrantedAuthority"][];
         };
         SignUpUserForm: {
             username?: string;
@@ -804,6 +804,22 @@ export interface components {
             code: string;
             message: string;
             data: components["schemas"]["ProductPostResponse"][];
+        };
+        PageDtoProductPostResponse: {
+            items: components["schemas"]["ProductPostResponse"][];
+            /** Format: int32 */
+            totalPages: number;
+            /** Format: int32 */
+            totalItems: number;
+            /** Format: int32 */
+            curPageNo: number;
+            /** Format: int32 */
+            pageSize: number;
+        };
+        RsDataPageDtoProductPostResponse: {
+            code: string;
+            message: string;
+            data: components["schemas"]["PageDtoProductPostResponse"];
         };
         PaymentMetaData: {
             paymentId?: string;
@@ -1680,7 +1696,10 @@ export interface operations {
     };
     getMyPurchases: {
         parameters: {
-            query?: never;
+            query?: {
+                page?: number;
+                pageSize?: number;
+            };
             header?: never;
             path?: never;
             cookie?: never;
@@ -1693,7 +1712,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json;charset=UTF-8": components["schemas"]["RsDataListProductPostResponse"];
+                    "application/json;charset=UTF-8": components["schemas"]["RsDataPageDtoProductPostResponse"];
                 };
             };
             /** @description Internal Server Error */
