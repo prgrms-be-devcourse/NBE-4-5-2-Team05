@@ -47,6 +47,8 @@ export default function ClientLayout({
 
     if (response.error) {
       alert(response.error.message);
+      removeLoginMember();
+      router.replace("/user/login");
       return;
     }
 
