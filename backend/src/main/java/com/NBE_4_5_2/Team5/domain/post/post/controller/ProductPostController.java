@@ -74,17 +74,24 @@ public class ProductPostController {
 	}
 
 	@GetMapping("/{id}")
-	@Transactional(readOnly = true)
+	@Transactional(readOnly = false)
 	public RsData<ProductPostResponse> getPost(@PathVariable String id) {
-		User user = userService.getUserIdentity();
+
+		// 인증되지 않은 경우에도 게시글 상세 조회가 가능하도록 수정
 		ProductPostResponse postResponse = productPostService.getPost(id);
 
-		recentlyViewedService.addViewedPost(user.getId(), id);
+		// 만약 현재 로그인된 사용자가 있다면 최근 본 게시글로 추가
+		try {
+			User user = rq.getUserIdentity();
+			recentlyViewedService.addViewedPost(user.getId(), id);
+		} catch (Exception e) {
+			// 로그인 정보가 없으면 그냥 넘어감 (혹은 로그로 남김)
+		}
 
 		return new RsData<>(
-			"200",
-			"게시물 조회가 완료되었습니다.",
-			postResponse
+				"200",
+				"게시물 조회가 완료되었습니다.",
+				postResponse
 		);
 	}
 
@@ -134,7 +141,16 @@ public class ProductPostController {
 		);
 	}
 
-    // 내가 구매한 내역 조회
+	/// 찜(좋아요) 엔드포인트 – 한 유저가 한 게시글에 대해 한 번만 찜할 수 있음
+	@PreAuthorize("isAuthenticated()")
+	@PostMapping("/{id}/like")
+	public RsData<ProductPostResponse> likePost(@PathVariable String id) {
+		User actor = rq.getUserIdentity();
+		ProductPostResponse response = productPostService.likePost(actor, id);
+		return new RsData<>("200", "찜 완료", response);
+	}
+
+    /// 내가 구매한 내역 조회
     @GetMapping("/my/purchases")
     public RsData<List<ProductPostResponse>> getMyPurchases() {
         User actor = userService.getUserIdentity();
@@ -148,7 +164,7 @@ public class ProductPostController {
 		);
 	}
 
-	// 내가 판매한 내역
+	/// 내가 판매한 내역
 	@PreAuthorize("isAuthenticated()")
 	@GetMapping("/my/sales")
 	public RsData<List<ProductPostResponse>> getMySales() {
@@ -162,7 +178,7 @@ public class ProductPostController {
 		);
 	}
 
-	// 내가 찜한 내역
+	/// 내가 찜한 내역
 	@PreAuthorize("isAuthenticated()")
 	@GetMapping("/my/favorites")
 	public RsData<List<ProductPostResponse>> getMyFavorites() {
