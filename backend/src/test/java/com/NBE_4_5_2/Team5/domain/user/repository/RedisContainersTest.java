@@ -1,6 +1,7 @@
 package com.NBE_4_5_2.Team5.domain.user.repository;
 
-import com.NBE_4_5_2.Team5.domain.user.entity.RefreshToken;
+import com.NBE_4_5_2.Team5.domain.user.user.entity.RefreshToken;
+import com.NBE_4_5_2.Team5.domain.user.user.repository.RedisRepository;
 import com.NBE_4_5_2.Team5.global.config.RedisTestContainerConfig;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.DisplayName;

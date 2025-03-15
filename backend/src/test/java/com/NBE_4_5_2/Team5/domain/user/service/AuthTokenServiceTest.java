@@ -1,6 +1,8 @@
 package com.NBE_4_5_2.Team5.domain.user.service;
 
-import com.NBE_4_5_2.Team5.domain.user.entity.User;
+import com.NBE_4_5_2.Team5.domain.user.user.entity.User;
+import com.NBE_4_5_2.Team5.domain.user.user.service.AuthTokenService;
+import com.NBE_4_5_2.Team5.domain.user.user.service.UserService;
 import com.NBE_4_5_2.Team5.global.config.RedisTestContainerConfig;
 import com.NBE_4_5_2.Team5.global.standard.util.Ut;
 import jakarta.transaction.Transactional;

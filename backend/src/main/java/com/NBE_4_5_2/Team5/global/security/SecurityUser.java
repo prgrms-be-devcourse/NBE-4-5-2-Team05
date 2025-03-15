@@ -7,7 +7,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 
-import com.NBE_4_5_2.Team5.domain.user.entity.Role;
+import com.NBE_4_5_2.Team5.domain.user.user.entity.Role;
 
 import lombok.Getter;
 
@@ -29,7 +29,7 @@ public class SecurityUser extends User implements OAuth2User {
         this.nickname = nickname;
     }
 
-    public SecurityUser(com.NBE_4_5_2.Team5.domain.user.entity.User user) {
+    public SecurityUser(com.NBE_4_5_2.Team5.domain.user.user.entity.User user) {
         this(user.getId(), user.getUsername(), user.getPassword(), user.getNickname(), user.getRole(), user.getAuthorities());
     }
 
