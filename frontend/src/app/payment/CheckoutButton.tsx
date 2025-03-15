@@ -56,7 +56,7 @@ export default function CheckoutButton({
   // @docs https://docs.tosspayments.com/sdk/v2/js#paymentrequestpayment
   async function requestPayment() {
     await fetch(
-      `http://localhost:8080/api/payments/metadata?id=${orderId}&amount=${amount.value}`,
+      `http://${process.env.NEXT_PUBLIC_BACKEND_HOST}:${process.env.NEXT_PUBLIC_BACKEND_PORT}/api/payments/metadata?id=${orderId}&amount=${amount.value}`,
       {
         credentials: "include",
       }

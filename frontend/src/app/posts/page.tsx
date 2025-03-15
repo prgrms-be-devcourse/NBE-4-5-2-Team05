@@ -1,20 +1,16 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import axios from "axios";
 import Link from "next/link";
 import Notice from "@/components/posts/Notice";
 import FilterSidebar from "@/components/posts/FilterSiderbar";
 import PostList from "@/components/posts/PostList";
 import Pagination from "@/components/posts/Pagination";
 import { components } from "@/lib/backend/apiV1/schema";
+import client from "@/lib/client";
 
 type NoticeListItem = components["schemas"]["NoticeResBody"];
-type RsDataNoticeListResBody = components["schemas"]["RsDataListNoticeResBody"];
-type PageProductPostListRes =
-  components["schemas"]["PageDtoPreviewPostResponse"];
 type ProductPostListItem = components["schemas"]["PreviewPostResponse"];
-type CategoryListRes = components["schemas"]["RsDataListCategory"];
 
 export default function PostsPage() {
   const [noticeList, setNoticeList] = useState<NoticeListItem[]>([]);
@@ -34,39 +30,38 @@ export default function PostsPage() {
 
   useEffect(() => {
     (async () => {
-      try {
-        const res = await axios.get<RsDataNoticeListResBody>(
-          "/api/admin/notices/latest",
-          { withCredentials: true }
-        );
-        setNoticeList(res.data.data);
-      } catch (err) {
-        console.error("공지사항 로드 실패", err);
+      const res = await client.GET("/api/admin/notices/latest", {
+        Credential: "include",
+      });
+      if (res.error) {
+        console.error("공지사항 로드 실패", res.error);
+        return;
       }
+      setNoticeList(res.data!.data);
     })();
   }, []);
 
   useEffect(() => {
     (async () => {
-      try {
-        const res = await axios.get<CategoryListRes>("/api/categories", {
-          withCredentials: true,
-        });
-        const cats = res.data.data.map((cat) => ({
-          id: cat.id ?? 0,
-          name: cat.name ?? "",
-        }));
-        setCategories(cats);
-      } catch (err) {
-        console.error("카테고리 로드 실패", err);
+      const res = await client.GET("/api/categories", {
+        Credential: "include",
+      });
+      if (res.error) {
+        console.error("카테고리 로드 실패", res.error);
+        return;
       }
+      const cats = res.data!.data.map((cat) => ({
+        id: cat.id ?? 0,
+        name: cat.name ?? "",
+      }));
+      setCategories(cats);
     })();
   }, []);
 
   const fetchPosts = async () => {
-    try {
-      const res = await axios.get<PageProductPostListRes>("/api/posts", {
-        params: {
+    const res = await client.GET("/api/posts", {
+      params: {
+        query: {
           page: currentPage,
           pageSize: 10,
           keyword: filters.keyword || undefined,
@@ -75,14 +70,15 @@ export default function PostsPage() {
           maxPrice: filters.maxPrice || undefined,
           category: filters.category || undefined,
         },
-        withCredentials: true,
-      });
-      const { items, totalPages } = res.data;
-      setPosts(items);
-      setTotalPages(totalPages);
-    } catch (err) {
-      console.error("게시글 로드 실패", err);
+      },
+      credentials: "include",
+    });
+    if (res.error) {
+      console.error("게시글 로드 실패", res.error);
     }
+    const { items, totalPages } = res.data!.data;
+    setPosts(items);
+    setTotalPages(totalPages);
   };
 
   useEffect(() => {
