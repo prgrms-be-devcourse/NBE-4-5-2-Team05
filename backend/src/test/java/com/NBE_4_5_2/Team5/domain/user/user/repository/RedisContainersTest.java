@@ -1,4 +1,4 @@
-package com.NBE_4_5_2.Team5.domain.user.repository;
+package com.NBE_4_5_2.Team5.domain.user.user.repository;
 
 import com.NBE_4_5_2.Team5.domain.user.user.entity.RefreshToken;
 import com.NBE_4_5_2.Team5.domain.user.user.repository.RedisRepository;

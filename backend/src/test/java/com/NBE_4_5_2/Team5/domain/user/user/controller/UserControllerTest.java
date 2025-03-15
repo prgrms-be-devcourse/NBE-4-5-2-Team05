@@ -1,4 +1,4 @@
-package com.NBE_4_5_2.Team5.domain.user.controller;
+package com.NBE_4_5_2.Team5.domain.user.user.controller;
 
 import com.NBE_4_5_2.Team5.domain.user.user.controller.UserController;
 import com.NBE_4_5_2.Team5.domain.user.user.dto.AuthToken;

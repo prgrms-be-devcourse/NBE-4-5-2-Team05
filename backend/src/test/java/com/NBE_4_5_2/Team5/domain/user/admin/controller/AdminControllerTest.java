@@ -1,4 +1,4 @@
-package com.NBE_4_5_2.Team5.domain.admin.controller;
+package com.NBE_4_5_2.Team5.domain.user.admin.controller;
 
 import com.NBE_4_5_2.Team5.TestConfig;
 import com.NBE_4_5_2.Team5.Util;
