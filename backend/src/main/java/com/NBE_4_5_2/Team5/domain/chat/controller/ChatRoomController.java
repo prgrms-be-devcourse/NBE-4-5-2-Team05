@@ -22,13 +22,15 @@ import com.NBE_4_5_2.Team5.domain.chat.entity.ChatRoom;
 import com.NBE_4_5_2.Team5.domain.chat.service.ChatRoomService;
 import com.NBE_4_5_2.Team5.domain.post.post.dto.response.ProductPostResponse;
 import com.NBE_4_5_2.Team5.domain.post.post.service.ProductPostService;
-import com.NBE_4_5_2.Team5.domain.user.entity.User;
-import com.NBE_4_5_2.Team5.domain.user.repository.UserRepository;
-import com.NBE_4_5_2.Team5.domain.user.service.AuthTokenService;
-import com.NBE_4_5_2.Team5.domain.user.service.UserService;
+import com.NBE_4_5_2.Team5.domain.user.user.entity.User;
+import com.NBE_4_5_2.Team5.domain.user.user.repository.UserRepository;
+import com.NBE_4_5_2.Team5.domain.user.user.service.AuthTokenService;
+import com.NBE_4_5_2.Team5.domain.user.user.service.UserAuthService;
+import com.NBE_4_5_2.Team5.domain.user.user.service.UserService;
 import com.NBE_4_5_2.Team5.global.Rq;
 import com.NBE_4_5_2.Team5.global.dto.RsData;
-import com.NBE_4_5_2.Team5.global.exception.ServiceException;
+import com.NBE_4_5_2.Team5.global.exception.security.WrongRoleException;
+import com.NBE_4_5_2.Team5.global.exception.user.UserNotFoundException;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -48,6 +50,7 @@ public class ChatRoomController {
 	private final Rq rq;
 	private final UserService userService;
 	private final UserRepository userRepository;
+	private final UserAuthService userAuthService;
 
 	/*
 	테스트용 HTML(임시)
@@ -65,9 +68,9 @@ public class ChatRoomController {
 
 	// 채팅방 상세 페이지로 이동 (HTML 반환)
 	@Operation(summary = "채팅방 상세 페이지 조회", description = "채팅방 상세 페이지를 HTML로 반환합니다.")
+
 	@GetMapping("/room/{roomId}/show")
-	public String showRoomDetailPage(
-		@PathVariable String roomId) {
+	public String showRoomDetailPage(@PathVariable String roomId) {
 		String token = rq.getValueFromCookie("accessToken");
 		if (token == null || authTokenService.getUsernameFromToken(token) == null) {
 			return "redirect:/api/users/login"; // 로그인 페이지로 리다이렉트
@@ -84,8 +87,8 @@ public class ChatRoomController {
 	@ResponseBody
 	public RsData<AccessProvider> getUserInfo() {
 		String token = rq.getValueFromCookie("accessToken");
-		User userIdentity = rq.getUserIdentity();
-		User user = rq.getRealActor(userIdentity);
+		User userIdentity = userAuthService.getUserIdentity();
+		User user = userAuthService.getRealActor(userIdentity);
 
 		AccessProvider access = AccessProvider.builder()
 			.name(user.getNickname())  // 사용자 이름
@@ -105,8 +108,8 @@ public class ChatRoomController {
 	public RsData<ChatRoom> createRoom(
 		@Parameter(description = "상품 게시글 아이디", example = "ppost-fkkdsjf9adsa-ds8fdfsdf-289103yd")
 		@RequestParam String postId) {
-		User userIdentity = rq.getUserIdentity();
-		User sender = rq.getRealActor(userIdentity);
+		User userIdentity = userAuthService.getUserIdentity();
+		User sender = userAuthService.getRealActor(userIdentity);
 
 		ProductPostResponse postResponse = productPostService.getPost(postId);
 		String receiver = postResponse.getWriterName();
@@ -124,15 +127,15 @@ public class ChatRoomController {
 	@Transactional
 	public RsData<ChatRoom> createRoomAdmin(
 		@Parameter(description = "관리자 id", example = "user-1231jkj-g04hi8gah-123hixfdh9") @PathVariable String adminId) {
-		User userIdentity = rq.getUserIdentity();
-		User sender = rq.getRealActor(userIdentity);
+		User userIdentity = userAuthService.getUserIdentity();
+		User sender = userAuthService.getRealActor(userIdentity);
 
 		User admin = userService.getUserById(adminId).orElseThrow(
-			() -> new ServiceException("404", "잘못된 ID")
+			() -> new UserNotFoundException("404", "잘못된 ID")
 		);
 
 		if (!admin.isAdmin()) {
-			throw new ServiceException("404", "옳지 않은 사용자"); // 권한 없음 예외
+			throw new WrongRoleException("404", "옳지 않은 사용자"); // 권한 없음 예외
 		}
 
 		String receiver = admin.getNickname();
@@ -149,8 +152,8 @@ public class ChatRoomController {
 	@GetMapping("/rooms")
 	@ResponseBody
 	public RsData<List<ChatRoomDto>> getUserRooms() {
-		User userIdentity = rq.getUserIdentity();
-		User user = rq.getRealActor(userIdentity);
+		User userIdentity = userAuthService.getUserIdentity();
+		User user = userAuthService.getRealActor(userIdentity);
 
 		List<ChatRoom> chatRoomsList = chatRoomService.findRoomByUser(user.getNickname());
 
@@ -174,8 +177,8 @@ public class ChatRoomController {
 	public RsData<List<MessageDto>> getMessages(
 		@Parameter(description = "채팅방 id", example = "123")
 		@RequestParam String roomId) {
-		User userIdentity = rq.getUserIdentity();
-		User user = rq.getRealActor(userIdentity);
+		User userIdentity = userAuthService.getUserIdentity();
+		User user = userAuthService.getRealActor(userIdentity);
 		List<ChatMessage> messages = chatRoomService.getMessagesByUser(roomId, user.getNickname());
 		List<MessageDto> response = messages.stream()
 			.map(chatMessage -> new MessageDto(
@@ -196,8 +199,8 @@ public class ChatRoomController {
 	public RsData<String> deleteRoom(
 		@Parameter(description = "채팅방 id", example = "123")
 		@RequestParam String roomId) {
-		User userIdentity = rq.getUserIdentity();
-		User user = rq.getRealActor(userIdentity);
+		User userIdentity = userAuthService.getUserIdentity();
+		User user = userAuthService.getRealActor(userIdentity);
 		chatRoomService.deleteChatRoom(roomId, user.getNickname());
 		return new RsData<>("200", "삭제 완료");
 	}
@@ -211,8 +214,8 @@ public class ChatRoomController {
 	public RsData<String> findChatRooms(
 		@Parameter(description = "찾으려는 채팅방에 속한 유저의 ID", example = "user-12k3j-sjdfi2jj-431iojr124io1")
 		@RequestParam String receiver) {
-		User userIdentity = rq.getUserIdentity();
-		User user = rq.getRealActor(userIdentity);
+		User userIdentity = userAuthService.getUserIdentity();
+		User user = userAuthService.getRealActor(userIdentity);
 		System.out.println("name:" + user.getNickname());
 		String roomId = chatRoomService.findByRoomIdByClients(user.getNickname(), receiver);
 
@@ -228,7 +231,7 @@ public class ChatRoomController {
 	@PutMapping("/admin")
 	@ResponseBody
 	public RsData<User> grantAdmin(@RequestParam String userId) {
-		User user = userService.getUserById(userId).orElseThrow(() -> new ServiceException("404", "존재하지 않는 사용자"));
+		User user = userService.getUserById(userId).orElseThrow(() -> new UserNotFoundException("404", "존재하지 않는 사용자"));
 		user.setAdmin();
 		userRepository.save(user);
 		return new RsData<>("200", "권한부여", user);

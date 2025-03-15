@@ -20,7 +20,8 @@ import com.NBE_4_5_2.Team5.domain.post.post.dto.response.PreviewPostResponse;
 import com.NBE_4_5_2.Team5.domain.post.post.dto.response.ProductPostResponse;
 import com.NBE_4_5_2.Team5.domain.post.post.service.ProductPostService;
 import com.NBE_4_5_2.Team5.domain.post.post.service.RecentlyViewedService;
-import com.NBE_4_5_2.Team5.domain.user.entity.User;
+import com.NBE_4_5_2.Team5.domain.user.user.entity.User;
+import com.NBE_4_5_2.Team5.domain.user.user.service.UserAuthService;
 import com.NBE_4_5_2.Team5.global.Rq;
 import com.NBE_4_5_2.Team5.global.dto.Empty;
 import com.NBE_4_5_2.Team5.global.dto.PageDto;
@@ -41,6 +42,7 @@ public class ProductPostController {
 	private final ProductPostService productPostService;
 	private final RecentlyViewedService recentlyViewedService;
 	private final Rq rq;
+	private final UserAuthService userAuthService;
 
 	@Operation(summary = "상품 게시글 작성", description = "상품 게시글을 작성합니다.")
 	@SecurityRequirement(name = "cookieAuth")
@@ -48,7 +50,7 @@ public class ProductPostController {
 	@PostMapping
 	public RsData<ProductPostResponse> createPost(@Valid @RequestBody ProductPostWriteForm body) {
 
-		User actor = rq.getUserIdentity();
+		User actor = userAuthService.getUserIdentity();
 		ProductPostResponse postResponse = productPostService.write(actor, body);
 
 		return new RsData<>(
@@ -91,7 +93,7 @@ public class ProductPostController {
 		@RequestParam(defaultValue = "10") int pageSize,
 		@Parameter(description = "정렬 순서")
 		@RequestParam(defaultValue = "desc") String sort) {
-		User actor = rq.getUserIdentity();
+		User actor = userAuthService.getUserIdentity();
 		PageDto<PreviewPostResponse> postPage = productPostService.getMyPosts(actor, page, pageSize, sort);
 
 		return new RsData<>(
@@ -112,7 +114,7 @@ public class ProductPostController {
 
 		// 만약 현재 로그인된 사용자가 있다면 최근 본 게시글로 추가
 		try {
-			User user = rq.getUserIdentity();
+			User user = userAuthService.getUserIdentity();
 			recentlyViewedService.addViewedPost(user.getId(), id);
 		} catch (Exception e) {
 			// 로그인 정보가 없으면 그냥 넘어감 (혹은 로그로 남김)
@@ -132,7 +134,7 @@ public class ProductPostController {
 	@Transactional(readOnly = true)
 	public RsData<List<PreviewPostResponse>> getRecentlyViewPosts() {
 
-		User user = rq.getUserIdentity();
+		User user = userAuthService.getUserIdentity();
 		List<PreviewPostResponse> recentlyViewedPosts = recentlyViewedService.getRecentlyViewedPosts(user.getId());
 
 		return new RsData<>(
@@ -152,7 +154,7 @@ public class ProductPostController {
 		@Parameter(description = "상품 게시글 id", example = "ppost-fsiodf-21edd-fd2c1")
 		@PathVariable String id) {
 
-		User actor = rq.getUserIdentity();
+		User actor = userAuthService.getUserIdentity();
 		ProductPostResponse postResponse = productPostService.modify(actor, id, body);
 
 		return new RsData<>(
@@ -171,7 +173,7 @@ public class ProductPostController {
 		@Parameter(description = "상품 게시글 id", example = "ppost-2ji109-fe3sfd-3fsdf")
 		@PathVariable String id) {
 
-		User actor = rq.getUserIdentity();
+		User actor = userAuthService.getUserIdentity();
 		productPostService.delete(actor, id);
 
 		return new RsData<>(
@@ -188,7 +190,7 @@ public class ProductPostController {
 	public RsData<ProductPostResponse> likePost(
 		@Parameter(description = "상품 게시글 id", example = "ppost-2ji109-fe3sfd-3fsdf")
 		@PathVariable String id) {
-		User actor = rq.getUserIdentity();
+		User actor = userAuthService.getUserIdentity();
 		ProductPostResponse response = productPostService.likePost(actor, id);
 		return new RsData<>("200", "찜 완료", response);
 	}
@@ -199,7 +201,7 @@ public class ProductPostController {
 	@PreAuthorize("isAuthenticated()")
 	@GetMapping("/my/purchases")
 	public RsData<List<ProductPostResponse>> getMyPurchases() {
-		User actor = rq.getUserIdentity();
+		User actor = userAuthService.getUserIdentity();
 
 		List<ProductPostResponse> myPurchases = productPostService.getMyPurchases(actor);
 
@@ -216,7 +218,7 @@ public class ProductPostController {
 	@PreAuthorize("isAuthenticated()")
 	@GetMapping("/my/sales")
 	public RsData<List<ProductPostResponse>> getMySales() {
-		User actor = rq.getUserIdentity();
+		User actor = userAuthService.getUserIdentity();
 		List<ProductPostResponse> sales = productPostService.getMySales(actor);
 
 		return new RsData<>(
@@ -232,7 +234,7 @@ public class ProductPostController {
 	@PreAuthorize("isAuthenticated()")
 	@GetMapping("/my/favorites")
 	public RsData<List<ProductPostResponse>> getMyFavorites() {
-		User actor = rq.getUserIdentity();
+		User actor = userAuthService.getUserIdentity();
 		List<ProductPostResponse> favorites = productPostService.getMyFavorites(actor);
 
 		return new RsData<>(
