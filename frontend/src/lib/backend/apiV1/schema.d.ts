@@ -1142,10 +1142,10 @@ export interface components {
             sort?: string[];
         };
         PageUserDto: {
-            /** Format: int64 */
-            totalElements?: number;
             /** Format: int32 */
             totalPages?: number;
+            /** Format: int64 */
+            totalElements?: number;
             /** Format: int32 */
             size?: number;
             content?: components["schemas"]["UserDto"][];
@@ -1181,10 +1181,10 @@ export interface components {
             sorted?: boolean;
         };
         PageNoticeResBody: {
-            /** Format: int64 */
-            totalElements?: number;
             /** Format: int32 */
             totalPages?: number;
+            /** Format: int64 */
+            totalElements?: number;
             /** Format: int32 */
             size?: number;
             content?: components["schemas"]["NoticeResBody"][];
