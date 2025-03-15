@@ -68,6 +68,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/admin/notices/{notice-id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put: operations["updateNotice"];
+        post?: never;
+        delete: operations["deleteNotice"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/users/signup": {
         parameters: {
             query?: never;
@@ -180,22 +196,6 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/posts/{id}/like": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        post: operations["likePost"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
     "/api/payments": {
         parameters: {
             query?: never;
@@ -254,7 +254,7 @@ export interface paths {
         get?: never;
         put?: never;
         post: operations["banUser"];
-        delete?: never;
+        delete: operations["unBanUser"];
         options?: never;
         head?: never;
         patch?: never;
@@ -267,7 +267,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        get?: never;
+        get: operations["getNotices"];
         put?: never;
         post: operations["writeNotice"];
         delete?: never;
@@ -460,6 +460,22 @@ export interface paths {
             cookie?: never;
         };
         get: operations["getCategories"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/admin/users": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getUserList"];
         put?: never;
         post?: never;
         delete?: never;
@@ -668,6 +684,29 @@ export interface components {
             admin?: boolean;
             memberAuthoritiesAsString?: string[];
         };
+        UpdateNoticeReq: {
+            title?: string;
+            content?: string;
+        };
+        AdminResBody: {
+            id?: string;
+            nickname?: string;
+            /** @enum {string} */
+            role?: "ADMIN" | "USER";
+        };
+        NoticeResBody: {
+            id?: string;
+            title?: string;
+            content?: string;
+            admin?: components["schemas"]["AdminResBody"];
+            /** Format: date-time */
+            createdAt?: string;
+        };
+        RsDataNoticeResBody: {
+            code: string;
+            message: string;
+            data: components["schemas"]["NoticeResBody"];
+        };
         SignUpUserForm: {
             username?: string;
             password?: string;
@@ -782,23 +821,6 @@ export interface components {
             title: string;
             content: string;
         };
-        AdminResBody: {
-            id?: string;
-            nickname?: string;
-            /** @enum {string} */
-            role?: "ADMIN" | "USER";
-        };
-        NoticeResBody: {
-            id?: string;
-            title?: string;
-            content?: string;
-            admin?: components["schemas"]["AdminResBody"];
-        };
-        RsDataNoticeResBody: {
-            code: string;
-            message: string;
-            data: components["schemas"]["NoticeResBody"];
-        };
         PageDtoPreviewPostResponse: {
             items: components["schemas"]["PreviewPostResponse"][];
             /** Format: int32 */
@@ -892,6 +914,75 @@ export interface components {
             code: string;
             message: string;
             data: components["schemas"]["Category"][];
+        };
+        Pageable: {
+            /** Format: int32 */
+            page?: number;
+            /** Format: int32 */
+            size?: number;
+            sort?: string[];
+        };
+        PageUserDto: {
+            /** Format: int32 */
+            totalPages?: number;
+            /** Format: int64 */
+            totalElements?: number;
+            /** Format: int32 */
+            size?: number;
+            content?: components["schemas"]["UserDto"][];
+            /** Format: int32 */
+            number?: number;
+            sort?: components["schemas"]["SortObject"];
+            first?: boolean;
+            last?: boolean;
+            /** Format: int32 */
+            numberOfElements?: number;
+            pageable?: components["schemas"]["PageableObject"];
+            empty?: boolean;
+        };
+        PageableObject: {
+            /** Format: int64 */
+            offset?: number;
+            sort?: components["schemas"]["SortObject"];
+            /** Format: int32 */
+            pageSize?: number;
+            paged?: boolean;
+            /** Format: int32 */
+            pageNumber?: number;
+            unpaged?: boolean;
+        };
+        RsDataPageUserDto: {
+            code: string;
+            message: string;
+            data: components["schemas"]["PageUserDto"];
+        };
+        SortObject: {
+            empty?: boolean;
+            unsorted?: boolean;
+            sorted?: boolean;
+        };
+        PageNoticeResBody: {
+            /** Format: int32 */
+            totalPages?: number;
+            /** Format: int64 */
+            totalElements?: number;
+            /** Format: int32 */
+            size?: number;
+            content?: components["schemas"]["NoticeResBody"][];
+            /** Format: int32 */
+            number?: number;
+            sort?: components["schemas"]["SortObject"];
+            first?: boolean;
+            last?: boolean;
+            /** Format: int32 */
+            numberOfElements?: number;
+            pageable?: components["schemas"]["PageableObject"];
+            empty?: boolean;
+        };
+        RsDataPageNoticeResBody: {
+            code: string;
+            message: string;
+            data: components["schemas"]["PageNoticeResBody"];
         };
         RsDataListNoticeResBody: {
             code: string;
@@ -1203,6 +1294,72 @@ export interface operations {
             };
         };
     };
+    updateNotice: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                "notice-id": string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateNoticeReq"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json;charset=UTF-8": components["schemas"]["RsDataNoticeResBody"];
+                };
+            };
+            /** @description Internal Server Error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json;charset=UTF-8": components["schemas"]["RsDataVoid"];
+                };
+            };
+        };
+    };
+    deleteNotice: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                "notice-id": string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json;charset=UTF-8": components["schemas"]["RsDataVoid"];
+                };
+            };
+            /** @description Internal Server Error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json;charset=UTF-8": components["schemas"]["RsDataVoid"];
+                };
+            };
+        };
+    };
     createUser: {
         parameters: {
             query?: never;
@@ -1469,37 +1626,6 @@ export interface operations {
             };
         };
     };
-    likePost: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                id: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json;charset=UTF-8": components["schemas"]["RsDataProductPostResponse"];
-                };
-            };
-            /** @description Internal Server Error */
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json;charset=UTF-8": components["schemas"]["RsDataVoid"];
-                };
-            };
-        };
-    };
     purchaseItem: {
         parameters: {
             query?: never;
@@ -1617,6 +1743,68 @@ export interface operations {
                 };
                 content: {
                     "application/json;charset=UTF-8": components["schemas"]["RsDataBanResBody"];
+                };
+            };
+            /** @description Internal Server Error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json;charset=UTF-8": components["schemas"]["RsDataVoid"];
+                };
+            };
+        };
+    };
+    unBanUser: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                "user-id": string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json;charset=UTF-8": components["schemas"]["RsDataVoid"];
+                };
+            };
+            /** @description Internal Server Error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json;charset=UTF-8": components["schemas"]["RsDataVoid"];
+                };
+            };
+        };
+    };
+    getNotices: {
+        parameters: {
+            query: {
+                pageable: components["schemas"]["Pageable"];
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json;charset=UTF-8": components["schemas"]["RsDataPageNoticeResBody"];
                 };
             };
             /** @description Internal Server Error */
@@ -2044,6 +2232,37 @@ export interface operations {
                 };
                 content: {
                     "application/json;charset=UTF-8": components["schemas"]["RsDataListCategory"];
+                };
+            };
+            /** @description Internal Server Error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json;charset=UTF-8": components["schemas"]["RsDataVoid"];
+                };
+            };
+        };
+    };
+    getUserList: {
+        parameters: {
+            query: {
+                pageable: components["schemas"]["Pageable"];
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json;charset=UTF-8": components["schemas"]["RsDataPageUserDto"];
                 };
             };
             /** @description Internal Server Error */

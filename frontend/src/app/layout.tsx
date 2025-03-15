@@ -4,7 +4,6 @@ import localFont from "next/font/local";
 import ClientLayout from "./ClientLayout";
 import { cookies } from "next/headers";
 import { parseAccessToken } from "./util/auth";
-import type { components } from "@/lib/backend/apiV1/schema";
 
 const pretendard = localFont({
   src: "./../../node_modules/pretendard/dist/web/variable/woff2/PretendardVariable.woff2",
@@ -20,7 +19,7 @@ export const metadata: Metadata = {
 
 export default async function RootLayout({
   children,
-}: {
+}: Readonly<{
   children: React.ReactNode;
 }) {
   const myCookie = await cookies();
@@ -55,12 +54,14 @@ export default async function RootLayout({
       };
 
   return (
-    <ClientLayout
-      fontVariable={pretendard.variable}
-      fontClassName={pretendard.className}
-      me={me}
+    <html
+      lang="en"
+      className={`${pretendard.variable}`}
+      suppressHydrationWarning
     >
-      {children}
-    </ClientLayout>
+      <body className={`min-h-[100dvh] flex flex-col ${pretendard.className}`}>
+        <ClientLayout>{children}</ClientLayout>
+      </body>
+    </html>
   );
 }

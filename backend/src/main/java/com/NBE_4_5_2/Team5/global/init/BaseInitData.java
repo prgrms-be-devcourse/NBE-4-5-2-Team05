@@ -1,33 +1,33 @@
 package com.NBE_4_5_2.Team5.global.init;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import com.NBE_4_5_2.Team5.domain.admin.entity.NoticePost;
-import com.NBE_4_5_2.Team5.domain.admin.repository.NoticePostRepository;
-import com.NBE_4_5_2.Team5.domain.admin.service.AdminService;
-import com.NBE_4_5_2.Team5.domain.user.entity.Role;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.ApplicationRunner;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Lazy;
-import org.springframework.core.annotation.Order;
-
 import com.NBE_4_5_2.Team5.domain.post.category.entity.Category;
 import com.NBE_4_5_2.Team5.domain.post.category.repository.CategoryRepository;
 import com.NBE_4_5_2.Team5.domain.post.post.entity.ProductCategory;
 import com.NBE_4_5_2.Team5.domain.post.post.entity.ProductPost;
 import com.NBE_4_5_2.Team5.domain.post.post.repository.ProductCategoryRepository;
 import com.NBE_4_5_2.Team5.domain.post.post.repository.ProductPostRepository;
-import com.NBE_4_5_2.Team5.domain.user.entity.User;
-import com.NBE_4_5_2.Team5.domain.user.repository.UserRepository;
-import com.NBE_4_5_2.Team5.domain.user.service.UserService;
-
+import com.NBE_4_5_2.Team5.domain.user.admin.entity.NoticePost;
+import com.NBE_4_5_2.Team5.domain.user.admin.repository.NoticePostRepository;
+import com.NBE_4_5_2.Team5.domain.user.admin.service.AdminService;
+import com.NBE_4_5_2.Team5.domain.user.user.entity.Role;
+import com.NBE_4_5_2.Team5.domain.user.user.entity.User;
+import com.NBE_4_5_2.Team5.domain.user.user.repository.UserRepository;
+import com.NBE_4_5_2.Team5.domain.user.user.service.UserService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.ApplicationRunner;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Lazy;
+import org.springframework.context.annotation.Profile;
+import org.springframework.core.annotation.Order;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Configuration
+@Profile("!monitor")
 @RequiredArgsConstructor
 public class BaseInitData {
 	private final CategoryRepository categoryRepository;
@@ -87,8 +87,9 @@ public class BaseInitData {
 			"https://example.com/default_profile.png");
 		userService.createUser("user3", "user31234@", "user3@gmail.com", "user3", "서울시 광진구",
 			"https://example.com/default_profile.png");
+		adminService.signUpAdmin("admin2", "password2", "admin2", "admin2@gmail.com");
 
-		adminService.signUpAdmin("user4", "user41234@", "user4@gmail.com");
+		adminService.signUpAdmin("user4", "user41234@", "admin4", "user4@gmail.com");
 
 	}
 
@@ -170,19 +171,19 @@ public class BaseInitData {
 
 		// 공지사항 생성: 총 10개의 공지사항 생성
 		User admin = userRepository.findAll().stream()
-				.filter(u -> u.getRole().equals(Role.ADMIN))
-				.findFirst()
-				.orElse(null);
+			.filter(u -> u.getRole().equals(Role.ADMIN))
+			.findFirst()
+			.orElse(null);
 		if (admin == null && !userRepository.findAll().isEmpty()) {
 			admin = userRepository.findAll().get(0);
 		}
 
 		for (int i = 1; i <= 10; i++) {
 			NoticePost notice = NoticePost.builder()
-					.admin(admin)
-					.title("공지사항 제목 " + i)
-					.content("공지사항 내용 " + i + " - 중요한 공지사항 내용입니다.")
-					.build();
+				.admin(admin)
+				.title("공지사항 제목 " + i)
+				.content("공지사항 내용 " + i + " - 중요한 공지사항 내용입니다.")
+				.build();
 			noticePostRepository.save(notice);
 		}
 	}
