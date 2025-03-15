@@ -70,15 +70,9 @@ export default function ClientPage() {
       return;
     }
 
-    setIsCodeLoading(true); // 로딩 시작
-    setCodeStatus("인증 코드 확인 중입니다. 잠시만 기다려 주세요");
-    setCodeStatusColor("text-red-500");
-
     const response = await client.POST("/api/users/email/code/verify", {
       body: { email: formData.email, code: emailCode },
     });
-
-    setIsCodeLoading(false); // 로딩 종료
 
     if (response.error) {
       setCodeStatus(response.error.message);
