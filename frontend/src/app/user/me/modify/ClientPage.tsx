@@ -23,10 +23,20 @@ export default function ClientPage() {
   const [codeStatusColor, setCodeStatusColor] = useState("text-red-500");
 
   function handleEmailChange(e: React.ChangeEvent<HTMLInputElement>) {
-    setEmail(e.target.value);
-    setIsEmailSent(false);
-    setIsEmailVerified(false);
-    setEmailStatus("");
+    const newEmail = e.target.value;
+    setEmail(newEmail);
+
+    if (newEmail === loginMember.email) {
+      // 기존 이메일로 돌아가면 인증 필요 없음
+      setIsEmailVerified(true);
+      setIsEmailSent(false);
+      setEmailStatus("");
+    } else {
+      // 이메일이 변경되면 다시 인증 필요
+      setIsEmailVerified(false);
+      setIsEmailSent(false);
+      setEmailStatus("");
+    }
   }
 
   async function sendEmailVerification() {
@@ -138,9 +148,13 @@ export default function ClientPage() {
                 />
                 <Button
                   type="button"
-                  className="bg-blue-500 text-white p-2 flex items-center justify-center"
+                  className={`p-2 ${
+                    isLoading || email === loginMember.email || !email.trim()
+                      ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                      : "bg-blue-500 text-white"
+                  }`}
                   onClick={sendEmailVerification}
-                  disabled={isLoading}
+                  disabled={email === loginMember.email || !email.trim()}
                 >
                   {isLoading ? (
                     <div className="animate-spin border-2 border-white border-t-transparent w-5 h-5 rounded-full"></div>
