@@ -4,7 +4,7 @@ import * as React from "react";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 
-type PaymentOption = { amount: string; id: string; displayName: string };
+export type PaymentOption = { amount: string; id: string; displayName: string };
 
 export default function CustomRadioGroup({
   options,

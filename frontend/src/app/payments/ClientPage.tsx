@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import CheckoutButton from "./CheckoutButton";
 import { v4 as uuidv4 } from "uuid";
-import RadioBtns from "./RadioBtns";
+import RadioBtns, { PaymentOption } from "./RadioBtns";
 
 export default function CheckoutPage() {
   const values = [1000, 5000, 10000, 50000];
