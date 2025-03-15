@@ -45,7 +45,7 @@ export default function PostDetailPage() {
       },
     });
     if (response.error) {
-      console.error("게시글 상세 조회 실패", err);
+      console.error("게시글 상세 조회 실패", response.error);
       setError("게시글 정보를 불러올 수 없습니다.");
 
       return;
