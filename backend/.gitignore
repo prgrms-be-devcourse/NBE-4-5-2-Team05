@@ -38,11 +38,6 @@ nbdist/
 *.code-workspace
 
 ### 🛠 환경 설정 파일 ###
-/src/main/resources/application.properties
-/src/main/resources/application.yml
-/src/main/resources/application-dev.yml
-/src/main/resources/application-prod.yml
-/src/main/resources/application-local.yml
 
 ### 🚀 데이터베이스 관련 ###
 *.db
@@ -66,7 +61,6 @@ gradlew
 db_dev.mv.db
 db_dev.trace.db
 
-
 ### 🌍 OS 관련 불필요한 파일 ###
 .DS_Store
 Thumbs.db
@@ -80,11 +74,5 @@ Dockerfile
 ### 💡 특정 데이터 폴더 무시 ###
 data/
 db_dev.mv.db  # H2 데이터베이스 파일도 무시
-gradle
-src/main/resources/application*.yml
-# Generated OpenAPI Files
 apiV1.json
-frontend/src/lib/backend/api/schema.d.ts
-
-
-
+/application.pid
