@@ -9,6 +9,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import com.NBE_4_5_2.Team5.domain.user.user.dto.AuthToken;
 import com.NBE_4_5_2.Team5.domain.user.user.entity.User;
+import com.NBE_4_5_2.Team5.domain.user.user.service.UserAuthService;
 import com.NBE_4_5_2.Team5.domain.user.user.service.UserService;
 import com.NBE_4_5_2.Team5.global.Rq;
 
@@ -24,6 +25,7 @@ public class CustomAuthenticationFilter extends OncePerRequestFilter {
 
 	private final Rq rq;
 	private final UserService userService;
+	private final UserAuthService userAuthService;
 
 	@Override
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
@@ -51,7 +53,7 @@ public class CustomAuthenticationFilter extends OncePerRequestFilter {
 			return;
 		}
 
-		rq.setLogin(actor);
+		userAuthService.setLogin(actor);
 		filterChain.doFilter(request, response);
 	}
 

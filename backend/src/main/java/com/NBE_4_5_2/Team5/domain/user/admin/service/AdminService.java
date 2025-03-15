@@ -1,31 +1,33 @@
 package com.NBE_4_5_2.Team5.domain.user.admin.service;
 
+import java.time.LocalDateTime;
+import java.util.Comparator;
+import java.util.List;
+import java.util.UUID;
+import java.util.stream.Collectors;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.NBE_4_5_2.Team5.domain.post.post.repository.ProductPostRepository;
 import com.NBE_4_5_2.Team5.domain.user.admin.dto.BanListDto;
 import com.NBE_4_5_2.Team5.domain.user.admin.dto.NoticeResBody;
 import com.NBE_4_5_2.Team5.domain.user.admin.entity.BanList;
 import com.NBE_4_5_2.Team5.domain.user.admin.entity.NoticePost;
 import com.NBE_4_5_2.Team5.domain.user.admin.repository.BanListRepository;
 import com.NBE_4_5_2.Team5.domain.user.admin.repository.NoticePostRepository;
-import com.NBE_4_5_2.Team5.domain.post.post.repository.ProductPostRepository;
 import com.NBE_4_5_2.Team5.domain.user.user.entity.Role;
 import com.NBE_4_5_2.Team5.domain.user.user.entity.User;
 import com.NBE_4_5_2.Team5.domain.user.user.repository.UserRepository;
 import com.NBE_4_5_2.Team5.domain.user.user.service.UserService;
-import com.NBE_4_5_2.Team5.global.exception.ServiceException;
+import com.NBE_4_5_2.Team5.global.exception.security.WrongRoleException;
+
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.constraints.NotEmpty;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import java.util.Comparator;
-
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -62,7 +64,6 @@ public class AdminService {
 		 * 변경했습니다.
 		 * */
 		userService.generateAuthtoken(admin);
-
 
 		return userRepository.save(admin);
 	}
@@ -108,7 +109,7 @@ public class AdminService {
 
 	private void isAdmin(User admin) {
 		if (!admin.getRole().equals(Role.ADMIN)) {
-			throw new ServiceException(HttpStatus.BAD_REQUEST.toString(), "관리자만 작성할 수 있는 글입니다.");
+			throw new WrongRoleException(HttpStatus.BAD_REQUEST.toString(), "관리자만 작성할 수 있는 글입니다.");
 		}
 	}
 
@@ -119,14 +120,15 @@ public class AdminService {
 
 		productPostRepository.deleteById(postId);
 	}
+
 	// 최신 공지사항을 조회하는 메서드 (최신순 정렬 후 상위 limit 개 반환)
 	@Transactional(readOnly = true)
 	public List<NoticePost> getLatestNotices(int limit) {
 		List<NoticePost> notices = noticePostRepository.findAll();
 		return notices.stream()
-				.sorted(Comparator.comparing(NoticePost::getCreatedAt).reversed())
-				.limit(limit)
-				.collect(Collectors.toList());
+			.sorted(Comparator.comparing(NoticePost::getCreatedAt).reversed())
+			.limit(limit)
+			.collect(Collectors.toList());
 	}
 
 }

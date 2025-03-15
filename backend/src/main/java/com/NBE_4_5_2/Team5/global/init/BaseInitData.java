@@ -20,12 +20,14 @@ import org.springframework.boot.ApplicationRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.context.annotation.Profile;
 import org.springframework.core.annotation.Order;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @Configuration
+@Profile("!monitor")
 @RequiredArgsConstructor
 public class BaseInitData {
 	private final CategoryRepository categoryRepository;
@@ -168,19 +170,19 @@ public class BaseInitData {
 
 		// 공지사항 생성: 총 10개의 공지사항 생성
 		User admin = userRepository.findAll().stream()
-				.filter(u -> u.getRole().equals(Role.ADMIN))
-				.findFirst()
-				.orElse(null);
+			.filter(u -> u.getRole().equals(Role.ADMIN))
+			.findFirst()
+			.orElse(null);
 		if (admin == null && !userRepository.findAll().isEmpty()) {
 			admin = userRepository.findAll().get(0);
 		}
 
 		for (int i = 1; i <= 10; i++) {
 			NoticePost notice = NoticePost.builder()
-					.admin(admin)
-					.title("공지사항 제목 " + i)
-					.content("공지사항 내용 " + i + " - 중요한 공지사항 내용입니다.")
-					.build();
+				.admin(admin)
+				.title("공지사항 제목 " + i)
+				.content("공지사항 내용 " + i + " - 중요한 공지사항 내용입니다.")
+				.build();
 			noticePostRepository.save(notice);
 		}
 	}

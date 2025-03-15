@@ -16,8 +16,8 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 public class BaseEntity {
 
-    @Id
-    @EqualsAndHashCode.Include
-    private String id;
+	@Id
+	@EqualsAndHashCode.Include
+	private String id;
 
 }
