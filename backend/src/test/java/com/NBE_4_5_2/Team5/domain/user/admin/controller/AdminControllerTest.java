@@ -1,14 +1,21 @@
 package com.NBE_4_5_2.Team5.domain.user.admin.controller;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
-import java.util.UUID;
-
+import com.NBE_4_5_2.Team5.domain.post.category.entity.Category;
+import com.NBE_4_5_2.Team5.domain.post.category.repository.CategoryRepository;
+import com.NBE_4_5_2.Team5.domain.post.post.entity.ProductPost;
+import com.NBE_4_5_2.Team5.domain.post.post.repository.ProductPostRepository;
+import com.NBE_4_5_2.Team5.domain.user.admin.entity.BanList;
+import com.NBE_4_5_2.Team5.domain.user.admin.entity.NoticePost;
+import com.NBE_4_5_2.Team5.domain.user.admin.repository.BanListRepository;
+import com.NBE_4_5_2.Team5.domain.user.admin.repository.NoticePostRepository;
+import com.NBE_4_5_2.Team5.domain.user.admin.service.AdminService;
+import com.NBE_4_5_2.Team5.domain.user.user.entity.Role;
+import com.NBE_4_5_2.Team5.domain.user.user.entity.User;
+import com.NBE_4_5_2.Team5.domain.user.user.repository.UserRepository;
+import com.NBE_4_5_2.Team5.global.config.BaseTestConfig;
+import com.NBE_4_5_2.Team5.global.config.RedisTestContainerConfig;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.servlet.http.Cookie;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -21,24 +28,11 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
-import com.NBE_4_5_2.Team5.domain.post.category.entity.Category;
-import com.NBE_4_5_2.Team5.domain.post.category.repository.CategoryRepository;
-import com.NBE_4_5_2.Team5.domain.post.post.entity.ProductPost;
-import com.NBE_4_5_2.Team5.domain.post.post.repository.ProductPostRepository;
-import com.NBE_4_5_2.Team5.domain.user.admin.controller.AdminController;
-import com.NBE_4_5_2.Team5.domain.user.admin.entity.BanList;
-import com.NBE_4_5_2.Team5.domain.user.admin.entity.NoticePost;
-import com.NBE_4_5_2.Team5.domain.user.admin.repository.BanListRepository;
-import com.NBE_4_5_2.Team5.domain.user.admin.repository.NoticePostRepository;
-import com.NBE_4_5_2.Team5.domain.user.admin.service.AdminService;
-import com.NBE_4_5_2.Team5.domain.user.user.entity.Role;
-import com.NBE_4_5_2.Team5.domain.user.user.entity.User;
-import com.NBE_4_5_2.Team5.domain.user.user.repository.UserRepository;
-import com.NBE_4_5_2.Team5.global.config.BaseTestConfig;
-import com.NBE_4_5_2.Team5.global.config.RedisTestContainerConfig;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.*;
 
-import jakarta.servlet.http.Cookie;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -190,12 +184,12 @@ class AdminControllerTest extends RedisTestContainerConfig {
 	void deletePost() throws Exception {
 		//given
 		Category category = categoryRepository.save(Category.builder().name("cat1").build());
-		User user = adminService.signUpAdmin("user1", "password", "admin231", "email");
+		User user = adminService.signUpAdmin("user5", "password", "admin231", "email");
 		ProductPost post = productPostRepository.save(
 			ProductPost.create(user, "name", 5000, "title", "content", "url", 30F, 40F)
 		);
 
-		Map<String, Cookie> cookieMap = login("user1", "password");
+		Map<String, Cookie> cookieMap = login("user5", "password");
 
 		//when
 		mockMvc.perform(delete("/api/admin/posts/%s".formatted(post.getId()))
