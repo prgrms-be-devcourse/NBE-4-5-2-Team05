@@ -46,7 +46,7 @@ export default function PostCreatePage() {
       body: formData as any, // 타입 우회를 위해 any 캐스팅
       rawBody: true, // JSON 자동 변환을 방지하고 FormData 그대로 전송
       credentials: "include",
-      headers: {}, // Content-Type 헤더를 설정하지 않음 (브라우저가 자동으로 설정)
+      headers: {}, // Content-Type 헤더를 제거 (브라우저가 자동 설정)
     });
     if (response.error) {
       console.error("파일 업로드 실패", response.error);
@@ -80,7 +80,9 @@ export default function PostCreatePage() {
       );
     }
     const categoryIds = selectedCategory ? [Number(selectedCategory)] : [];
-    const data = {
+
+    // 요청 바디 타입은 OpenAPI 스키마의 ProductPostWriteForm을 사용합니다.
+    const data: components["schemas"]["ProductPostWriteForm"] = {
       productName,
       productPrice: price === "" ? 0 : Number(price),
       title,
@@ -154,7 +156,7 @@ export default function PostCreatePage() {
           >
             <option value="">카테고리 선택</option>
             {categories.map((cat) => (
-              <option key={cat.id!} value={cat.id!}>
+              <option key={cat.id} value={cat.id}>
                 {cat.name}
               </option>
             ))}

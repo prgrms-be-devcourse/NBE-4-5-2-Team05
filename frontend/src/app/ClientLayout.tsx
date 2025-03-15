@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useEffect } from "react"; // useEffect 추가
-import { useRouter } from "next/navigation"; // useRouter 추가
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import client from "@/lib/client";
 import Link from "next/link";
@@ -10,8 +10,6 @@ import {
   LoginMemberContext,
   useLoginMember,
 } from "./stores/auth/loginMemberStore";
-import { useRouter } from "next/router";
-import { useEffect } from "react";
 
 export default function ClientLayout({
   children,

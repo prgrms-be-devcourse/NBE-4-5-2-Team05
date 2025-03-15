@@ -168,6 +168,38 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/users/email/code": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["sendAuthenticationCode"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/users/email/code/verify": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["verifyAuthenticationCode"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/uploadFile": {
         parameters: {
             query?: never;
@@ -259,7 +291,11 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        get?: never;
+        /**
+         * 상품 구매 여부 조회
+         * @description 로그인한 유저가 상품을 구매했는지 여부를 반환합니다.
+         */
+        get: operations["checkPurchased"];
         put?: never;
         /**
          * 상품 구매
@@ -705,6 +741,8 @@ export interface components {
             profileUrl?: string;
             /** @enum {string} */
             role?: "ADMIN" | "USER";
+            /** Format: int32 */
+            cash?: number;
             /** Format: date-time */
             createdAt?: string;
             /** Format: date-time */
@@ -897,6 +935,13 @@ export interface components {
             message: string;
             data: components["schemas"]["LoginUserDto"];
         };
+        EmailCodeRequest: {
+            email?: string;
+        };
+        VerifyCodeRequest: {
+            email?: string;
+            code?: string;
+        };
         ProductPostWriteForm: {
             productName: string;
             /** Format: int32 */
@@ -1047,6 +1092,11 @@ export interface components {
             code: string;
             message: string;
             data: components["schemas"]["PageDtoProductPostResponse"];
+        };
+        RsDataBoolean: {
+            code: string;
+            message: string;
+            data: boolean;
         };
         PaymentMetaData: {
             paymentId?: string;
@@ -1680,6 +1730,72 @@ export interface operations {
             };
         };
     };
+    sendAuthenticationCode: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["EmailCodeRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json;charset=UTF-8": components["schemas"]["RsDataVoid"];
+                };
+            };
+            /** @description Internal Server Error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json;charset=UTF-8": components["schemas"]["RsDataVoid"];
+                };
+            };
+        };
+    };
+    verifyAuthenticationCode: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["VerifyCodeRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json;charset=UTF-8": components["schemas"]["RsDataVoid"];
+                };
+            };
+            /** @description Internal Server Error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json;charset=UTF-8": components["schemas"]["RsDataVoid"];
+                };
+            };
+        };
+    };
     uploadFile: {
         parameters: {
             query?: never;
@@ -1848,6 +1964,37 @@ export interface operations {
                 };
                 content: {
                     "application/json;charset=UTF-8": components["schemas"]["RsDataProductPostResponse"];
+                };
+            };
+            /** @description Internal Server Error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json;charset=UTF-8": components["schemas"]["RsDataVoid"];
+                };
+            };
+        };
+    };
+    checkPurchased: {
+        parameters: {
+            query: {
+                "post-id": string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json;charset=UTF-8": components["schemas"]["RsDataBoolean"];
                 };
             };
             /** @description Internal Server Error */
