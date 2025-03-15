@@ -2,9 +2,9 @@
 
 import React, { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
+import Image from "next/image";
 import type { components } from "@/lib/backend/apiV1/schema";
 import client from "@/lib/client";
-import Image from "next/image";
 
 type ProductPostResponse = components["schemas"]["ProductPostResponse"];
 
@@ -17,57 +17,61 @@ export default function PostDetailPage() {
   const [likeLoading, setLikeLoading] = useState<boolean>(false);
   const [liked, setLiked] = useState<boolean>(false);
 
-  // 로그인 상태 체크 함수
   const checkLoginStatus = async (): Promise<boolean> => {
-    // 로그인 여부를 확인하는 API 호출 (/api/users/me)
-    const result = await client.GET("/api/users/me", {
-      credentials: "include",
-    });
-    if (result.error) {
-      console.log(result.error);
+    try {
+      const result = await client.GET("/api/users/me", {
+        credentials: "include",
+      });
+      if (result.error) {
+        console.log("로그인 상태 확인 실패:", result.error);
+        return false;
+      }
+      return true;
+    } catch (err) {
+      console.log("로그인 상태 확인 중 예외 발생:", err);
       return false;
     }
-    return true;
   };
 
-  // 게시글 상세 조회 (백엔드에서 조회수 증가 처리)
   const fetchPost = async () => {
     if (!postId) return;
-    const response = await client.GET("/api/posts/{id}", {
-      withCredentials: true,
-      params: {
-        path: {
-          id: postId,
-        },
-      },
-    });
-    if (response.error) {
-      console.error("게시글 상세 조회 실패", err);
+    try {
+      const response = await client.GET("/api/posts/{id}", {
+        withCredentials: true,
+        params: { path: { id: postId } },
+      });
+      if (response.error) {
+        console.error("게시글 상세 조회 실패", response.error);
+        setError("게시글 정보를 불러올 수 없습니다.");
+      } else {
+        setPost(response.data.data);
+      }
+    } catch (err) {
+      console.error("게시글 상세 조회 중 예외 발생:", err);
       setError("게시글 정보를 불러올 수 없습니다.");
+    } finally {
       setLoading(false);
-      return;
     }
-    setPost(response.data.data);
   };
 
-  // 사용자의 찜한 내역을 불러와 현재 게시글이 찜되었는지 확인
   const fetchUserFavorites = async () => {
-    // 먼저 로그인 상태 체크
     const isLoggedIn = await checkLoginStatus();
-    if (!isLoggedIn) {
-      // 로그인 안되어 있으면 찜한 내역을 불러오지 않음
-      return;
-    }
-    const response = await client.GET("/api/posts/my/favorites", {
-      credentials: "include",
-    });
-    if (response.error) {
-      console.error("찜한 내역 조회 실패", response.error);
-      return;
-    }
-    const favorites = response.data!.data; // ProductPostResponse[]
-    if (post?.id && favorites.some((fav) => fav.id === post.id)) {
-      setLiked(true);
+    if (!isLoggedIn) return;
+    try {
+      const response = await client.GET("/api/posts/my/favorites", {
+        credentials: "include",
+      });
+      if (response.error) {
+        console.error("찜한 내역 조회 실패", response.error);
+        return;
+      }
+      const favoritesResponse = response.data.data;
+      const favorites: ProductPostResponse[] = favoritesResponse.items;
+      if (post?.id && favorites.some((fav) => fav.id === post.id)) {
+        setLiked(true);
+      }
+    } catch (err) {
+      console.error("찜한 내역 조회 중 예외 발생:", err);
     }
   };
 
@@ -76,14 +80,11 @@ export default function PostDetailPage() {
   }, [postId]);
 
   useEffect(() => {
-    if (post) {
-      fetchUserFavorites();
-    }
+    if (post) fetchUserFavorites();
   }, [post]);
 
   const handleLike = async () => {
     if (!post) return;
-    // 로그인 상태 체크
     const isLoggedIn = await checkLoginStatus();
     if (!isLoggedIn) {
       alert("먼저 로그인을 해주세요.");
@@ -91,29 +92,35 @@ export default function PostDetailPage() {
       return;
     }
     setLikeLoading(true);
-
-    const response = await client.POST("/api/posts/{id}/like", {
-      params: {
-        path: {
-          id: post.id!,
-        },
-      },
-      credentials: "include",
-    });
-    if (response.error) {
-      console.error("찜 처리 실패", response.error);
-      return;
+    try {
+      const response = await client.POST("/api/posts/{id}/like", {
+        params: { path: { id: post.id! } },
+        credentials: "include",
+      });
+      if (response.error) {
+        console.error("찜 처리 실패", response.error);
+        return;
+      }
+      setPost(response.data.data);
+      setLiked(true);
+    } catch (err) {
+      console.error("찜 처리 중 예외 발생", err);
+    } finally {
+      setLikeLoading(false);
     }
-    setPost(response.data.data);
-    setLiked(true);
-    setLikeLoading(false);
   };
 
   if (loading) return <div className="p-4">로딩 중...</div>;
   if (error) return <div className="p-4 text-red-500">{error}</div>;
   if (!post) return <div className="p-4">게시글 정보를 찾을 수 없습니다.</div>;
 
-  const images = post.imageUrls ? post.imageUrls.split(",") : [];
+  // 이미지 URL들을 소문자와 trim을 적용해 유효한 값만 필터링
+  const images = post.imageUrls
+    ? post.imageUrls
+        .split(",")
+        .map((url) => url.trim())
+        .filter((url) => url && url.toLowerCase() !== "null")
+    : [];
 
   return (
     <div className="p-4">
@@ -124,11 +131,14 @@ export default function PostDetailPage() {
         <div className="flex-1 bg-gray-100 rounded p-4">
           <h2 className="text-xl font-semibold mb-2">사진</h2>
           {images.length > 0 ? (
-            <Image
-              src={images[0]}
-              alt={post.title || "이미지"}
-              className="w-full h-auto object-cover rounded"
-            />
+            <div className="relative w-full h-64">
+              <Image
+                src={images[0]}
+                alt={post.title || "이미지"}
+                fill
+                className="object-cover rounded"
+              />
+            </div>
           ) : (
             <div className="h-64 flex items-center justify-center text-gray-500">
               이미지가 없습니다.
@@ -190,12 +200,14 @@ export default function PostDetailPage() {
             <h3 className="text-lg font-semibold mb-2">추가 사진</h3>
             <div className="flex gap-2 overflow-x-auto">
               {images.slice(1).map((imgUrl, idx) => (
-                <Image
-                  key={idx}
-                  src={imgUrl}
-                  alt={`${post.title} - ${idx + 1}`}
-                  className="w-40 h-auto object-cover rounded"
-                />
+                <div key={idx} className="relative w-40 h-40">
+                  <Image
+                    src={imgUrl}
+                    alt={`${post.title} - ${idx + 1}`}
+                    fill
+                    className="object-cover rounded"
+                  />
+                </div>
               ))}
             </div>
           </div>

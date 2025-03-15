@@ -28,8 +28,16 @@ export interface paths {
             cookie?: never;
         };
         get?: never;
+        /**
+         * 댓글 수정
+         * @description 댓글 내용을 수정합니다.
+         */
         put: operations["updateComment"];
         post?: never;
+        /**
+         * 댓글 삭제
+         * @description 댓글을 삭제합니다.
+         */
         delete: operations["deleteComment"];
         options?: never;
         head?: never;
@@ -43,9 +51,21 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
+        /**
+         * 상품 게시글 상세 조회
+         * @description 상품 게시글의 상세 정보를 조회합니다.
+         */
         get: operations["getPost"];
+        /**
+         * 상품 게시글 수정
+         * @description 상품 게시글의 내용을 수정합니다.
+         */
         put: operations["modify"];
         post?: never;
+        /**
+         * 상품 게시글 삭제
+         * @description 상품 게시글을 삭제합니다.
+         */
         delete: operations["delete"];
         options?: never;
         head?: never;
@@ -63,6 +83,22 @@ export interface paths {
         put: operations["grantAdmin"];
         post?: never;
         delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/admin/notices/{notice-id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put: operations["updateNotice"];
+        post?: never;
+        delete: operations["deleteNotice"];
         options?: never;
         head?: never;
         patch?: never;
@@ -141,6 +177,10 @@ export interface paths {
         };
         get?: never;
         put?: never;
+        /**
+         * 파일 업로드
+         * @description 새로운 파일을 업로드합니다.
+         */
         post: operations["uploadFile"];
         delete?: never;
         options?: never;
@@ -155,8 +195,16 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
+        /**
+         * 글 목록 조회
+         * @description 상품 게시글 목록을 조회합니다.
+         */
         get: operations["getPosts"];
         put?: never;
+        /**
+         * 상품 게시글 작성
+         * @description 상품 게시글을 작성합니다.
+         */
         post: operations["createPost"];
         delete?: never;
         options?: never;
@@ -173,6 +221,10 @@ export interface paths {
         };
         get?: never;
         put?: never;
+        /**
+         * 댓글 작성
+         * @description 상품에 댓글을 작성합니다.
+         */
         post: operations["writeComment"];
         delete?: never;
         options?: never;
@@ -189,6 +241,10 @@ export interface paths {
         };
         get?: never;
         put?: never;
+        /**
+         * 상품 게시글 찜
+         * @description 상품 게시글을 찜합니다.
+         */
         post: operations["likePost"];
         delete?: never;
         options?: never;
@@ -205,6 +261,10 @@ export interface paths {
         };
         get?: never;
         put?: never;
+        /**
+         * 상품 구매
+         * @description 페이머니로 상품을 구매합니다.
+         */
         post: operations["purchaseItem"];
         delete?: never;
         options?: never;
@@ -219,8 +279,16 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        get?: never;
+        /**
+         * 채팅방 목록 페이지 조회
+         * @description 채팅방 목록을 HTML 페이지로 반환합니다.
+         */
+        get: operations["rooms"];
         put?: never;
+        /**
+         * 채팅방 생성
+         * @description 상품 판매자와의 채팅방을 생성합니다.
+         */
         post: operations["createRoom"];
         delete?: never;
         options?: never;
@@ -237,6 +305,10 @@ export interface paths {
         };
         get?: never;
         put?: never;
+        /**
+         * 관리자와의 채팅방을 생성합니다.
+         * @description id를 가진 관리자와의 채팅방을 생성합니다.
+         */
         post: operations["createRoomAdmin"];
         delete?: never;
         options?: never;
@@ -253,8 +325,12 @@ export interface paths {
         };
         get?: never;
         put?: never;
+        /**
+         * 유저 정지
+         * @description 특정 유저를 정지시킵니다.
+         */
         post: operations["banUser"];
-        delete?: never;
+        delete: operations["unBanUser"];
         options?: never;
         head?: never;
         patch?: never;
@@ -267,8 +343,12 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        get?: never;
+        get: operations["getNotices"];
         put?: never;
+        /**
+         * 공지사항 등록
+         * @description 새로운 공지사항을 등록합니다.
+         */
         post: operations["writeNotice"];
         delete?: never;
         options?: never;
@@ -283,6 +363,10 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
+        /**
+         * 최근 조회한 상품 조회
+         * @description 최근 조회한 상품들을 조회합니다.
+         */
         get: operations["getRecentlyViewPosts"];
         put?: never;
         post?: never;
@@ -299,6 +383,10 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
+        /**
+         * 내가 작성한 상품 게시글 조회
+         * @description 내가 작성한 상품 게시글을 조회합니다.
+         */
         get: operations["getMyPosts"];
         put?: never;
         post?: never;
@@ -315,6 +403,10 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
+        /**
+         * 내가 판매한 상품 게시글 리스트 조회
+         * @description 내가 판매한 상품 게시글의 목록을 조회합니다.
+         */
         get: operations["getMySales"];
         put?: never;
         post?: never;
@@ -331,6 +423,10 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
+        /**
+         * 내가 구매한 상품 게시글 리스트 조회
+         * @description 내가 구매한 상품 게시글의 목록을 조회합니다.
+         */
         get: operations["getMyPurchases"];
         put?: never;
         post?: never;
@@ -347,6 +443,10 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
+        /**
+         * 내가 판매한 상품 게시글 리스트 조회
+         * @description 내가 판매한 상품 게시글의 목록을 조회합니다.
+         */
         get: operations["getMyFavorites"];
         put?: never;
         post?: never;
@@ -363,6 +463,10 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
+        /**
+         * 결제 승인
+         * @description PG사에 결제 승인을 요청합니다. PG사 서버로부터 리다이렉트된 요청을 받아 PG사로 결제 승인 API를 호출합니다.
+         */
         get: operations["requestPayment"];
         put?: never;
         post?: never;
@@ -379,6 +483,10 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
+        /**
+         * 결제 메타데이터 저장
+         * @description 결제흐름 진행 전 메타데이터를 저장합니다.
+         */
         get: operations["saveMetaData"];
         put?: never;
         post?: never;
@@ -395,6 +503,10 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
+        /**
+         * 사용자 토큰 조회
+         * @description 사용자를 판단하기 위한 토큰을 생성해 반환합니다.
+         */
         get: operations["getUserInfo"];
         put?: never;
         post?: never;
@@ -411,6 +523,10 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
+        /**
+         * 채팅방 검색
+         * @description 특정 유저가 속한 채팅방을 검색합니다.
+         */
         get: operations["findChatRooms"];
         put?: never;
         post?: never;
@@ -427,7 +543,31 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
+        /**
+         * 채팅방 조회
+         * @description 유저가 속한 채팅방을 모두 조회합니다.
+         */
         get: operations["getUserRooms"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/chat/room/{roomId}/show": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * 채팅방 상세 페이지 조회
+         * @description 채팅방 상세 페이지를 HTML로 반환합니다.
+         */
+        get: operations["showRoomDetailPage"];
         put?: never;
         post?: never;
         delete?: never;
@@ -443,9 +583,17 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
+        /**
+         * 채팅방 메세지 조회
+         * @description 채팅방의 모든 메시지를 조회합니다.
+         */
         get: operations["getMessages"];
         put?: never;
         post?: never;
+        /**
+         * 채팅방을 삭제합니다.
+         * @description 유저가 속한 채팅방을 id로 삭제합니다.
+         */
         delete: operations["deleteRoom"];
         options?: never;
         head?: never;
@@ -459,7 +607,27 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
+        /**
+         * 카테고리 작성
+         * @description 존재하는 카테고리 목록을 조회합니다.
+         */
         get: operations["getCategories"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/admin/users": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getUserList"];
         put?: never;
         post?: never;
         delete?: never;
@@ -475,6 +643,10 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
+        /**
+         * 최신 공지사항 조회
+         * @description 최신 공지사항 5개를 조회합니다.
+         */
         get: operations["getLatestNotices"];
         put?: never;
         post?: never;
@@ -494,6 +666,10 @@ export interface paths {
         get?: never;
         put?: never;
         post?: never;
+        /**
+         * 게시글 삭제
+         * @description 게시글을 삭제합니다.
+         */
         delete: operations["deletePost"];
         options?: never;
         head?: never;
@@ -668,6 +844,29 @@ export interface components {
             authorities?: components["schemas"]["GrantedAuthority"][];
             memberAuthoritiesAsString?: string[];
         };
+        UpdateNoticeReq: {
+            title?: string;
+            content?: string;
+        };
+        AdminResBody: {
+            id?: string;
+            nickname?: string;
+            /** @enum {string} */
+            role?: "ADMIN" | "USER";
+        };
+        NoticeResBody: {
+            id?: string;
+            title?: string;
+            content?: string;
+            admin?: components["schemas"]["AdminResBody"];
+            /** Format: date-time */
+            createdAt?: string;
+        };
+        RsDataNoticeResBody: {
+            code: string;
+            message: string;
+            data: components["schemas"]["NoticeResBody"];
+        };
         SignUpUserForm: {
             username?: string;
             password?: string;
@@ -759,6 +958,7 @@ export interface components {
             message: string;
             data: components["schemas"]["ChatRoom"];
         };
+        /** @description 공지사항 등록 요청 바디 */
         BanReqBody: {
             reason: string;
         };
@@ -778,26 +978,10 @@ export interface components {
             message: string;
             data: components["schemas"]["BanResBody"];
         };
+        /** @description 공지사항 등록 body */
         NoticeReqBody: {
             title: string;
             content: string;
-        };
-        AdminResBody: {
-            id?: string;
-            nickname?: string;
-            /** @enum {string} */
-            role?: "ADMIN" | "USER";
-        };
-        NoticeResBody: {
-            id?: string;
-            title?: string;
-            content?: string;
-            admin?: components["schemas"]["AdminResBody"];
-        };
-        RsDataNoticeResBody: {
-            code: string;
-            message: string;
-            data: components["schemas"]["NoticeResBody"];
         };
         PageDtoPreviewPostResponse: {
             items: components["schemas"]["PreviewPostResponse"][];
@@ -830,6 +1014,8 @@ export interface components {
             viewCount?: number;
             /** Format: int32 */
             likedCount?: number;
+            /** @enum {string} */
+            status?: "RESERVED" | "AVAILABLE" | "PURCHASED";
         };
         RsDataPageDtoPreviewPostResponse: {
             code: string;
@@ -845,6 +1031,22 @@ export interface components {
             code: string;
             message: string;
             data: components["schemas"]["ProductPostResponse"][];
+        };
+        PageDtoProductPostResponse: {
+            items: components["schemas"]["ProductPostResponse"][];
+            /** Format: int32 */
+            totalPages: number;
+            /** Format: int32 */
+            totalItems: number;
+            /** Format: int32 */
+            curPageNo: number;
+            /** Format: int32 */
+            pageSize: number;
+        };
+        RsDataPageDtoProductPostResponse: {
+            code: string;
+            message: string;
+            data: components["schemas"]["PageDtoProductPostResponse"];
         };
         PaymentMetaData: {
             paymentId?: string;
@@ -892,6 +1094,75 @@ export interface components {
             code: string;
             message: string;
             data: components["schemas"]["Category"][];
+        };
+        Pageable: {
+            /** Format: int32 */
+            page?: number;
+            /** Format: int32 */
+            size?: number;
+            sort?: string[];
+        };
+        PageUserDto: {
+            /** Format: int32 */
+            totalPages?: number;
+            /** Format: int64 */
+            totalElements?: number;
+            /** Format: int32 */
+            size?: number;
+            content?: components["schemas"]["UserDto"][];
+            /** Format: int32 */
+            number?: number;
+            sort?: components["schemas"]["SortObject"];
+            first?: boolean;
+            last?: boolean;
+            /** Format: int32 */
+            numberOfElements?: number;
+            pageable?: components["schemas"]["PageableObject"];
+            empty?: boolean;
+        };
+        PageableObject: {
+            /** Format: int64 */
+            offset?: number;
+            sort?: components["schemas"]["SortObject"];
+            /** Format: int32 */
+            pageSize?: number;
+            paged?: boolean;
+            unpaged?: boolean;
+            /** Format: int32 */
+            pageNumber?: number;
+        };
+        RsDataPageUserDto: {
+            code: string;
+            message: string;
+            data: components["schemas"]["PageUserDto"];
+        };
+        SortObject: {
+            empty?: boolean;
+            unsorted?: boolean;
+            sorted?: boolean;
+        };
+        PageNoticeResBody: {
+            /** Format: int32 */
+            totalPages?: number;
+            /** Format: int64 */
+            totalElements?: number;
+            /** Format: int32 */
+            size?: number;
+            content?: components["schemas"]["NoticeResBody"][];
+            /** Format: int32 */
+            number?: number;
+            sort?: components["schemas"]["SortObject"];
+            first?: boolean;
+            last?: boolean;
+            /** Format: int32 */
+            numberOfElements?: number;
+            pageable?: components["schemas"]["PageableObject"];
+            empty?: boolean;
+        };
+        RsDataPageNoticeResBody: {
+            code: string;
+            message: string;
+            data: components["schemas"]["PageNoticeResBody"];
         };
         RsDataListNoticeResBody: {
             code: string;
@@ -1080,6 +1351,10 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /**
+                 * @description 상품 게시글 id
+                 * @example ppost-f90sdf8-sd8fu7sd-ds8uf9
+                 */
                 id: string;
             };
             cookie?: never;
@@ -1111,6 +1386,10 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /**
+                 * @description 상품 게시글 id
+                 * @example ppost-fsiodf-21edd-fd2c1
+                 */
                 id: string;
             };
             cookie?: never;
@@ -1146,6 +1425,10 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /**
+                 * @description 상품 게시글 id
+                 * @example ppost-2ji109-fe3sfd-3fsdf
+                 */
                 id: string;
             };
             cookie?: never;
@@ -1190,6 +1473,72 @@ export interface operations {
                 };
                 content: {
                     "application/json;charset=UTF-8": components["schemas"]["RsDataUser"];
+                };
+            };
+            /** @description Internal Server Error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json;charset=UTF-8": components["schemas"]["RsDataVoid"];
+                };
+            };
+        };
+    };
+    updateNotice: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                "notice-id": string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateNoticeReq"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json;charset=UTF-8": components["schemas"]["RsDataNoticeResBody"];
+                };
+            };
+            /** @description Internal Server Error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json;charset=UTF-8": components["schemas"]["RsDataVoid"];
+                };
+            };
+        };
+    };
+    deleteNotice: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                "notice-id": string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json;charset=UTF-8": components["schemas"]["RsDataVoid"];
                 };
             };
             /** @description Internal Server Error */
@@ -1370,9 +1719,16 @@ export interface operations {
     getPosts: {
         parameters: {
             query?: {
+                /** @description 페이지 번호 */
                 page?: number;
+                /** @description 페이지에 포함된 아이템 개수 */
                 pageSize?: number;
+                /** @description 검색 키워드 */
                 keyword?: string;
+                /**
+                 * @description 정렬 순서. desc:내림차순, asc:오름차순
+                 * @example desc
+                 */
                 sort?: string;
             };
             header?: never;
@@ -1439,6 +1795,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description 작성할 상품 게시글 id */
                 "post-id": string;
             };
             cookie?: never;
@@ -1474,6 +1831,10 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /**
+                 * @description 상품 게시글 id
+                 * @example ppost-2ji109-fe3sfd-3fsdf
+                 */
                 id: string;
             };
             cookie?: never;
@@ -1533,9 +1894,42 @@ export interface operations {
             };
         };
     };
+    rooms: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json;charset=UTF-8": string;
+                };
+            };
+            /** @description Internal Server Error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json;charset=UTF-8": components["schemas"]["RsDataVoid"];
+                };
+            };
+        };
+    };
     createRoom: {
         parameters: {
             query: {
+                /**
+                 * @description 상품 게시글 아이디
+                 * @example ppost-fkkdsjf9adsa-ds8fdfsdf-289103yd
+                 */
                 postId: string;
             };
             header?: never;
@@ -1569,6 +1963,10 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /**
+                 * @description 관리자 id
+                 * @example user-1231jkj-g04hi8gah-123hixfdh9
+                 */
                 adminId: string;
             };
             cookie?: never;
@@ -1600,6 +1998,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description 유저 id */
                 "user-id": string;
             };
             cookie?: never;
@@ -1610,13 +2009,75 @@ export interface operations {
             };
         };
         responses: {
-            /** @description OK */
+            /** @description 유저 정지 성공 */
             200: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
                     "application/json;charset=UTF-8": components["schemas"]["RsDataBanResBody"];
+                };
+            };
+            /** @description Internal Server Error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json;charset=UTF-8": components["schemas"]["RsDataVoid"];
+                };
+            };
+        };
+    };
+    unBanUser: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                "user-id": string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json;charset=UTF-8": components["schemas"]["RsDataVoid"];
+                };
+            };
+            /** @description Internal Server Error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json;charset=UTF-8": components["schemas"]["RsDataVoid"];
+                };
+            };
+        };
+    };
+    getNotices: {
+        parameters: {
+            query: {
+                pageable: components["schemas"]["Pageable"];
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json;charset=UTF-8": components["schemas"]["RsDataPageNoticeResBody"];
                 };
             };
             /** @description Internal Server Error */
@@ -1643,7 +2104,7 @@ export interface operations {
             };
         };
         responses: {
-            /** @description OK */
+            /** @description 공지사항 등록 성공 */
             200: {
                 headers: {
                     [name: string]: unknown;
@@ -1695,9 +2156,13 @@ export interface operations {
     getMyPosts: {
         parameters: {
             query?: {
+                /** @description 페이지 번호 */
                 page?: number;
+                /** @description 페이지 내 아이템 개수 */
                 pageSize?: number;
+                /** @description 정렬 순서 */
                 sort?: string;
+                status?: "RESERVED" | "AVAILABLE" | "PURCHASED";
             };
             header?: never;
             path?: never;
@@ -1756,7 +2221,10 @@ export interface operations {
     };
     getMyPurchases: {
         parameters: {
-            query?: never;
+            query?: {
+                page?: number;
+                pageSize?: number;
+            };
             header?: never;
             path?: never;
             cookie?: never;
@@ -1769,7 +2237,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json;charset=UTF-8": components["schemas"]["RsDataListProductPostResponse"];
+                    "application/json;charset=UTF-8": components["schemas"]["RsDataPageDtoProductPostResponse"];
                 };
             };
             /** @description Internal Server Error */
@@ -1785,7 +2253,10 @@ export interface operations {
     };
     getMyFavorites: {
         parameters: {
-            query?: never;
+            query?: {
+                page?: number;
+                pageSize?: number;
+            };
             header?: never;
             path?: never;
             cookie?: never;
@@ -1798,7 +2269,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json;charset=UTF-8": components["schemas"]["RsDataListProductPostResponse"];
+                    "application/json;charset=UTF-8": components["schemas"]["RsDataPageDtoProductPostResponse"];
                 };
             };
             /** @description Internal Server Error */
@@ -1815,8 +2286,11 @@ export interface operations {
     requestPayment: {
         parameters: {
             query: {
+                /** @description 결제 id */
                 orderId: string;
+                /** @description PG사에서 생성한 paymentKey */
                 paymentKey: string;
+                /** @description 총 구매 가격 */
                 amount: number;
             };
             header?: never;
@@ -1848,7 +2322,9 @@ export interface operations {
     saveMetaData: {
         parameters: {
             query: {
+                /** @description 구매할 상품 게시글 id */
                 id: string;
+                /** @description 총 결제 금액 */
                 amount: number;
             };
             header?: never;
@@ -1909,6 +2385,10 @@ export interface operations {
     findChatRooms: {
         parameters: {
             query: {
+                /**
+                 * @description 찾으려는 채팅방에 속한 유저의 ID
+                 * @example user-12k3j-sjdfi2jj-431iojr124io1
+                 */
                 receiver: string;
             };
             header?: never;
@@ -1966,9 +2446,44 @@ export interface operations {
             };
         };
     };
+    showRoomDetailPage: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                roomId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json;charset=UTF-8": string;
+                };
+            };
+            /** @description Internal Server Error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json;charset=UTF-8": components["schemas"]["RsDataVoid"];
+                };
+            };
+        };
+    };
     getMessages: {
         parameters: {
             query: {
+                /**
+                 * @description 채팅방 id
+                 * @example 123
+                 */
                 roomId: string;
             };
             header?: never;
@@ -2000,6 +2515,10 @@ export interface operations {
     deleteRoom: {
         parameters: {
             query: {
+                /**
+                 * @description 채팅방 id
+                 * @example 123
+                 */
                 roomId: string;
             };
             header?: never;
@@ -2057,6 +2576,37 @@ export interface operations {
             };
         };
     };
+    getUserList: {
+        parameters: {
+            query: {
+                pageable: components["schemas"]["Pageable"];
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json;charset=UTF-8": components["schemas"]["RsDataPageUserDto"];
+                };
+            };
+            /** @description Internal Server Error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json;charset=UTF-8": components["schemas"]["RsDataVoid"];
+                };
+            };
+        };
+    };
     getLatestNotices: {
         parameters: {
             query?: never;
@@ -2066,7 +2616,7 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            /** @description OK */
+            /** @description 최신 공지사항 조회 성공 */
             200: {
                 headers: {
                     [name: string]: unknown;
@@ -2091,14 +2641,15 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description post id */
                 "post-id": string;
             };
             cookie?: never;
         };
         requestBody?: never;
         responses: {
-            /** @description OK */
-            200: {
+            /** @description 게시글 삭제 성공 */
+            204: {
                 headers: {
                     [name: string]: unknown;
                 };

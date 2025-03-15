@@ -4,14 +4,14 @@ import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import type { components } from "@/lib/backend/apiV1/schema";
 import client from "@/lib/client";
+import fileUploadClient from "@/lib/fileUploadClient"; // 파일 업로드 전용 클라이언트
 
-// OpenAPI 스키마의 Category 타입 사용 (선택적 속성일 수 있으므로 필요한 경우 non-null assertion이나 default 값을 설정)
 type Category = components["schemas"]["Category"];
 
 export default function PostCreatePage() {
   const router = useRouter();
 
-  // 로그인 체크
+  // 로그인 체크 (로그인 안되어 있으면 로그인 페이지로 이동)
   useEffect(() => {
     async function checkAuth() {
       const response = await client.GET("/api/users/me", {
@@ -29,46 +29,41 @@ export default function PostCreatePage() {
   const [productName, setProductName] = useState("");
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
-  // 선택한 카테고리 id (문자열로 받아서 후에 number로 변환)
   const [selectedCategory, setSelectedCategory] = useState("");
   const [price, setPrice] = useState<number | "">("");
   const [location, setLocation] = useState("");
   const [latitude, setLatitude] = useState<number | "">("");
   const [longitude, setLongitude] = useState<number | "">("");
-  // 이미지 파일 선택 state
   const [selectedFiles, setSelectedFiles] = useState<FileList | null>(null);
-  // 백엔드에서 불러온 카테고리 목록 state (OpenAPI 스키마의 Category 타입 사용)
   const [categories, setCategories] = useState<Category[]>([]);
 
-  // AWS S3 업로드 API 호출 함수
+  // AWS S3 업로드 API 호출 함수 (FormData 그대로 전송)
   const uploadFile = async (file: File): Promise<string> => {
     const formData = new FormData();
     formData.append("file", file);
-    const response = await client.POST("/api/uploadFile", {
-      headers: { "Content-Type": "multipart/form-data" },
-      body: {
-        file: await file.text(),
-      },
+    // fileUploadClient를 사용하여 multipart/form-data로 전송
+    const response = await fileUploadClient.POST("/api/uploadFile", {
+      body: formData as any, // 타입 우회를 위해 any 캐스팅
+      rawBody: true, // JSON 자동 변환을 방지하고 FormData 그대로 전송
       credentials: "include",
+      headers: {}, // Content-Type 헤더를 설정하지 않음 (브라우저가 자동으로 설정)
     });
     if (response.error) {
-      console.log(response);
+      console.error("파일 업로드 실패", response.error);
     }
-    return response.data!;
+    return response.data as string;
   };
 
-  // 백엔드에서 카테고리 목록 불러오기 (스키마 기반 타입 사용)
+  // 카테고리 목록 불러오기
   useEffect(() => {
     async function fetchCategories() {
-      // schema.d.ts에 정의된 Category 배열을 반환하는 엔드포인트 호출
       const res = await client.GET("/api/categories", {
         credentials: "include",
       });
       if (res.error) {
-        console.log(res.error);
+        console.error("카테고리 불러오기 실패", res.error);
         return;
       }
-      // 필요시 undefined 속성을 보완할 수 있음
       setCategories(res.data!.data);
     }
     fetchCategories();
@@ -84,32 +79,20 @@ export default function PostCreatePage() {
         Array.from(selectedFiles).map((file) => uploadFile(file))
       );
     }
-    // 선택한 카테고리 id를 숫자로 변환하여 배열에 넣음
     const categoryIds = selectedCategory ? [Number(selectedCategory)] : [];
-
-    // 게시글 생성 API로 보낼 JSON 데이터 구성
     const data = {
       productName,
       productPrice: price === "" ? 0 : Number(price),
       title,
       content,
-      categoryIds: categoryIds,
+      categoryIds,
       imageUrlList: uploadedUrls,
       latitude: latitude === "" ? 0 : Number(latitude),
       longitude: longitude === "" ? 0 : Number(longitude),
     };
 
     const result = await client.POST("/api/posts", {
-      body: {
-        title: data.title,
-        content: data.content,
-        productName: data.productName,
-        productPrice: data.productPrice,
-        categoryIds: data.categoryIds,
-        imageUrlList: data.imageUrlList,
-        latitude: data.latitude,
-        longitude: data.longitude,
-      },
+      body: data,
       credentials: "include",
     });
     if (result.error) {
@@ -118,12 +101,9 @@ export default function PostCreatePage() {
         router.push("/user/login");
         return;
       }
-      console.log(result.error);
       console.error("게시글 작성 실패", result.error);
-
       return;
     }
-
     router.push("/posts");
   };
 
@@ -163,7 +143,7 @@ export default function PostCreatePage() {
         </div>
       </div>
 
-      {/* 오른쪽 영역: 카테고리, 가격, 거래 위치, 좌표, 사진 추가, 게시하기 버튼 */}
+      {/* 오른쪽 영역: 카테고리, 가격, 거래 위치, 좌표, 사진 추가, 제출 버튼 */}
       <div className="w-1/3">
         <div className="mb-4">
           <label className="block mb-1 font-semibold">카테고리</label>
@@ -222,8 +202,7 @@ export default function PostCreatePage() {
             }
           />
         </div>
-
-        {/* 파일 입력 부분: 버튼으로 파일 선택 및 선택 파일 목록 표시 */}
+        {/* 파일 선택 부분 */}
         <div className="mb-4">
           <label className="block mb-1 font-semibold">사진 추가</label>
           <input
@@ -250,7 +229,6 @@ export default function PostCreatePage() {
             </div>
           )}
         </div>
-
         <button
           type="submit"
           className="mt-4 w-full bg-blue-500 text-white p-2 rounded"

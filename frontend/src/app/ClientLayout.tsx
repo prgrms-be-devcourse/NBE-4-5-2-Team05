@@ -1,5 +1,7 @@
 "use client";
 
+import React, { useEffect } from "react"; // useEffect 추가
+import { useRouter } from "next/navigation"; // useRouter 추가
 import { Button } from "@/components/ui/button";
 import { components } from "@/lib/backend/apiV1/schema";
 import client from "@/lib/client";
