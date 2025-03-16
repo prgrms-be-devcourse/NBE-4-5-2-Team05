@@ -1,33 +1,15 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import Link from "next/link";
-import ClinetLayout from "./ClientLayout";
-import client from "@/lib/backend/client";
-import { cookies, headers } from "next/headers";
 import localFont from "next/font/local";
-import { config } from '@fortawesome/fontawesome-svg-core'
-import '@fortawesome/fontawesome-svg-core/styles.css'
-
-
-config.autoAddCss = false
-
+import ClientLayout from "./ClientLayout";
+import { cookies } from "next/headers";
+import { parseAccessToken } from "./util/auth";
 
 const pretendard = localFont({
   src: "./../../node_modules/pretendard/dist/web/variable/woff2/PretendardVariable.woff2",
   display: "swap",
   weight: "45 920",
   variable: "--font-pretendard",
-});
-
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
 });
 
 export const metadata: Metadata = {
@@ -40,34 +22,26 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const myCookie = await cookies();
+  const { isLogin, payload } = parseAccessToken(myCookie.get("accessToken"));
 
-  const response = await client.GET("/api/users/me", {
-    headers: {
-      cookie: (await cookies()).toString(),
-    },
-  });
-
-  const me = response.data
-    ? response.data.data
+  const me = isLogin
+    ? {
+        id: payload.id,
+        nickname: payload.nickname,
+      }
     : {
-      id: "",                           // 빈 문자열로 초기화
-      username: "",                     // 빈 문자열로 초기화
-      email: "",                        // 빈 문자열로 초기화
-      nickname: "",                     // 빈 문자열로 초기화
-      address: "",                      // 빈 문자열로 초기화
-      profileUrl: "",                   // 빈 문자열로 초기화
-      role: "USER" as "USER",                     // 기본값으로 "USER" 설정
-      createdAt: new Date().toISOString(), // 현재 날짜를 ISO 문자열로 초기화
-      modifiedAt: new Date().toISOString(), // 현재 날짜를 ISO 문자열로 초기화
-      blocked: false,                   // 기본값 false
-      blockedCount: 0,                  // 기본값 0
-    };
-    
-    
-  return (<ClinetLayout 
-    me={me} 
-    fontVariable={pretendard.variable}
-    fontClassName={pretendard.className}>
+        id: "",
+        nickname: "",
+      };
+
+  return (
+    <ClientLayout
+      fontVariable={pretendard.variable}
+      fontClassName={pretendard.className}
+      me={me}
+    >
       {children}
-      </ClinetLayout>);
+    </ClientLayout>
+  );
 }

@@ -44,13 +44,13 @@ spring:
   profiles:
     active: dev
     include: secret
+    active: dev
 
   security:
     oauth2:
       client:
         registration:
           kakao:
-            clientId: ON_SECRET
             scope: profile_nickname, profile_image
             client-name: Kakao
             authorization-grant-type: authorization_code

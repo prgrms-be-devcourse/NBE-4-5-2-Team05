@@ -1,12 +1,17 @@
 "use client";
 
+import { Button } from "@/components/ui/button";
 import { components } from "@/lib/backend/apiV1/schema";
+import client from "@/lib/client";
+import { cookies } from "next/headers";
 import client from "@/lib/backend/client";
 import { faBookBookmark, faThumbsUp } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Geist, Geist_Mono } from "next/font/google";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+import { FaStore } from "react-icons/fa";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -15,9 +20,9 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { Button } from "@/components/ui/button";
 
 
+export default function ClientLayout({
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -30,75 +35,60 @@ const geistMono = Geist_Mono({
 
 export default function ClinetLayout({
   children,
-  me,
   fontVariable,
   fontClassName,
+  me,
 }: Readonly<{
   children: React.ReactNode;
-  me:components["schemas"]["UserDto"];
   fontVariable: string;
   fontClassName: string;
+  me: components["schemas"]["UserDto"];
 }>) {
+  const isLogin = me.id !== "";
   const router = useRouter();
   const isLogined = me.id !== "";
 
+  async function handleLogout(e: React.MouseEvent<HTMLButtonElement>) {
+    e.preventDefault();
+    const response = await client.POST("/api/users/logout", {
+      credentials: "include",
+    });
+
+    if (response.error) {
+      alert(response.error.message);
+      return;
+    }
+
+    window.location.href = "/";
+  }
+
   return (
     <html lang="en" className={`${fontVariable}`}>
-      <body
-        className={`min-h-[100dvh] flex flex-col ${fontClassName}`}>
-          <FontAwesomeIcon
-           icon={faThumbsUp}
-           className="fa-fw text-4xl text-[red]"
-         />
-         <FontAwesomeIcon icon={faBookBookmark} />
-        <header className="flex justify-end gap-3 px-4">
-          <DropdownMenu >
-            <DropdownMenuTrigger asChild>
-              <Button variant="outline" className="relative z-10 bg-black text-white rounded-md">Menu</Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent className="absolute z-50 bg-white border border-gray-300 shadow-lg rounded-md right-0">
-              <DropdownMenuLabel>{me.nickname}</DropdownMenuLabel>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem>
-                <Link href="/">메인</Link>
-              </DropdownMenuItem>
-              {isLogined && 
-              <DropdownMenuItem>
-                <Link href="/post">게시판</Link>
-              </DropdownMenuItem>}
-              {isLogined && 
-              <DropdownMenuItem>
-                <Link href="/member/me">내정보</Link>
-              </DropdownMenuItem>}
-              {!isLogined && 
-              <DropdownMenuItem>
-                <Link href="/member/login">로그인</Link>
-              </DropdownMenuItem>}
-              {isLogined && 
-              <DropdownMenuItem>
-                <Link href="/chat">채팅방</Link>
-              </DropdownMenuItem>}
-              {isLogined && 
-              <DropdownMenuItem> 
-                <Link href="" onClick={async (e)=>{
-                e.preventDefault();
-                const response=await client.POST("/api/users/logout",{
-                  credentials:"include",
-                });
-                if(response.error){
-                  alert(response.error.message);
-                  return;
-                }
-                router.push("/");
-                }}>로그아웃</Link>
-              </DropdownMenuItem>}
-            </DropdownMenuContent>
-          </DropdownMenu>
-                    
+      <body className={`min-h-[100dvh] flex flex-col ${fontClassName}`}>
+        <header className="flex justify-between">
+          <Link href="/" className="flex items-center gap-2">
+            <Button>
+              <FaStore className="text-lg" />
+              길게 볼 장터
+            </Button>
+          </Link>
+          {isLogin ? (
+            <div className="flex items-center gap-2">
+              <Link href="/user/me">
+                <Button>내 정보</Button>
+              </Link>
+              <Button className="cursor-pointer" onClick={handleLogout}>
+                로그아웃
+              </Button>
+            </div>
+          ) : (
+            <Link href="/user/login">
+              <Button>로그인 및 회원가입</Button>
+            </Link>
+          )}
         </header>
-        <div>
-          {children}
-        </div>
+        <div className="flex-grow">{children}</div>
+        <footer>푸터</footer>
       </body>
     </html>
   );
