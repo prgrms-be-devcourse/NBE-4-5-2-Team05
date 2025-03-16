@@ -13,6 +13,9 @@ public class ChatRoomDto {
     private String roomId;
     private String name;
     private long userCount;
+    private String lastMessage;
+    private String lastTimestamp;
+    private String other;
 
     public ChatRoomDto(ChatRoom chatRoom) {
         this.postId=chatRoom.getId();

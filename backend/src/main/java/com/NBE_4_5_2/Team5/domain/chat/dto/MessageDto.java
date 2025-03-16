@@ -15,4 +15,6 @@ public class MessageDto {
     private double latitude;
     private double longitude;
     private String timestamp;
+    private String lastMessage;
+    private String lastTimestamp;
 }

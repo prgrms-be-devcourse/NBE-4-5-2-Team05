@@ -765,6 +765,9 @@ export interface components {
             name?: string;
             /** Format: int64 */
             userCount?: number;
+            lastMessage?: string;
+            lastTimestamp?: string;
+            other?: string;
         };
         RsDataChatRoomDto: {
             code: string;
@@ -786,6 +789,8 @@ export interface components {
             /** Format: double */
             longitude?: number;
             timestamp?: string;
+            lastMessage?: string;
+            lastTimestamp?: string;
         };
         RsDataListMessageDto: {
             code: string;

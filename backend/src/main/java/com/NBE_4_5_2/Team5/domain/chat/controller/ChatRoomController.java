@@ -124,14 +124,26 @@ public class ChatRoomController {
 
         List<ChatRoom> chatRoomsList=chatRoomService.findRoomByUser(user.getNickname());
         List<ChatRoomDto> response=chatRoomsList.stream()
-                .map(chatRoom -> new ChatRoomDto(
-                        chatRoom.getId(),
-                        chatRoom.getRoomId(),
-                        chatRoom.getName(),
-                        chatRoom.getUserCount()))
+                .map(chatRoom -> {
+                    String other=chatRoomService.findOther(chatRoom.getRoomId(),user.getNickname());
+                    List<ChatMessage> messages= chatRoomService.getMessagesByUser(chatRoom.getRoomId(),user.getNickname());
+                    String lastMessage="";
+                    String lastTimestamp="";
+                    if(messages.size()>0) {
+                        lastMessage = messages.get(messages.size() - 1).getMessage();
+                        lastTimestamp = messages.get(messages.size() - 1).getTimestamp();
+                    }
+                    return new ChatRoomDto(
+                            chatRoom.getId(),
+                            chatRoom.getRoomId(),
+                            chatRoom.getName(),
+                            chatRoom.getUserCount(),
+                            lastMessage,
+                            lastTimestamp,
+                            other
+                    );
+                })
                 .toList();
-
-
         return new RsData<>("200","채팅방 목록",response);
     }
 
@@ -140,7 +152,7 @@ public class ChatRoomController {
     public RsData<ChatRoom> getRoomByRoomId(@PathVariable String roomId) {
         User userIdentity = rq.getUserIdentity();
         User user = rq.getRealActor(userIdentity);
-
+//        List<ChatMessage> messages=chatRoomService.getMessagesByUser(roomId,user.getNickname());
         ChatRoom chatRoom=chatRoomService.findChatRoomByClient(roomId,user.getNickname());
         return new RsData<>("200","채팅방 반환",chatRoom);
     }
@@ -153,6 +165,7 @@ public class ChatRoomController {
         User user = rq.getRealActor(userIdentity);
         List<ChatMessage> messages= chatRoomService.getMessagesByUser(roomId,user.getNickname());
         String other=chatRoomService.findOther(roomId,user.getNickname());
+
         List<MessageDto> response=messages.stream()
                 .map(chatMessage -> new MessageDto(
                         chatMessage.getMessageId(),
@@ -161,7 +174,9 @@ public class ChatRoomController {
                         chatMessage.getImage(),
                         chatMessage.getLatitude(),
                         chatMessage.getLongitude(),
-                        chatMessage.getTimestamp()))
+                        chatMessage.getTimestamp(),
+                        messages.get(messages.size()-1).getMessage(),
+                        messages.get(messages.size()-1).getTimestamp()))
                 .toList();
         return new RsData<>("200",other+"와의 대화방",response);
     }
@@ -185,10 +200,25 @@ public class ChatRoomController {
         System.out.println("name:"+user.getNickname());
         ChatRoom chatRoom=chatRoomService.findByRoomIdByClients(user.getNickname(),receiver);
 //        ChatRoom chatRoom=chatRoomService.findChatRoomByClient(roomId,user.getNickname());
+        List<ChatMessage> messages= chatRoomService.getMessagesByUser(chatRoom.getRoomId(),user.getNickname());
+        String lastMessage="";
+        String lastTimestamp="";
+        if(messages.size()>0) {
+            lastMessage = messages.get(messages.size() - 1).getMessage();
+            lastTimestamp = messages.get(messages.size() - 1).getTimestamp();
+        }
         if (chatRoom == null) {
             return new RsData<>("404", "존재하지 않는 대화방입니다.");
         }
-        ChatRoomDto chatRoomDto=new ChatRoomDto(chatRoom);
+        ChatRoomDto chatRoomDto = new ChatRoomDto(
+                chatRoom.getId(),
+                chatRoom.getRoomId(),
+                chatRoom.getName(),
+                chatRoom.getUserCount(),
+                lastMessage, // 마지막 메시지 내용
+                lastTimestamp,
+                receiver
+        );
         return new RsData<>("200","success",chatRoomDto);
     }
 

@@ -23,7 +23,6 @@ export default function ClientPage({
     event.preventDefault(); // 기본 폼 제출 방지
     router.push(`/chat?page=1&receiver=${searchTerm}`); // 검색어를 쿼리파라미터로 전달
   };
-
   return (
     <div>
     <h1 className="text-xl font-bold mb-4">채팅방 목록</h1>
@@ -44,16 +43,16 @@ export default function ClientPage({
     {receiver && (
         <div>
           <h2 className="text-lg font-semibold mb-2">검색 결과: {receiver}</h2>
-          {searchChatRoomDto.length==1 ? (
+          {searchChatRoomDto.length>0 ? (
             // 반복문을 한 번만 사용하여 첫 번째 항목만 출력
             <div className="border-2 border-gray-300 rounded-lg p-4 bg-white shadow-md">
               {searchChatRoomDto.map((room) => (
                 <Link key={room.roomId} href={`/chat/${room.roomId}`} className="block">
-                  <div className="font-semibold">채팅방 정보</div>
-                  <div>Post ID: {room.postId}</div>
-                  <div>Room ID: {room.roomId}</div>
-                  <div>Name: {room.name}</div>
-                  <div>User Count: {room.userCount}</div>
+                    <div><strong>{room.name}</strong></div>
+                    <div className="text-gray-600 text-sm">{room.lastMessage}</div> 
+                    <div className="text-gray-500 text-xs text-right"> 
+                        {room.lastTimestamp}
+                    </div>
                 </Link>
               ))}
             </div>
@@ -71,12 +70,14 @@ export default function ClientPage({
                   className="border-2 border-gray-300 rounded-lg p-4 bg-white shadow-md"
               >
                   <Link href={`/chat/${room.roomId}`} className="block">
-                      <div className="font-semibold">채팅방 정보</div>
-                      <div>Post ID: {room.postId}</div>
-                      <div>Room ID: {room.roomId}</div>
-                      <div>Name: {room.name}</div>
-                      <div>User Count: {room.userCount}</div>
-                  </Link>
+                    <div>
+                        <strong className="text-lg">{room.other}</strong> 
+                    </div>
+                    <div className="text-gray-600 text-sm">{room.lastMessage}</div> 
+                    <div className="text-gray-500 text-xs text-right"> 
+                        {room.lastTimestamp}
+                    </div>
+                </Link>
               </li>
           ))}
       </ul>
