@@ -10,7 +10,8 @@ import com.NBE_4_5_2.Team5.domain.post.post.repository.ProductPostRepository;
 import com.NBE_4_5_2.Team5.domain.user.user.entity.User;
 import com.NBE_4_5_2.Team5.domain.user.user.repository.UserRepository;
 import com.NBE_4_5_2.Team5.domain.user.user.service.UserService;
-import com.NBE_4_5_2.Team5.global.exception.post.product.ProductNotFoundException;
+import com.NBE_4_5_2.Team5.global.exception.payment.PaymentChargeException;
+import com.NBE_4_5_2.Team5.global.exception.payment.PaymentNotFoundException;
 import com.NBE_4_5_2.Team5.global.exception.post.product.ProductPostNotFoundException;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
@@ -53,7 +54,7 @@ public class PaymentService {
 
         User loggedInUserEntity = userRepository.findById(loggedInUser.getId()).get();
         ProductPost product = productRepository.findById(productId)
-                .orElseThrow(() -> new ProductNotFoundException("id가 %s인 Payment를 찾을 수 없습니다.".formatted(productId)));
+                .orElseThrow(() -> new PaymentNotFoundException("404", "id가 %s인 Payment를 찾을 수 없습니다.".formatted(productId)));
 
         // 할인 등 product 가격과 총 결제 금액이 다를 수 있으므로 amount를 따로 받음.
         loggedInUserEntity.canBuy(product, product.getProductPrice());
@@ -78,10 +79,10 @@ public class PaymentService {
 
         User loggedInUserEntity = userRepository.findById(loggedInUser.getId()).get();
         Payment payment = paymentRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Payment를 찾을 수 없습니다."));
+                .orElseThrow(() -> new PaymentNotFoundException("404", "Payment를 찾을 수 없습니다."));
 
         if (!payment.checkValid(amount)) {
-            throw new IllegalArgumentException("총 가격이 맞지 않습니다.");
+            throw new PaymentChargeException("404", "총 가격이 맞지 않습니다.");
         }
 
         Payment update = payment.updatePaymentKey(paymentKey);
