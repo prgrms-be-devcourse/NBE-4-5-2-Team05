@@ -8,7 +8,7 @@ import client from "@/lib/client";
 // OpenAPI 스키마의 Category 타입 사용 (선택적 속성일 수 있으므로 필요한 경우 non-null assertion이나 default 값을 설정)
 type Category = components["schemas"]["Category"];
 
-export default function PostCreatePage() {
+export default function ClientPage() {
   const router = useRouter();
 
   // 로그인 체크
