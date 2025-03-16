@@ -3,10 +3,9 @@
 import { LoginMemberContext } from "@/app/stores/auth/loginMemberStore";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { components } from "@/lib/backend/apiV1/schema";
 import client from "@/lib/client";
 import { useRouter } from "next/navigation";
-import { use, useState } from "react";
+import { use } from "react";
 
 export default function ClientPage() {
   const router = useRouter();
