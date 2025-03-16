@@ -106,7 +106,7 @@ public class ProductPost extends BaseTime {
 
 	public void addCategories(List<Category> categories) {
 		List<ProductCategory> productCategories = categories.stream()
-			.map(category -> ProductCategory.builder()
+			.map(category -> (ProductCategory) ProductCategory.builder()
 				.productPost(this)
 				.category(category)
 				.build())

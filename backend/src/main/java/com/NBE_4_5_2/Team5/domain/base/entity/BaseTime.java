@@ -16,13 +16,13 @@ import java.time.LocalDateTime;
 @Getter
 @EntityListeners(AuditingEntityListener.class)
 @SuperBuilder
-public class BaseTime{
+public class BaseTime {
 
-	@CreatedDate
-	@Setter(AccessLevel.PRIVATE)
-	private LocalDateTime createdAt;
+    @CreatedDate
+    @Setter(AccessLevel.PRIVATE)
+    private LocalDateTime createdAt;
 
-	@LastModifiedDate
-	@Setter(AccessLevel.PRIVATE)
-	private LocalDateTime modifiedAt;
+    @LastModifiedDate
+    @Setter(AccessLevel.PRIVATE)
+    private LocalDateTime modifiedAt;
 }
