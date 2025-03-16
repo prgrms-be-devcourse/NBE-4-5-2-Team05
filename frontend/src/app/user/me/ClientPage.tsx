@@ -2,9 +2,7 @@
 
 import { LoginMemberContext } from "@/app/stores/auth/loginMemberStore";
 import { Button } from "@/components/ui/button";
-import { components } from "@/lib/backend/apiV1/schema";
 import { useRouter } from "next/navigation";
-import router from "next/router";
 import { use } from "react";
 
 export default function ClientPage() {
