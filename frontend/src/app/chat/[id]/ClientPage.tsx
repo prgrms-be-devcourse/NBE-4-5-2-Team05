@@ -254,33 +254,33 @@ export default function ClientPage({
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
-      <div className="flex-grow overflow-auto flex flex-col mb-26">
+      <div className="flex-grow overflow-auto flex flex-col mb-26 max-h-[220vh]">
         <ul className="space-y-3">
           {chatMessages.map((message) => (
-            <li key={`${message.messageId}-${chatRoom.id}`} className={`border p-2 rounded shadow-sm text-sm ${message.sender === userNickname ? "bg-blue-200 text-right" : "bg-white text-left"}`}>
+            <li key={`${message.messageId}-${chatRoom.id}`} className={`border p-2 rounded shadow-sm text-sm ${message.sender === userNickname ? "bg-gray-200 text-right w-4/5 ml-auto" : "bg-white text-left w-4/5 mr-auto"}`}>
               {message.sender !== userNickname && (
-                <div>
-                  <strong>보낸 이:</strong> {message.sender}
+                <div className="flex justify-between">
+                  <span className="font-semibold">{message.sender}</span> {/* 상대방 이름 */}
                 </div>
               )}
-              <div>
-                <strong>메시지 내용:</strong> {message.message}
+              <div className="my-1">
+                {message.message}
               </div>
               {/* 위도, 경도 정보 표시 */}
               {(message.latitude !== 0 && message.longitude !== 0) ? (
                 <div>
-                  <strong>위치 정보:</strong> 
-                  <div>위도: {message.latitude}, 경도: {message.longitude}</div>
-                  <a href={`https://www.google.com/maps?q=${message.latitude},${message.longitude}`} target="_blank" rel="noopener noreferrer" className="text-blue-500">구글 맵에서 보기</a>
+                  {/* <strong>위치 정보:</strong>  */}
+                  {/* <div>위도: {message.latitude}, 경도: {message.longitude}</div> */}
+                  <a href={`https://www.google.com/maps?q=${message.latitude},${message.longitude}`} target="_blank" rel="noopener noreferrer" className="text-blue-500">지도</a>
                 </div>
               ) : null}
               {message.image && (
                 <div>
-                  <strong>이미지:</strong> <img src={message.image} alt="메시지 첨부 이미지" className="max-w-full h-auto" />
+                <img src={message.image} alt="메시지 첨부 이미지" className="max-w-full h-auto" />
                 </div>
               )}
-              <div>
-                <strong>보낸 시간:</strong> {message.timestamp} 
+              <div className={`text-gray-500 text-xs ${message.sender === userNickname ? "text-left" : "text-right"}`}>
+                {message.timestamp}
               </div>
             </li>
           ))}
