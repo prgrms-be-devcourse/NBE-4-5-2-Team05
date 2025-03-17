@@ -92,6 +92,10 @@ export interface paths {
             cookie?: never;
         };
         get?: never;
+        /**
+         * 관리자 권한 부여
+         * @description 특정 사용자의 계정을 관리자(Admin)로 설정합니다.
+         */
         put: operations["grantAdmin"];
         post?: never;
         delete?: never;
@@ -386,8 +390,8 @@ export interface paths {
         get?: never;
         put?: never;
         /**
-         * 관리자와의 채팅방을 생성합니다.
-         * @description id를 가진 관리자와의 채팅방을 생성합니다.
+         * 관리자와의 채팅방 생성
+         * @description 관리자와의 채팅방을 생성합니다.
          */
         post: operations["createRoomAdmin"];
         delete?: never;
@@ -699,7 +703,7 @@ export interface paths {
         put?: never;
         post?: never;
         /**
-         * 채팅방을 삭제합니다.
+         * 채팅방 삭제
          * @description 유저가 속한 채팅방을 id로 삭제합니다.
          */
         delete: operations["deleteRoom"];
@@ -1166,12 +1170,12 @@ export interface components {
             /** Format: int64 */
             offset?: number;
             sort?: components["schemas"]["SortObject"];
+            unpaged?: boolean;
             /** Format: int32 */
             pageSize?: number;
             paged?: boolean;
             /** Format: int32 */
             pageNumber?: number;
-            unpaged?: boolean;
         };
         RsDataSliceCommentDto: {
             code: string;
@@ -1276,10 +1280,10 @@ export interface components {
             data: components["schemas"]["Category"][];
         };
         PageUserDto: {
-            /** Format: int64 */
-            totalElements?: number;
             /** Format: int32 */
             totalPages?: number;
+            /** Format: int64 */
+            totalElements?: number;
             /** Format: int32 */
             size?: number;
             content?: components["schemas"]["UserDto"][];
@@ -1299,10 +1303,10 @@ export interface components {
             data: components["schemas"]["PageUserDto"];
         };
         PageNoticeResBody: {
-            /** Format: int64 */
-            totalElements?: number;
             /** Format: int32 */
             totalPages?: number;
+            /** Format: int64 */
+            totalElements?: number;
             /** Format: int32 */
             size?: number;
             content?: components["schemas"]["NoticeResBody"][];
