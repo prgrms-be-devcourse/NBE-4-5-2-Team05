@@ -1,9 +1,11 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import axios from "axios";
+
 import { useRouter } from "next/navigation";
 import type { components } from "@/lib/backend/apiV1/schema";
+import client from "@/lib/client";
+
 
 type PreviewPostResponse = components["schemas"]["PreviewPostResponse"];
 
@@ -19,12 +21,15 @@ export default function RecentlyViewedSection() {
   // 로그인 상태 체크
   useEffect(() => {
     async function checkLogin() {
-      try {
-        await axios.get("/api/users/me", { withCredentials: true });
-        setIsLogin(true);
-      } catch (err) {
+
+      const result = await client.GET("/api/users/me", {
+        credentials: "include",
+      });
+      if (result.error) {
         setIsLogin(false);
       }
+      setIsLogin(true);
+
     }
     checkLogin();
   }, []);
@@ -37,12 +42,12 @@ export default function RecentlyViewedSection() {
     }
     async function fetchRecentlyViewed() {
       try {
-        const res = await axios.get<{
-          code: string;
-          message: string;
-          data: PreviewPostResponse[];
-        }>("/api/posts/recently-viewed", { withCredentials: true });
-        setRecentProducts(res.data.data);
+
+        const res = await client.GET("/api/posts/recently-viewed", {
+          withCredentials: true,
+        });
+        setRecentProducts(res.data!.data);
+
       } catch (err) {
         console.error("최근 본 상품 조회 실패", err);
         setError("최근 본 상품을 불러오는데 실패했습니다.");

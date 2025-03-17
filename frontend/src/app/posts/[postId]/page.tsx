@@ -83,6 +83,9 @@ export default function PostDetailPage() {
     if (post) fetchUserFavorites();
   }, [post]);
 
+  
+  
+
   const handleLike = async () => {
     if (!post) return;
     const isLoggedIn = await checkLoginStatus();

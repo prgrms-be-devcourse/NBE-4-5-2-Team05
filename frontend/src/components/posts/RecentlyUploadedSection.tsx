@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import axios from "axios";
+
 import { useRouter } from "next/navigation";
 import type { components } from "@/lib/backend/apiV1/schema";
 
@@ -17,7 +17,7 @@ export default function RecentlyUploadedSection() {
     async function fetchRecentlyUploaded() {
       try {
         // 최근 올라온 상품은 최신순(desc)으로 1페이지, 10개 항목 불러온다고 가정합니다.
-        const res = await axios.get<{
+        const res = await client.GET<{
           code: string;
           message: string;
           data: components["schemas"]["PageDtoPreviewPostResponse"];
