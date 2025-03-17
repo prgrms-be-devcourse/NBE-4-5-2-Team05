@@ -53,7 +53,6 @@ public class Rq {
 	public void addCookie(String name, String value) {
 		Cookie accsessTokenCookie = new Cookie(name, value);
 
-		accsessTokenCookie.setDomain("localhost");
 		accsessTokenCookie.setPath("/");
 		accsessTokenCookie.setHttpOnly(true);
 		accsessTokenCookie.setSecure(true);
@@ -65,7 +64,6 @@ public class Rq {
 	public void removeCookie(String name) {
 
 		Cookie cookie = new Cookie(name, null);
-		cookie.setDomain("localhost");
 		cookie.setPath("/");
 		cookie.setHttpOnly(true);
 		cookie.setSecure(true);
