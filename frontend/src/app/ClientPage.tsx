@@ -9,6 +9,8 @@ import RecentlyUploadedSection from "@/components/posts/RecentlyUploadedSection"
 import { LoginMemberContext } from "./stores/auth/loginMemberStore";
 import client from "@/lib/client";
 import { components } from "@/lib/backend/apiV1/schema";
+import { faComment } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 type Notice = components["schemas"]["NoticeResBody"];
 type Category = {
@@ -100,7 +102,14 @@ export default function ClientPage() {
           <Link href="/user/me/sell/manage">
             <Button variant="default">내 상점</Button>
           </Link>
-          <Button variant="outline">💬 채팅</Button>
+          <Button 
+            variant="outline"
+            asChild>              
+            <Link href="/chat">
+              <FontAwesomeIcon icon={faComment} className="mr-2" />
+              채팅방
+            </Link>
+          </Button>
         </div>
       </section>
 
