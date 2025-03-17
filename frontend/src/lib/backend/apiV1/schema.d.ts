@@ -880,9 +880,9 @@ export interface components {
             purchasedProducts?: components["schemas"]["ProductPost"][];
             writtenProducts?: components["schemas"]["ProductPost"][];
             wroteComments?: components["schemas"]["Comment"][];
+            memberAuthoritiesAsString?: string[];
             admin?: boolean;
             authorities?: components["schemas"]["GrantedAuthority"][];
-            memberAuthoritiesAsString?: string[];
         };
         UpdateNoticeReq: {
             title?: string;
@@ -1155,10 +1155,10 @@ export interface components {
             sort?: string[];
         };
         PageUserDto: {
-            /** Format: int64 */
-            totalElements?: number;
             /** Format: int32 */
             totalPages?: number;
+            /** Format: int64 */
+            totalElements?: number;
             /** Format: int32 */
             size?: number;
             content?: components["schemas"]["UserDto"][];
@@ -1176,12 +1176,12 @@ export interface components {
             /** Format: int64 */
             offset?: number;
             sort?: components["schemas"]["SortObject"];
-            paged?: boolean;
+            unpaged?: boolean;
             /** Format: int32 */
             pageSize?: number;
+            paged?: boolean;
             /** Format: int32 */
             pageNumber?: number;
-            unpaged?: boolean;
         };
         RsDataPageUserDto: {
             code: string;
@@ -1190,14 +1190,14 @@ export interface components {
         };
         SortObject: {
             empty?: boolean;
-            unsorted?: boolean;
             sorted?: boolean;
+            unsorted?: boolean;
         };
         PageNoticeResBody: {
-            /** Format: int64 */
-            totalElements?: number;
             /** Format: int32 */
             totalPages?: number;
+            /** Format: int64 */
+            totalElements?: number;
             /** Format: int32 */
             size?: number;
             content?: components["schemas"]["NoticeResBody"][];

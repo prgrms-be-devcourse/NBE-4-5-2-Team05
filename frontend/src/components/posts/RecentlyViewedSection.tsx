@@ -1,33 +1,24 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import axios from "axios";
+
 import { useRouter } from "next/navigation";
 import type { components } from "@/lib/backend/apiV1/schema";
+import client from "@/lib/client";
 
 type PreviewPostResponse = components["schemas"]["PreviewPostResponse"];
 
-export default function RecentlyViewedSection() {
+export default function RecentlyViewedSection({
+  isLogin,
+}: {
+  isLogin: boolean;
+}) {
   const router = useRouter();
-  const [isLogin, setIsLogin] = useState<boolean>(false);
   const [recentProducts, setRecentProducts] = useState<PreviewPostResponse[]>(
     []
   );
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string>("");
-
-  // 로그인 상태 체크
-  useEffect(() => {
-    async function checkLogin() {
-      try {
-        await axios.get("/api/users/me", { withCredentials: true });
-        setIsLogin(true);
-      } catch (err) {
-        setIsLogin(false);
-      }
-    }
-    checkLogin();
-  }, []);
 
   // 로그인한 경우에만 최근 본 상품 데이터를 불러옴
   useEffect(() => {
@@ -37,12 +28,10 @@ export default function RecentlyViewedSection() {
     }
     async function fetchRecentlyViewed() {
       try {
-        const res = await axios.get<{
-          code: string;
-          message: string;
-          data: PreviewPostResponse[];
-        }>("/api/posts/recently-viewed", { withCredentials: true });
-        setRecentProducts(res.data.data);
+        const res = await client.GET("/api/posts/recently-viewed", {
+          credentials: "include",
+        });
+        setRecentProducts(res.data!.data);
       } catch (err) {
         console.error("최근 본 상품 조회 실패", err);
         setError("최근 본 상품을 불러오는데 실패했습니다.");
@@ -56,7 +45,11 @@ export default function RecentlyViewedSection() {
   if (loading) return <p>로딩 중...</p>;
 
   if (!isLogin) {
-    return <p>로그인을 먼저 해주세요.</p>;
+    return (
+      <div>
+        <p>로그인 이후에 최근 본 상품을 이용할 수 있습니다.</p>
+      </div>
+    );
   }
 
   if (error) return <p className="text-red-500">{error}</p>;

@@ -1,22 +1,17 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { use, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import RecentlyViewedSection from "@/components/posts/RecentlyViewedSection";
 import RecentlyUploadedSection from "@/components/posts/RecentlyUploadedSection";
+import { LoginMemberContext } from "./stores/auth/loginMemberStore";
 
-interface ClientPageProps {
-  me: {
-    id: string;
-    nickname: string;
-  };
-}
-
-export default function ClientPage({ me }: ClientPageProps) {
+export default function ClientPage() {
   const [searchKeyword, setSearchKeyword] = useState("");
   const router = useRouter();
+  const { isLogin, isAdmin } = use(LoginMemberContext);
 
   const handleSearch = () => {
     router.push(`/posts?keyword=${encodeURIComponent(searchKeyword)}`);
@@ -57,8 +52,12 @@ export default function ClientPage({ me }: ClientPageProps) {
           </div>
         </div>
         <div className="flex gap-2">
-          <Button variant="default">판매하기</Button>
-          <Button variant="default">내 상점</Button>
+          <Button variant="default">
+            <Link href="/posts">판매하기</Link>
+          </Button>
+          <Button variant="default">
+            <Link href="/user/me/sell/manage">내 상점</Link>
+          </Button>
           <Button variant="outline">💬 채팅</Button>
         </div>
       </section>
@@ -72,22 +71,13 @@ export default function ClientPage({ me }: ClientPageProps) {
 
       {/* 최근 본 상품 섹션 */}
       <section className="border p-4">
-        <RecentlyViewedSection />
+        <RecentlyViewedSection isLogin={isLogin} />
       </section>
 
       {/* 최근 올라온 상품 섹션 */}
       <section className="border p-4">
         <RecentlyUploadedSection />
       </section>
-
-      {/* 하단 고정 버튼 */}
-      <div className="fixed bottom-4 right-4">
-        <Link href="/posts/new">
-          <Button className="px-4 py-2 bg-blue-600 text-white rounded shadow-lg">
-            작성하기
-          </Button>
-        </Link>
-      </div>
     </div>
   );
 }
