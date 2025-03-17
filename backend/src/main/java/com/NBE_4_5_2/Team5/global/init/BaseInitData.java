@@ -88,12 +88,16 @@ public class BaseInitData {
         emailService.saveVerificationCode("user4@gmail.com", "verified");
         emailService.saveVerificationCode("admin2@gmail.com", "verified");
 
+
+        String baseUrl = "http://localhost:8080/images/";
+        String imageUrl = baseUrl + "default_profile" + ".jpg"; // ✅ 하나의 이미지만 저장
+
         userService.createUser("user1", "user11234@", "user1@gmail.com", "user1", "서울시 강남구",
-                "https://example.com/default_profile.png");
+                imageUrl);
         userService.createUser("user2", "user21234@", "user2@gmail.com", "user2", "서울시 강서구",
-                "https://example.com/default_profile.png");
+                imageUrl);
         userService.createUser("user3", "user31234@", "user3@gmail.com", "user3", "서울시 광진구",
-                "https://example.com/default_profile.png");
+                imageUrl);
 
         adminService.signUpAdmin("admin2", "password2", "admin2", "admin2@gmail.com");
         adminService.signUpAdmin("user4", "user41234@", "admin4", "user4@gmail.com");
@@ -135,21 +139,25 @@ public class BaseInitData {
         }
 
         List<User> users = userRepository.findAll();
-        System.out.println(users.size());
         List<Category> categories = categoryRepository.findAll();
 
         List<ProductPost> posts = new ArrayList<>();
 
-        // 0,1,2
+        String baseUrl = "http://localhost:8080/images/";
+
         for (int i = 1; i <= 50; i++) {
             User writer = users.get((i - 1) % users.size());
+
+            // ✅ 단순한 이미지 파일명 지정 (productX.jpg)
+            String imageUrl = baseUrl + "default" + ".jpg"; // ✅ 하나의 이미지만 저장
+
             posts.add(ProductPost.create(
                     writer,
                     "상품 " + i,
                     (i * 10000) % 200000 + 10000, // 가격 랜덤화
                     "제목 " + i,
                     "이것은 테스트 상품 " + i + " 입니다.",
-                    "https://example.com/product" + i + "_1.jpg,https://example.com/product" + i + "_2.jpg",
+                    imageUrl, // ✅ 하나의 이미지 URL 적용
                     37.5f + (i % 10) * 0.01f, // 위치 랜덤화
                     127.0f + (i % 10) * 0.01f
             ));
@@ -170,6 +178,8 @@ public class BaseInitData {
 
         productCategoryRepository.saveAll(productCategories);
     }
+
+
 
     @Transactional
     public void noticeInit() {
