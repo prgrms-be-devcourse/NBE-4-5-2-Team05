@@ -836,6 +836,8 @@ export interface components {
             image_urls?: string;
             /** Format: int32 */
             viewCount?: number;
+            /** Format: int32 */
+            likeCount?: number;
             /** @enum {string} */
             status?: "RESERVED" | "AVAILABLE" | "PURCHASED";
             /** Format: float */
@@ -1163,11 +1165,11 @@ export interface components {
             /** Format: int32 */
             number?: number;
             sort?: components["schemas"]["SortObject"];
+            pageable?: components["schemas"]["PageableObject"];
             first?: boolean;
             last?: boolean;
             /** Format: int32 */
             numberOfElements?: number;
-            pageable?: components["schemas"]["PageableObject"];
             empty?: boolean;
         };
         PageableObject: {
@@ -1202,11 +1204,11 @@ export interface components {
             /** Format: int32 */
             number?: number;
             sort?: components["schemas"]["SortObject"];
+            pageable?: components["schemas"]["PageableObject"];
             first?: boolean;
             last?: boolean;
             /** Format: int32 */
             numberOfElements?: number;
-            pageable?: components["schemas"]["PageableObject"];
             empty?: boolean;
         };
         RsDataPageNoticeResBody: {
