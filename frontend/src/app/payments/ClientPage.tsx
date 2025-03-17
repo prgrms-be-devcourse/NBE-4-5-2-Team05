@@ -13,8 +13,14 @@ export default function CheckoutPage() {
   const [paymentOptions, setPaymentOptions] = useState<PaymentOption[]>([]);
 
   const purchaseItem = async () => {
+    let url = "";
+    if (`${process.env.NEXT_PUBLIC_PROTOCOL}` === "https") {
+      url = `${process.env.NEXT_PUBLIC_PROTOCOL}://:${process.env.NEXT_PUBLIC_BACKEND_PORT}/api/payments`;
+    } else {
+      url = `${process.env.NEXT_PUBLIC_PROTOCOL}://${process.env.NEXT_PUBLIC_BACKEND_HOST}:${process.env.NEXT_PUBLIC_BACKEND_PORT}/api/payments`;
+    }
     const response = await fetch(
-      `${process.env.NEXT_PUBLIC_PROTOCOL}://${process.env.NEXT_PUBLIC_BACKEND_HOST}:${process.env.NEXT_PUBLIC_BACKEND_PORT}/api/payments`,
+      url,
       {
         method: "POST",
         body: JSON.stringify({
