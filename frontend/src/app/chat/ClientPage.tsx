@@ -64,7 +64,7 @@ export default function ClientPage({
   };
 
   return (
-    <div>
+    <div className="w-full">
     <h1 className="text-xl font-bold mb-4">채팅방 목록</h1>
     <div className="mb-4 flex justify-end">
       <Button onClick={handleCreateAdminRoom} variant="outline" className="ml-auto">

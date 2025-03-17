@@ -6,6 +6,9 @@ import Image from "next/image";
 import type { components } from "@/lib/backend/apiV1/schema";
 import client from "@/lib/client";
 import Comments from "./_pages/comments";
+import { Button } from "@/components/ui/button";
+import { faComment } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 type ProductPostResponse = components["schemas"]["ProductPostResponse"];
 
@@ -215,6 +218,13 @@ export default function PostDetailPage() {
   if (!post) return <div className="p-4">게시글 정보를 찾을 수 없습니다.</div>;
 
   const handleCreateChatRoom = async () => {
+    const isLoggedIn = await checkLoginStatus();
+    if (!isLoggedIn) {
+      alert("먼저 로그인을 해주세요.");
+      router.push("/user/login");
+      return;
+    }
+
     try {
       const createResponse = await client.POST("/api/chat/room", {
         params: {
@@ -281,13 +291,14 @@ export default function PostDetailPage() {
             <li>작성자 닉네임: {post.writerName}</li>
           </ul>
           <div className="mt-4">
-            <button
-              onClick={handleCreateChatRoom}
-              // onClick={() => router.push(`/chat/${post.id}`)}
-              className="px-4 py-2 bg-orange-400 text-white rounded"
-            >
-              채팅 걸기
-            </button>
+          <Button
+            variant="outline"
+            onClick={handleCreateChatRoom}
+            className="rounded-full bg-yellow-400 text-black py-2 px-4 border border-black-700 hover:bg-yellow-300"              
+          >
+            <FontAwesomeIcon icon={faComment} className="mr-2" />
+            채팅
+          </Button>
           </div>
         </div>
       </div>

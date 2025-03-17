@@ -238,7 +238,7 @@ export default function ClientPage({
   
 
   return (
-    <div className="flex flex-col h-screen"> {/* 전체 화면 높이 설정 */}
+    <div className="flex flex-col h-screen w-full">  
       <h1 className="text-xl font-bold mb-4 text-center">{title}</h1>
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
@@ -257,37 +257,43 @@ export default function ClientPage({
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
-      <div className="flex-grow overflow-auto flex flex-col mb-26 max-h-[220vh]">
-        <ul className="space-y-3">
-          {chatMessages.map((message) => (
-            <li key={`${message.messageId}-${chatRoom.id}`} className={`border p-2 rounded shadow-sm text-sm ${message.sender === userNickname ? "bg-gray-200 text-right w-4/5 ml-auto" : "bg-white text-left w-4/5 mr-auto"}`}>
-              {message.sender !== userNickname && (
-                <div className="flex justify-between">
-                  <span className="font-semibold">{message.sender}</span> {/* 상대방 이름 */}
-                </div>
-              )}
-              <div className="my-1">
-                {message.message}
-              </div>
-              {/* 위도, 경도 정보 표시 */}
-              {(message.latitude !== 0 && message.longitude !== 0) ? (
-                <div>
-                  {/* <strong>위치 정보:</strong>  */}
-                  {/* <div>위도: {message.latitude}, 경도: {message.longitude}</div> */}
-                  <a href={`https://www.google.com/maps?q=${message.latitude},${message.longitude}`} target="_blank" rel="noopener noreferrer" className="text-blue-500">지도</a>
-                </div>
-              ) : null}
-              {message.image && (
-                <div>
-                <img src={message.image} alt="메시지 첨부 이미지" className="max-w-full h-auto" />
-                </div>
-              )}
-              <div className={`text-gray-500 text-xs ${message.sender === userNickname ? "text-left" : "text-right"}`}>
-                {message.timestamp}
-              </div>
-            </li>
-          ))}
-        </ul>
+      <div className="flex-grow overflow-auto flex flex-col mb-26 w-full">
+      <ul className="space-y-3 w-full">
+  {chatMessages.map((message) => (
+    <li 
+      key={`${message.messageId}-${chatRoom.id}`} 
+      className={`border p-2 rounded shadow-sm text-sm 
+        ${message.sender === userNickname ? "bg-gray-200 text-right w-3/4 ml-auto" : "bg-white text-left w-3/4 mr-auto"}`}>
+      
+      {message.sender !== userNickname && (
+        <div className="flex justify-start"> {/* 수신한 사람의 이름을 왼쪽 정렬 */}
+          <span className="font-semibold">{message.sender}</span>
+        </div>
+      )}
+      
+      <div className={`my-1 ${message.sender === userNickname ? "text-right" : "text-left"}`}> {/* 메시지 내용의 정렬 */}
+        {message.message}
+      </div>
+      
+      {/* 위도, 경도 정보 표시 */}
+      {(message.latitude !== 0 && message.longitude !== 0) ? (
+        <div>
+          <a href={`https://www.google.com/maps?q=${message.latitude},${message.longitude}`} target="_blank" rel="noopener noreferrer" className="text-blue-500">지도</a>
+        </div>
+      ) : null}
+      
+      {message.image && (
+        <div>
+          <img src={message.image} alt="메시지 첨부 이미지" className="max-w-full h-auto" />
+        </div>
+      )}
+      
+      <div className={`text-gray-500 text-xs ${message.sender === userNickname ? "text-left" : "text-right"}`}>
+        {message.timestamp}
+      </div>
+    </li>
+  ))}
+</ul>
         <div ref={messagesEndRef} />
       </div>
       <input
