@@ -6,14 +6,9 @@ import Image from "next/image";
 import type { components } from "@/lib/backend/apiV1/schema";
 import client from "@/lib/client";
 
-// 부모로부터 전달받은 me 프롭 타입 정의 (로그인된 사용자 정보)
-interface PostDetailPageProps {
-  me: components["schemas"]["UserDto"];
-}
-
 type ProductPostResponse = components["schemas"]["ProductPostResponse"];
 
-export default function PostDetailPage({ me }: PostDetailPageProps) {
+export default function PostDetailPage() {
   const { postId } = useParams<{ postId: string }>();
   const router = useRouter();
   const [post, setPost] = useState<ProductPostResponse | null>(null);
@@ -21,10 +16,26 @@ export default function PostDetailPage({ me }: PostDetailPageProps) {
   const [error, setError] = useState<string>("");
   const [likeLoading, setLikeLoading] = useState<boolean>(false);
   const [liked, setLiked] = useState<boolean>(false);
+
   const [purchased, setPurchased] = useState<boolean>(false);
   const [purchaseLoading, setPurchasedLoading] = useState<boolean>(false);
 
-  // 로그인 여부는 이미 부모에서 me 프롭으로 전달되므로, 여기서는 작성자 체크만 진행
+  const checkLoginStatus = async (): Promise<boolean> => {
+    try {
+      const result = await client.GET("/api/users/me", {
+        credentials: "include",
+      });
+      if (result.error) {
+        console.log("로그인 상태 확인 실패:", result.error);
+        return false;
+      }
+      return true;
+    } catch (err) {
+      console.log("로그인 상태 확인 중 예외 발생:", err);
+      return false;
+    }
+  };
+
   const fetchPost = async () => {
     if (!postId) return;
     try {
@@ -46,27 +57,9 @@ export default function PostDetailPage({ me }: PostDetailPageProps) {
     }
   };
 
-  // (기존 찜, 구매 로직 그대로 유지)
-  const checkPurchased = async () => {
-    if (!me.id) return; // me.id가 없으면 로그인되지 않은 상태로 판단
-    try {
-      const result = await client.GET("/api/payments", {
-        params: { query: { "post-id": post!.id! } },
-        credentials: "include",
-      });
-      if (result.error) {
-        console.log(result);
-        setPurchased(false);
-        return;
-      }
-      setPurchased(true);
-    } catch (err) {
-      console.error(err);
-    }
-  };
-
   const fetchUserFavorites = async () => {
-    if (!me.id) return;
+    const isLoggedIn = await checkLoginStatus();
+    if (!isLoggedIn) return;
     try {
       const response = await client.GET("/api/posts/my/favorites", {
         credentials: "include",
@@ -96,55 +89,41 @@ export default function PostDetailPage({ me }: PostDetailPageProps) {
     }
   }, [post]);
 
-  // 수정하기 버튼 핸들러: 이제 me 프롭의 id와 post.writerId 비교
-  const handleEdit = () => {
-    console.log("me:", me);
-    console.log("post.writerId:", post?.writerId);
-    // 로그인 상태가 아니라면 (me.id가 없으면)
-    if (!me.id) {
-      alert("먼저 로그인을 해주세요.");
-      router.push("/user/login");
-      return;
-    }
-    if (post?.writerId !== me.id) {
-      alert("작성자만 수정할 수 있습니다.");
-      return;
-    }
-    router.push(`/posts/modify/${post!.id}`);
-  };
-
   const handlePurchase = async () => {
-    if (!me.id) {
+    console.log("hi");
+    const isLoggedIn = await checkLoginStatus();
+    if (!isLoggedIn) {
       alert("먼저 로그인을 해주세요.");
       router.push("/user/login");
       return;
     }
+
     const isConfirmed = confirm("정말 구매하시겠습니까?");
+
     if (isConfirmed) {
       setPurchasedLoading(true);
-      try {
-        const response = await client.POST("/api/payments", {
-          body: { productId: post!.id },
-          credentials: "include",
-        });
-        if (response.error) {
-          alert("구매에 실패했습니다.");
-          console.error("구매 처리 실패", response.error);
-          setPurchasedLoading(false);
-          return;
-        }
-        setPurchased(true);
-      } catch (err) {
-        console.error(err);
-      } finally {
+      const response = await client.POST("/api/payments", {
+        body: {
+          productId: post!.id,
+        },
+        credentials: "include",
+      });
+      if (response.error) {
+        alert("구매에 실패했습니다.");
+        console.error("구매 처리 실패", response.error);
         setPurchasedLoading(false);
+        return;
       }
+      setPurchased(true);
+      setPurchasedLoading(false);
+    } else {
     }
   };
 
   const handleLike = async () => {
     if (!post) return;
-    if (!me.id) {
+    const isLoggedIn = await checkLoginStatus();
+    if (!isLoggedIn) {
       alert("먼저 로그인을 해주세요.");
       router.push("/user/login");
       return;
@@ -172,6 +151,7 @@ export default function PostDetailPage({ me }: PostDetailPageProps) {
   if (error) return <div className="p-4 text-red-500">{error}</div>;
   if (!post) return <div className="p-4">게시글 정보를 찾을 수 없습니다.</div>;
 
+  // 이미지 URL들을 소문자와 trim을 적용해 유효한 값만 필터링
   const images = post.imageUrls
     ? post.imageUrls
         .split(",")
@@ -180,7 +160,7 @@ export default function PostDetailPage({ me }: PostDetailPageProps) {
     : [];
 
   return (
-    <div className="p-4 w-full">
+    <div className="p-4">
       <div className="bg-gray-800 text-white p-4 rounded mb-4">
         <h1 className="text-2xl font-bold">길게 볼 장터</h1>
       </div>
@@ -270,7 +250,7 @@ export default function PostDetailPage({ me }: PostDetailPageProps) {
           </div>
         )}
       </div>
-      <div className="mt-4 flex gap-4">
+      <div className="mt-4">
         <button
           disabled={likeLoading || liked}
           onClick={handleLike}
@@ -288,12 +268,6 @@ export default function PostDetailPage({ me }: PostDetailPageProps) {
             : purchaseLoading
             ? "처리 중..."
             : "구매하기"}
-        </button>
-        <button
-          onClick={handleEdit}
-          className="px-4 py-2 bg-blue-500 text-white rounded"
-        >
-          수정하기
         </button>
       </div>
     </div>

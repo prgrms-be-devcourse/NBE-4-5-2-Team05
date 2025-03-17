@@ -811,10 +811,14 @@ export interface components {
             name?: string;
         };
         Comment: {
+            /** Format: date-time */
+            createdAt?: string;
+            /** Format: date-time */
+            modifiedAt?: string;
             id?: string;
-            content?: string;
             target?: components["schemas"]["ProductPost"];
             author?: components["schemas"]["User"];
+            content?: string;
         };
         GrantedAuthority: {
             authority?: string;
@@ -826,6 +830,10 @@ export interface components {
             category?: components["schemas"]["Category"];
         };
         ProductPost: {
+            /** Format: date-time */
+            createdAt?: string;
+            /** Format: date-time */
+            modifiedAt?: string;
             id?: string;
             productName?: string;
             /** Format: int32 */
@@ -844,10 +852,6 @@ export interface components {
             latitude?: number;
             /** Format: float */
             longitude?: number;
-            /** Format: date-time */
-            createdAt?: string;
-            /** Format: date-time */
-            modifiedAt?: string;
             productCategories?: components["schemas"]["ProductCategory"][];
             writer?: components["schemas"]["User"];
             commentList?: components["schemas"]["Comment"][];
@@ -859,11 +863,11 @@ export interface components {
             data: components["schemas"]["User"];
         };
         User: {
-            id?: string;
             /** Format: date-time */
             createdAt?: string;
             /** Format: date-time */
             modifiedAt?: string;
+            id?: string;
             username?: string;
             password?: string;
             email?: string;
@@ -1155,18 +1159,18 @@ export interface components {
             sort?: string[];
         };
         PageUserDto: {
-            /** Format: int32 */
-            totalPages?: number;
             /** Format: int64 */
             totalElements?: number;
+            /** Format: int32 */
+            totalPages?: number;
+            first?: boolean;
+            last?: boolean;
             /** Format: int32 */
             size?: number;
             content?: components["schemas"]["UserDto"][];
             /** Format: int32 */
             number?: number;
             sort?: components["schemas"]["SortObject"];
-            first?: boolean;
-            last?: boolean;
             /** Format: int32 */
             numberOfElements?: number;
             pageable?: components["schemas"]["PageableObject"];
@@ -1176,10 +1180,10 @@ export interface components {
             /** Format: int64 */
             offset?: number;
             sort?: components["schemas"]["SortObject"];
+            paged?: boolean;
             unpaged?: boolean;
             /** Format: int32 */
             pageSize?: number;
-            paged?: boolean;
             /** Format: int32 */
             pageNumber?: number;
         };
@@ -1190,22 +1194,22 @@ export interface components {
         };
         SortObject: {
             empty?: boolean;
-            sorted?: boolean;
             unsorted?: boolean;
+            sorted?: boolean;
         };
         PageNoticeResBody: {
-            /** Format: int32 */
-            totalPages?: number;
             /** Format: int64 */
             totalElements?: number;
+            /** Format: int32 */
+            totalPages?: number;
+            first?: boolean;
+            last?: boolean;
             /** Format: int32 */
             size?: number;
             content?: components["schemas"]["NoticeResBody"][];
             /** Format: int32 */
             number?: number;
             sort?: components["schemas"]["SortObject"];
-            first?: boolean;
-            last?: boolean;
             /** Format: int32 */
             numberOfElements?: number;
             pageable?: components["schemas"]["PageableObject"];
