@@ -14,6 +14,7 @@ import com.NBE_4_5_2.Team5.domain.user.user.service.AuthTokenService;
 import com.NBE_4_5_2.Team5.domain.user.user.service.UserAuthService;
 import com.NBE_4_5_2.Team5.domain.user.user.service.UserService;
 import com.NBE_4_5_2.Team5.global.Rq;
+import com.NBE_4_5_2.Team5.global.dto.Empty;
 import com.NBE_4_5_2.Team5.global.dto.RsData;
 import com.NBE_4_5_2.Team5.global.exception.security.WrongRoleException;
 import com.NBE_4_5_2.Team5.global.exception.user.UserNotFoundException;
@@ -81,9 +82,9 @@ public class ChatRoomController {
 		User user = userAuthService.getRealActor(userIdentity);
 
 		AccessProvider access = AccessProvider.builder()
-			.name(user.getNickname())  // 사용자 이름
-			.token(token)
-			.build();
+				.name(user.getNickname())  // 사용자 이름
+				.token(token)
+				.build();
 
 		return new RsData<>("200", "success", access);
 	}
@@ -96,8 +97,8 @@ public class ChatRoomController {
 	@ResponseBody
 	@Transactional
 	public RsData<ChatRoom> createRoom(
-		@Parameter(description = "상품 게시글 아이디", example = "ppost-fkkdsjf9adsa-ds8fdfsdf-289103yd")
-		@RequestParam String postId) {
+			@Parameter(description = "상품 게시글 아이디", example = "ppost-fkkdsjf9adsa-ds8fdfsdf-289103yd")
+			@RequestParam String postId) {
 		User userIdentity = userAuthService.getUserIdentity();
 		User sender = userAuthService.getRealActor(userIdentity);
 
@@ -116,12 +117,12 @@ public class ChatRoomController {
 	@ResponseBody
 	@Transactional
 	public RsData<ChatRoom> createRoomAdmin(
-		@Parameter(description = "관리자 id", example = "user-1231jkj-g04hi8gah-123hixfdh9") @PathVariable String adminId) {
+			@Parameter(description = "관리자 id", example = "user-1231jkj-g04hi8gah-123hixfdh9") @PathVariable String adminId) {
 		User userIdentity = userAuthService.getUserIdentity();
 		User sender = userAuthService.getRealActor(userIdentity);
 
 		User admin = userService.getUserById(adminId).orElseThrow(
-			() -> new UserNotFoundException("404", "잘못된 ID")
+				() -> new UserNotFoundException("404", "잘못된 ID")
 		);
 
 		if (!admin.isAdmin()) {
@@ -145,17 +146,39 @@ public class ChatRoomController {
 		User userIdentity = userAuthService.getUserIdentity();
 		User user = userAuthService.getRealActor(userIdentity);
 
-		List<ChatRoom> chatRoomsList = chatRoomService.findRoomByUser(user.getNickname());
+		List<ChatRoom> chatRoomsList=chatRoomService.findRoomByUser(user.getNickname());
+		List<ChatRoomDto> response=chatRoomsList.stream()
+				.map(chatRoom -> {
+					String other=chatRoomService.findOther(chatRoom.getRoomId(),user.getNickname());
+					List<ChatMessage> messages= chatRoomService.getMessagesByUser(chatRoom.getRoomId(),user.getNickname());
+					String lastMessage="";
+					String lastTimestamp="";
+					if(messages.size()>0) {
+						lastMessage = messages.get(messages.size() - 1).getMessage();
+						lastTimestamp = messages.get(messages.size() - 1).getTimestamp();
+					}
+					return new ChatRoomDto(
+							chatRoom.getId(),
+							chatRoom.getRoomId(),
+							chatRoom.getName(),
+							chatRoom.getUserCount(),
+							lastMessage,
+							lastTimestamp,
+							other
+					);
+				})
+				.toList();
+		return new RsData<>("200","채팅방 목록",response);
+	}
 
-		List<ChatRoomDto> response = chatRoomsList.stream()
-			.map(chatRoom -> new ChatRoomDto(
-				chatRoom.getId(),
-				chatRoom.getRoomId(),
-				chatRoom.getName(),
-				chatRoom.getUserCount()))
-			.toList();
-
-		return new RsData<>("200", "채팅방 목록", response);
+	@GetMapping("/room/{roomId}")
+	@ResponseBody
+	public RsData<ChatRoom> getRoomByRoomId(@PathVariable String roomId) {
+		User userIdentity = userAuthService.getUserIdentity();
+		User user = userAuthService.getRealActor(userIdentity);
+//        List<ChatMessage> messages=chatRoomService.getMessagesByUser(roomId,user.getNickname());
+		ChatRoom chatRoom=chatRoomService.findChatRoomByClient(roomId,user.getNickname());
+		return new RsData<>("200","채팅방 반환",chatRoom);
 	}
 
 	// 채팅방 메세지 조회
@@ -165,19 +188,26 @@ public class ChatRoomController {
 	@GetMapping("/message")
 	@ResponseBody
 	public RsData<List<MessageDto>> getMessages(
-		@Parameter(description = "채팅방 id", example = "123")
-		@RequestParam String roomId) {
+			@Parameter(description = "채팅방 id", example = "123")
+			@RequestParam String roomId) {
 		User userIdentity = userAuthService.getUserIdentity();
 		User user = userAuthService.getRealActor(userIdentity);
-		List<ChatMessage> messages = chatRoomService.getMessagesByUser(roomId, user.getNickname());
-		List<MessageDto> response = messages.stream()
-			.map(chatMessage -> new MessageDto(
-				chatMessage.getSender(),
-				chatMessage.getMessage(),
-				chatMessage.getImage(),
-				chatMessage.getTimestamp()))
-			.toList();
-		return new RsData<>("200", roomId + "의 대화 목록", response);
+		List<ChatMessage> messages= chatRoomService.getMessagesByUser(roomId,user.getNickname());
+		String other=chatRoomService.findOther(roomId,user.getNickname());
+
+		List<MessageDto> response=messages.stream()
+				.map(chatMessage -> new MessageDto(
+						chatMessage.getMessageId(),
+						chatMessage.getSender(),
+						chatMessage.getMessage(),
+						chatMessage.getImage(),
+						chatMessage.getLatitude(),
+						chatMessage.getLongitude(),
+						chatMessage.getTimestamp(),
+						messages.get(messages.size()-1).getMessage(),
+						messages.get(messages.size()-1).getTimestamp()))
+				.toList();
+		return new RsData<>("200",other+"와의 대화방",response);
 	}
 
 	// 채팅방 삭제
@@ -186,13 +216,13 @@ public class ChatRoomController {
 	@SecurityRequirement(name = "cookieAuth")
 	@DeleteMapping("/message")
 	@ResponseBody
-	public RsData<String> deleteRoom(
-		@Parameter(description = "채팅방 id", example = "123")
-		@RequestParam String roomId) {
+	public RsData<?> deleteRoom(
+			@Parameter(description = "채팅방 id", example = "123")
+			@RequestParam String roomId) {
 		User userIdentity = userAuthService.getUserIdentity();
 		User user = userAuthService.getRealActor(userIdentity);
 		chatRoomService.deleteChatRoom(roomId, user.getNickname());
-		return new RsData<>("200", "삭제 완료");
+		return new RsData<>("200", "삭제 완료",new Empty());
 	}
 
 	// 특정 사용자와의 채팅방 검색
@@ -201,18 +231,33 @@ public class ChatRoomController {
 	@SecurityRequirement(name = "cookieAuth")
 	@GetMapping("/search")
 	@ResponseBody
-	public RsData<String> findChatRooms(
-		@Parameter(description = "찾으려는 채팅방에 속한 유저의 ID", example = "user-12k3j-sjdfi2jj-431iojr124io1")
-		@RequestParam String receiver) {
+	public RsData<ChatRoomDto> findChatRooms(
+			@Parameter(description = "찾으려는 채팅방에 속한 유저의 ID", example = "user-12k3j-sjdfi2jj-431iojr124io1")
+			@RequestParam String receiver) {
 		User userIdentity = userAuthService.getUserIdentity();
 		User user = userAuthService.getRealActor(userIdentity);
-		System.out.println("name:" + user.getNickname());
-		String roomId = chatRoomService.findByRoomIdByClients(user.getNickname(), receiver);
-
-		if (roomId == null) {
+		ChatRoom chatRoom=chatRoomService.findByRoomIdByClients(user.getNickname(),receiver);
+//        ChatRoom chatRoom=chatRoomService.findChatRoomByClient(roomId,user.getNickname());
+		List<ChatMessage> messages= chatRoomService.getMessagesByUser(chatRoom.getRoomId(),user.getNickname());
+		String lastMessage="";
+		String lastTimestamp="";
+		if(messages.size()>0) {
+			lastMessage = messages.get(messages.size() - 1).getMessage();
+			lastTimestamp = messages.get(messages.size() - 1).getTimestamp();
+		}
+		if (chatRoom == null) {
 			return new RsData<>("404", "존재하지 않는 대화방입니다.");
 		}
-		return new RsData<>("200", "success", "roomId: " + roomId);
+		ChatRoomDto chatRoomDto = new ChatRoomDto(
+				chatRoom.getId(),
+				chatRoom.getRoomId(),
+				chatRoom.getName(),
+				chatRoom.getUserCount(),
+				lastMessage, // 마지막 메시지 내용
+				lastTimestamp,
+				receiver
+		);
+		return new RsData<>("200","success",chatRoomDto);
 	}
 
 	// 권한부여(임시)
