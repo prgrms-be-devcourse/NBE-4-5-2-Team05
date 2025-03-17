@@ -11,21 +11,9 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /**
-         * 내 정보 조회
-         * @description 현재 로그인된 사용자의 정보를 조회합니다.
-         */
         get: operations["me"];
-        /**
-         * 내 정보 수정
-         * @description 현재 로그인된 사용자의 정보를 수정합니다.
-         */
         put: operations["updateMyProfile"];
         post?: never;
-        /**
-         * 회원 탈퇴
-         * @description 현재 로그인된 사용자의 계정을 삭제합니다.
-         */
         delete: operations["deleteMyProfile"];
         options?: never;
         head?: never;
@@ -92,10 +80,6 @@ export interface paths {
             cookie?: never;
         };
         get?: never;
-        /**
-         * 관리자 권한 부여
-         * @description 특정 사용자의 계정을 관리자(Admin)로 설정합니다.
-         */
         put: operations["grantAdmin"];
         post?: never;
         delete?: never;
@@ -111,17 +95,9 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        get?: never;
-        /**
-         * 공지사항 수정
-         * @description 기존 공지사항을 수정합니다.
-         */
+        get: operations["getNotice"];
         put: operations["updateNotice"];
         post?: never;
-        /**
-         * 공지사항 삭제
-         * @description 기존 공지사항을 삭제합니다.
-         */
         delete: operations["deleteNotice"];
         options?: never;
         head?: never;
@@ -137,10 +113,6 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /**
-         * 회원 가입
-         * @description 새로운 사용자를 등록합니다.
-         */
         post: operations["createUser"];
         delete?: never;
         options?: never;
@@ -157,10 +129,6 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /**
-         * AccessToken 재발급
-         * @description RefreshToken을 이용하여 새로운 AccessToken을 발급받습니다.
-         */
         post: operations["refreshAccessToken"];
         delete?: never;
         options?: never;
@@ -177,10 +145,6 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /**
-         * 로그아웃
-         * @description 현재 로그인된 사용자를 로그아웃합니다.
-         */
         post: operations["logoutUser"];
         delete?: never;
         options?: never;
@@ -197,10 +161,6 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /**
-         * 로그인
-         * @description 사용자가 로그인합니다.
-         */
         post: operations["loginUser"];
         delete?: never;
         options?: never;
@@ -217,10 +177,6 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /**
-         * 이메일 인증 코드 발송
-         * @description 사용자의 이메일로 인증 코드를 발송합니다.
-         */
         post: operations["sendAuthenticationCode"];
         delete?: never;
         options?: never;
@@ -237,10 +193,6 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /**
-         * 이메일 인증 코드 검증
-         * @description 사용자가 입력한 인증 코드를 검증합니다.
-         */
         post: operations["verifyAuthenticationCode"];
         delete?: never;
         options?: never;
@@ -390,8 +342,8 @@ export interface paths {
         get?: never;
         put?: never;
         /**
-         * 관리자와의 채팅방 생성
-         * @description 관리자와의 채팅방을 생성합니다.
+         * 관리자와의 채팅방을 생성합니다.
+         * @description id를 가진 관리자와의 채팅방을 생성합니다.
          */
         post: operations["createRoomAdmin"];
         delete?: never;
@@ -414,10 +366,6 @@ export interface paths {
          * @description 특정 유저를 정지시킵니다.
          */
         post: operations["banUser"];
-        /**
-         * 계정 정지 해제
-         * @description 특정 유저의 정지를 해제합니다.
-         */
         delete: operations["unBanUser"];
         options?: never;
         head?: never;
@@ -431,10 +379,6 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /**
-         * 공지사항 리스트 조회
-         * @description 공지사항 리스트를 조회합니다.
-         */
         get: operations["getNotices"];
         put?: never;
         /**
@@ -455,10 +399,6 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /**
-         * 댓글 목록 조회
-         * @description 특정 게시글의 댓글 목록을 조회합니다.
-         */
         get: operations["getComments"];
         put?: never;
         post?: never;
@@ -703,7 +643,7 @@ export interface paths {
         put?: never;
         post?: never;
         /**
-         * 채팅방 삭제
+         * 채팅방을 삭제합니다.
          * @description 유저가 속한 채팅방을 id로 삭제합니다.
          */
         delete: operations["deleteRoom"];
@@ -739,10 +679,6 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /**
-         * 유저 리스트 조회
-         * @description 등록된 유저 리스트를 조회합니다.
-         */
         get: operations["getUserList"];
         put?: never;
         post?: never;
@@ -1171,11 +1107,11 @@ export interface components {
             offset?: number;
             sort?: components["schemas"]["SortObject"];
             /** Format: int32 */
-            pageSize?: number;
-            paged?: boolean;
-            unpaged?: boolean;
-            /** Format: int32 */
             pageNumber?: number;
+            unpaged?: boolean;
+            paged?: boolean;
+            /** Format: int32 */
+            pageSize?: number;
         };
         RsDataSliceCommentDto: {
             code: string;
@@ -1647,6 +1583,37 @@ export interface operations {
             };
         };
     };
+    getNotice: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                "notice-id": string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json;charset=UTF-8": components["schemas"]["RsDataNoticeResBody"];
+                };
+            };
+            /** @description Internal Server Error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json;charset=UTF-8": components["schemas"]["RsDataVoid"];
+                };
+            };
+        };
+    };
     updateNotice: {
         parameters: {
             query?: never;
@@ -1662,7 +1629,7 @@ export interface operations {
             };
         };
         responses: {
-            /** @description 공지사항 업데이트 성공 */
+            /** @description OK */
             200: {
                 headers: {
                     [name: string]: unknown;
@@ -1693,7 +1660,7 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            /** @description 공지사항 삭제 성공 */
+            /** @description OK */
             200: {
                 headers: {
                     [name: string]: unknown;
@@ -2298,8 +2265,8 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            /** @description 계정 정지 해제 성공. */
-            204: {
+            /** @description OK */
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -2329,7 +2296,7 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            /** @description 공지사항 리스트 조회 성공 */
+            /** @description OK */
             200: {
                 headers: {
                     [name: string]: unknown;
@@ -2878,7 +2845,7 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            /** @description 유저 리스트 조회 성공 */
+            /** @description OK */
             200: {
                 headers: {
                     [name: string]: unknown;
