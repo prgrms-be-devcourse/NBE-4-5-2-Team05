@@ -89,7 +89,7 @@ export default function SidebarLayout({
     router.push(`?tab=${page}`, { scroll: false });
   };
   return (
-    <div className="flex flex-1 overflow-y-scroll ">
+    <div className="flex flex-1 w-full ">
       <Sidebar setPage={setPage} />
       <Content page={currentPage} />
     </div>
