@@ -95,7 +95,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        get?: never;
+        get: operations["getNotice"];
         put: operations["updateNotice"];
         post?: never;
         delete: operations["deleteNotice"];
@@ -1106,12 +1106,12 @@ export interface components {
             /** Format: int64 */
             offset?: number;
             sort?: components["schemas"]["SortObject"];
-            unpaged?: boolean;
             /** Format: int32 */
             pageSize?: number;
             paged?: boolean;
             /** Format: int32 */
             pageNumber?: number;
+            unpaged?: boolean;
         };
         RsDataSliceCommentDto: {
             code: string;
@@ -1570,6 +1570,37 @@ export interface operations {
                 };
                 content: {
                     "application/json;charset=UTF-8": components["schemas"]["RsDataUser"];
+                };
+            };
+            /** @description Internal Server Error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json;charset=UTF-8": components["schemas"]["RsDataVoid"];
+                };
+            };
+        };
+    };
+    getNotice: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                "notice-id": string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json;charset=UTF-8": components["schemas"]["RsDataNoticeResBody"];
                 };
             };
             /** @description Internal Server Error */
