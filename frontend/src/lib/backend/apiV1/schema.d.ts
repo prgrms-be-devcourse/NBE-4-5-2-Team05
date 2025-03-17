@@ -108,8 +108,16 @@ export interface paths {
             cookie?: never;
         };
         get?: never;
+        /**
+         * 공지사항 수정
+         * @description 기존 공지사항을 수정합니다.
+         */
         put: operations["updateNotice"];
         post?: never;
+        /**
+         * 공지사항 삭제
+         * @description 기존 공지사항을 삭제합니다.
+         */
         delete: operations["deleteNotice"];
         options?: never;
         head?: never;
@@ -402,6 +410,10 @@ export interface paths {
          * @description 특정 유저를 정지시킵니다.
          */
         post: operations["banUser"];
+        /**
+         * 계정 정지 해제
+         * @description 특정 유저의 정지를 해제합니다.
+         */
         delete: operations["unBanUser"];
         options?: never;
         head?: never;
@@ -415,6 +427,10 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
+        /**
+         * 공지사항 리스트 조회
+         * @description 공지사항 리스트를 조회합니다.
+         */
         get: operations["getNotices"];
         put?: never;
         /**
@@ -719,6 +735,10 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
+        /**
+         * 유저 리스트 조회
+         * @description 등록된 유저 리스트를 조회합니다.
+         */
         get: operations["getUserList"];
         put?: never;
         post?: never;
@@ -1638,7 +1658,7 @@ export interface operations {
             };
         };
         responses: {
-            /** @description OK */
+            /** @description 공지사항 업데이트 성공 */
             200: {
                 headers: {
                     [name: string]: unknown;
@@ -1669,7 +1689,7 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            /** @description OK */
+            /** @description 공지사항 삭제 성공 */
             200: {
                 headers: {
                     [name: string]: unknown;
@@ -2274,8 +2294,8 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            /** @description OK */
-            200: {
+            /** @description 계정 정지 해제 성공. */
+            204: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -2305,7 +2325,7 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            /** @description OK */
+            /** @description 공지사항 리스트 조회 성공 */
             200: {
                 headers: {
                     [name: string]: unknown;
@@ -2854,7 +2874,7 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            /** @description OK */
+            /** @description 유저 리스트 조회 성공 */
             200: {
                 headers: {
                     [name: string]: unknown;

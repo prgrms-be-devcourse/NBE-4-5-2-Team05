@@ -1,23 +1,5 @@
 package com.NBE_4_5_2.Team5.domain.user.admin.controller;
 
-import java.util.List;
-import java.util.stream.Collectors;
-
-
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.web.PageableDefault;
-
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-
 import com.NBE_4_5_2.Team5.domain.user.admin.dto.BanListDto;
 import com.NBE_4_5_2.Team5.domain.user.admin.dto.BanResBody;
 import com.NBE_4_5_2.Team5.domain.user.admin.dto.NoticeResBody;
@@ -25,7 +7,6 @@ import com.NBE_4_5_2.Team5.domain.user.admin.entity.NoticePost;
 import com.NBE_4_5_2.Team5.domain.user.admin.service.AdminService;
 import com.NBE_4_5_2.Team5.domain.user.user.dto.UserDto;
 import com.NBE_4_5_2.Team5.global.response.RsData;
-
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -35,6 +16,14 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotEmpty;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequiredArgsConstructor
@@ -87,7 +76,9 @@ public class AdminController {
 	}
 
 
-
+	@Operation(summary = "계정 정지 해제", description = "특정 유저의 정지를 해제합니다.")
+	@ApiResponses(value = {@ApiResponse(responseCode = "204", description = "계정 정지 해제 성공.")})
+	@SecurityRequirement(name = "cookieAuth")
 	@PreAuthorize("isAuthenticated")
 	@DeleteMapping("/users/{user-id}/ban")
 	public RsData<Void> unBanUser(@PathVariable(name = "user-id") String userId) {
@@ -119,6 +110,9 @@ public class AdminController {
 		return new RsData<>("200", "최신 공지사항 조회 성공.", res);
 	}
 
+	@Operation(summary = "유저 리스트 조회", description = "등록된 유저 리스트를 조회합니다.")
+	@ApiResponses(value = {@ApiResponse(responseCode = "200", description = "유저 리스트 조회 성공")})
+	@SecurityRequirement(name = "cookieAuth")
 	@PreAuthorize("isAuthenticated()")
 	@GetMapping("/users")
 	public RsData<Page<UserDto>> getUserList(@PageableDefault(size = 10, page = 0) Pageable pageable) {
@@ -127,6 +121,9 @@ public class AdminController {
 		return new RsData<>("200-1", "유저 리스트 조회 성공.", users);
 	}
 
+	@Operation(summary = "공지사항 리스트 조회", description = "공지사항 리스트를 조회합니다.")
+	@ApiResponses(value = {@ApiResponse(responseCode = "200", description = "공지사항 리스트 조회 성공")})
+	@SecurityRequirement(name = "cookieAuth")
 	@PreAuthorize("isAuthenticated()")
 	@GetMapping("/notices")
 	public RsData<Page<NoticeResBody>> getNotices(@PageableDefault(size = 10, page = 0) Pageable pageable) {
@@ -137,6 +134,9 @@ public class AdminController {
 	public record UpdateNoticeReq(String title, String content) {
 	}
 
+	@Operation(summary = "공지사항 수정", description = "기존 공지사항을 수정합니다.")
+	@ApiResponses(value = {@ApiResponse(responseCode = "200", description = "공지사항 업데이트 성공")})
+	@SecurityRequirement(name = "cookieAuth")
 	@PreAuthorize("isAuthenticated()")
 	@PutMapping("/notices/{notice-id}")
 	public RsData<NoticeResBody> updateNotice(@PathVariable(name = "notice-id") String noticeId,
@@ -145,6 +145,9 @@ public class AdminController {
 		return new RsData<>("200-1", "공지사항 업데이트 성공.", res);
 	}
 
+	@Operation(summary = "공지사항 삭제", description = "기존 공지사항을 삭제합니다.")
+	@ApiResponses(value = {@ApiResponse(responseCode = "200", description = "공지사항 삭제 성공")})
+	@SecurityRequirement(name = "cookieAuth")
 	@PreAuthorize("isAuthenticated()")
 	@DeleteMapping("/notices/{notice-id}")
 	public RsData<Void> deleteNotice(@PathVariable(name = "notice-id") String noticeId) {
