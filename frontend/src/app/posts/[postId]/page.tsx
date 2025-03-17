@@ -8,6 +8,7 @@ import client from "@/lib/client";
 import { LoginMemberContext } from "@/app/stores/auth/loginMemberStore";
 
 type ProductPostResponse = components["schemas"]["ProductPostResponse"];
+type StatusType = "AVAILABLE" | "RESERVED" | "PURCHASED";
 
 export default function PostDetailPage() {
   const { postId } = useParams<{ postId: string }>();
@@ -22,6 +23,9 @@ export default function PostDetailPage() {
   const [liked, setLiked] = useState<boolean>(false);
   const [purchased, setPurchased] = useState<boolean>(false);
   const [purchaseLoading, setPurchasedLoading] = useState<boolean>(false);
+
+  // 상태 변경 로딩 여부
+  const [statusLoading, setStatusLoading] = useState<boolean>(false);
 
   // 게시글 상세 조회 API 호출
   const fetchPost = async () => {
@@ -62,6 +66,43 @@ export default function PostDetailPage() {
       }
     } catch (err) {
       console.error("찜한 내역 조회 중 예외 발생:", err);
+    }
+  };
+
+  // 상품 상태 변경 핸들러
+  const handleStatusChange = async (newStatus: StatusType) => {
+    if (!post) return;
+    if (post.writerId !== loginMember.id) {
+      alert("작성자만 상태를 변경할 수 있습니다.");
+      return;
+    }
+
+    const confirmChange = confirm(
+      `상품 상태를 "${newStatus}"로 변경하시겠습니까?`
+    );
+    if (!confirmChange) return;
+
+    setStatusLoading(true);
+    try {
+      const response = await client.PUT("/api/posts/{id}", {
+        params: { path: { id: post.id! } },
+        body: { status: newStatus },
+        credentials: "include",
+      });
+
+      if (response.error) {
+        alert("상품 상태 변경 실패: " + response.error.message);
+        return;
+      }
+
+      // 상태 변경 성공 시 즉시 UI 업데이트
+      setPost((prev) => (prev ? { ...prev, status: newStatus } : prev));
+      alert(`상품 상태가 "${newStatus}"로 변경되었습니다.`);
+    } catch (err) {
+      console.error("상품 상태 변경 중 오류 발생:", err);
+      alert("상품 상태 변경 중 오류가 발생했습니다.");
+    } finally {
+      setStatusLoading(false);
     }
   };
 
@@ -285,7 +326,48 @@ export default function PostDetailPage() {
           </div>
         )}
       </div>
-      <div className="mt-4 flex gap-4">
+      <div className="mt-4 flex h-12 gap-4">
+        {/* 상품 상태 변경 버튼 (작성자만 보이도록 설정) */}
+        {post.writerId === loginMember.id && (
+          <div className="mb-4">
+            <h3 className="text-lg font-semibold">상품 상태 변경</h3>
+            <div className="flex gap-2 mt-2">
+              <button
+                className={`px-4 py-2 rounded ${
+                  post.status === "AVAILABLE"
+                    ? "bg-green-500 text-white"
+                    : "bg-gray-200"
+                }`}
+                onClick={() => handleStatusChange("AVAILABLE")}
+                disabled={statusLoading}
+              >
+                판매중
+              </button>
+              <button
+                className={`px-4 py-2 rounded ${
+                  post.status === "RESERVED"
+                    ? "bg-yellow-500 text-white"
+                    : "bg-gray-200"
+                }`}
+                onClick={() => handleStatusChange("RESERVED")}
+                disabled={statusLoading}
+              >
+                예약중
+              </button>
+              <button
+                className={`px-4 py-2 rounded ${
+                  post.status === "PURCHASED"
+                    ? "bg-red-500 text-white"
+                    : "bg-gray-200"
+                }`}
+                onClick={() => handleStatusChange("PURCHASED")}
+                disabled={statusLoading}
+              >
+                판매 완료
+              </button>
+            </div>
+          </div>
+        )}
         <button
           disabled={likeLoading || liked}
           onClick={handleLike}
@@ -304,18 +386,23 @@ export default function PostDetailPage() {
               ? "처리 중..."
               : "구매하기"}
         </button>
-        <button
-          onClick={handleEdit}
-          className="px-4 py-2 bg-blue-500 text-white rounded"
-        >
-          수정하기
-        </button>
-        <button
-          onClick={handleDelete}
-          className="px-4 py-2 bg-gray-500 text-white rounded"
-        >
-          삭제하기
-        </button>
+        {loginMember.id === post.writerId && (
+          <div className="flex ">
+            {" "}
+            <button
+              onClick={handleEdit}
+              className="px-4 py-2 bg-blue-500 text-white rounded"
+            >
+              수정하기
+            </button>
+            <button
+              onClick={handleDelete}
+              className="px-4 py-2 bg-gray-500 text-white rounded"
+            >
+              삭제하기
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );

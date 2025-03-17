@@ -9,6 +9,7 @@ import { LoginMemberContext } from "@/app/stores/auth/loginMemberStore";
 
 type Category = components["schemas"]["Category"];
 type ProductPostResponse = components["schemas"]["ProductPostResponse"];
+type StatusType = "AVAILABLE" | "RESERVED" | "PURCHASED";
 
 export default function PostModifyPage() {
   const { postId } = useParams<{ postId: string }>();
@@ -30,6 +31,8 @@ export default function PostModifyPage() {
   const [initialImageUrls, setInitialImageUrls] = useState<string[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string>("");
+  // 상태 변경 로딩 여부
+  const [status, setStatus] = useState<StatusType>("AVAILABLE");
 
   // 로그인 정보 디버깅
   useEffect(() => {
@@ -98,6 +101,7 @@ export default function PostModifyPage() {
             .filter((url) => url && url.toLowerCase() !== "null");
           setInitialImageUrls(imgs);
         }
+        setStatus(postData.status ?? "AVAILABLE");
       }
     } catch (err) {
       console.error("게시글 데이터를 불러오는 중 오류 발생", err);
@@ -132,6 +136,7 @@ export default function PostModifyPage() {
       latitude: Number(latitude),
       longitude: Number(longitude),
       location,
+      status,
     };
 
     // 수정 요청 전, 로그인 정보가 있는지 확인
@@ -174,7 +179,7 @@ export default function PostModifyPage() {
         onSubmit={handleSubmit}
         className="flex space-x-4 p-4 w-full flex-1"
       >
-        {/* 왼쪽 영역: 물품 이름, 게시글 제목, 본문 */}
+        {/* 왼쪽 영역: 물품 이름, 게시글 제목, 본문, 판매 상태 */}
         <div className="w-2/3 space-y-4">
           <div>
             <label className="block mb-1 font-semibold">물품 이름</label>
@@ -204,6 +209,23 @@ export default function PostModifyPage() {
               className="border p-2 w-full h-40"
               placeholder="상품 설명, 상태 등을 자세히 적어주세요."
             />
+          </div>
+          {/* 🔥 판매 상태 선택 드롭다운 추가 */}
+          <div>
+            <label className="block mb-1 font-semibold">판매 상태</label>
+            <select
+              className="border p-2 w-full"
+              value={status}
+              onChange={(e) =>
+                setStatus(
+                  e.target.value as "AVAILABLE" | "RESERVED" | "PURCHASED"
+                )
+              }
+            >
+              <option value="AVAILABLE">판매중</option>
+              <option value="RESERVED">예약중</option>
+              <option value="PURCHASED">판매완료</option>
+            </select>
           </div>
         </div>
 
