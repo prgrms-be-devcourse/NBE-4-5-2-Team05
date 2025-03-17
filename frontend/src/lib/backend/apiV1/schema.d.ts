@@ -11,9 +11,21 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
+        /**
+         * 내 정보 조회
+         * @description 현재 로그인된 사용자의 정보를 조회합니다.
+         */
         get: operations["me"];
+        /**
+         * 내 정보 수정
+         * @description 현재 로그인된 사용자의 정보를 수정합니다.
+         */
         put: operations["updateMyProfile"];
         post?: never;
+        /**
+         * 회원 탈퇴
+         * @description 현재 로그인된 사용자의 계정을 삭제합니다.
+         */
         delete: operations["deleteMyProfile"];
         options?: never;
         head?: never;
@@ -113,6 +125,10 @@ export interface paths {
         };
         get?: never;
         put?: never;
+        /**
+         * 회원 가입
+         * @description 새로운 사용자를 등록합니다.
+         */
         post: operations["createUser"];
         delete?: never;
         options?: never;
@@ -129,6 +145,10 @@ export interface paths {
         };
         get?: never;
         put?: never;
+        /**
+         * AccessToken 재발급
+         * @description RefreshToken을 이용하여 새로운 AccessToken을 발급받습니다.
+         */
         post: operations["refreshAccessToken"];
         delete?: never;
         options?: never;
@@ -145,6 +165,10 @@ export interface paths {
         };
         get?: never;
         put?: never;
+        /**
+         * 로그아웃
+         * @description 현재 로그인된 사용자를 로그아웃합니다.
+         */
         post: operations["logoutUser"];
         delete?: never;
         options?: never;
@@ -161,6 +185,10 @@ export interface paths {
         };
         get?: never;
         put?: never;
+        /**
+         * 로그인
+         * @description 사용자가 로그인합니다.
+         */
         post: operations["loginUser"];
         delete?: never;
         options?: never;
@@ -177,6 +205,10 @@ export interface paths {
         };
         get?: never;
         put?: never;
+        /**
+         * 이메일 인증 코드 발송
+         * @description 사용자의 이메일로 인증 코드를 발송합니다.
+         */
         post: operations["sendAuthenticationCode"];
         delete?: never;
         options?: never;
@@ -193,6 +225,10 @@ export interface paths {
         };
         get?: never;
         put?: never;
+        /**
+         * 이메일 인증 코드 검증
+         * @description 사용자가 입력한 인증 코드를 검증합니다.
+         */
         post: operations["verifyAuthenticationCode"];
         delete?: never;
         options?: never;
@@ -900,8 +936,8 @@ export interface components {
             purchasedProducts?: components["schemas"]["ProductPost"][];
             writtenProducts?: components["schemas"]["ProductPost"][];
             wroteComments?: components["schemas"]["Comment"][];
-            admin?: boolean;
             authorities?: components["schemas"]["GrantedAuthority"][];
+            admin?: boolean;
             memberAuthoritiesAsString?: string[];
         };
         UpdateNoticeReq: {
@@ -1106,12 +1142,12 @@ export interface components {
             /** Format: int64 */
             offset?: number;
             sort?: components["schemas"]["SortObject"];
+            unpaged?: boolean;
             paged?: boolean;
             /** Format: int32 */
             pageSize?: number;
             /** Format: int32 */
             pageNumber?: number;
-            unpaged?: boolean;
         };
         RsDataSliceCommentDto: {
             code: string;
@@ -1216,10 +1252,10 @@ export interface components {
             data: components["schemas"]["Category"][];
         };
         PageUserDto: {
-            /** Format: int64 */
-            totalElements?: number;
             /** Format: int32 */
             totalPages?: number;
+            /** Format: int64 */
+            totalElements?: number;
             /** Format: int32 */
             size?: number;
             content?: components["schemas"]["UserDto"][];
@@ -1239,10 +1275,10 @@ export interface components {
             data: components["schemas"]["PageUserDto"];
         };
         PageNoticeResBody: {
-            /** Format: int64 */
-            totalElements?: number;
             /** Format: int32 */
             totalPages?: number;
+            /** Format: int64 */
+            totalElements?: number;
             /** Format: int32 */
             size?: number;
             content?: components["schemas"]["NoticeResBody"][];
