@@ -75,11 +75,12 @@ export default function Comments({
   }, [initialComments]);
 
   return (
-    <div className="w-full max-h-1/2 mx-auto p-4 border rounded-lg shadow-lg">
+    <div className="w-full max-h-1/2 mx-auto p-4 border-2 rounded-lg shadow-lg">
       <h2 className="text-xl font-bold mb-4">Comments</h2>
       <div className="flex gap-2">
         <Input
           value={content}
+          className="border-4"
           onChange={(e) => {
             e.preventDefault();
             setContent(e.target.value);
@@ -98,7 +99,10 @@ export default function Comments({
         {comments.map((comment, index) => {
           console.log(comment);
           return (
-            <div key={comment.id} className="p-2 border-b flex justify-between">
+            <div
+              key={comment.id}
+              className="p-2 border-b flex justify-between border-2"
+            >
               {comment.content}
               <Button
                 onClick={(e) => {

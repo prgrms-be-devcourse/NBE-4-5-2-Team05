@@ -1106,9 +1106,13 @@ export interface components {
             /** Format: int64 */
             offset?: number;
             sort?: components["schemas"]["SortObject"];
+
+            unpaged?: boolean;
+
+            paged?: boolean;
+
             /** Format: int32 */
             pageSize?: number;
-            paged?: boolean;
             /** Format: int32 */
             pageNumber?: number;
             unpaged?: boolean;
@@ -1134,8 +1138,8 @@ export interface components {
         };
         SortObject: {
             empty?: boolean;
-            unsorted?: boolean;
             sorted?: boolean;
+            unsorted?: boolean;
         };
         RsDataListPreviewPostResponse: {
             code: string;
