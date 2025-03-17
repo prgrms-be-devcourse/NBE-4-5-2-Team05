@@ -836,6 +836,8 @@ export interface components {
             image_urls?: string;
             /** Format: int32 */
             viewCount?: number;
+            /** Format: int32 */
+            likeCount?: number;
             /** @enum {string} */
             status?: "RESERVED" | "AVAILABLE" | "PURCHASED";
             /** Format: float */
@@ -1153,10 +1155,10 @@ export interface components {
             sort?: string[];
         };
         PageUserDto: {
-            /** Format: int32 */
-            totalPages?: number;
             /** Format: int64 */
             totalElements?: number;
+            /** Format: int32 */
+            totalPages?: number;
             /** Format: int32 */
             size?: number;
             content?: components["schemas"]["UserDto"][];
@@ -1188,14 +1190,14 @@ export interface components {
         };
         SortObject: {
             empty?: boolean;
-            sorted?: boolean;
             unsorted?: boolean;
+            sorted?: boolean;
         };
         PageNoticeResBody: {
-            /** Format: int32 */
-            totalPages?: number;
             /** Format: int64 */
             totalElements?: number;
+            /** Format: int32 */
+            totalPages?: number;
             /** Format: int32 */
             size?: number;
             content?: components["schemas"]["NoticeResBody"][];
