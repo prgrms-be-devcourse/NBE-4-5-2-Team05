@@ -1073,6 +1073,54 @@ export interface components {
             message: string;
             data: components["schemas"]["PageDtoPreviewPostResponse"];
         };
+        Pageable: {
+            /** Format: int32 */
+            page?: number;
+            /** Format: int32 */
+            size?: number;
+            sort?: string[];
+        };
+        CommentDto: {
+            id?: string;
+            author?: components["schemas"]["UserDto"];
+            content?: string;
+            postId?: string;
+        };
+        PageableObject: {
+            /** Format: int64 */
+            offset?: number;
+            sort?: components["schemas"]["SortObject"];
+            paged?: boolean;
+            /** Format: int32 */
+            pageSize?: number;
+            /** Format: int32 */
+            pageNumber?: number;
+            unpaged?: boolean;
+        };
+        RsDataSliceCommentDto: {
+            code: string;
+            message: string;
+            data: components["schemas"]["SliceCommentDto"];
+        };
+        SliceCommentDto: {
+            /** Format: int32 */
+            size?: number;
+            content?: components["schemas"]["CommentDto"][];
+            /** Format: int32 */
+            number?: number;
+            sort?: components["schemas"]["SortObject"];
+            first?: boolean;
+            last?: boolean;
+            /** Format: int32 */
+            numberOfElements?: number;
+            pageable?: components["schemas"]["PageableObject"];
+            empty?: boolean;
+        };
+        SortObject: {
+            empty?: boolean;
+            sorted?: boolean;
+            unsorted?: boolean;
+        };
         RsDataListPreviewPostResponse: {
             code: string;
             message: string;
