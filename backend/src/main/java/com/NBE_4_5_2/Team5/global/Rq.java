@@ -59,8 +59,11 @@ public class Rq {
 		accsessTokenCookie.setSecure(true);
 		accsessTokenCookie.setAttribute("SameSite", "Strict");
 
+
 		response.addCookie(accsessTokenCookie);
 	}
+
+
 
 	public void removeCookie(String name) {
 
