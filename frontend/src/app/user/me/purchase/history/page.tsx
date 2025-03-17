@@ -23,6 +23,7 @@ export default async function Page({
     headers: {
       cookie: (await cookies()).toString(),
     },
+    credentials: "include",
   });
 
   if (response.error) {
