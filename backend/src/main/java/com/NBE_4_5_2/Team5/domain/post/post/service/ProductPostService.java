@@ -170,6 +170,10 @@ public class ProductPostService {
             post.getProductCategories().addAll(newProductCategories);
         }
 
+        if (body.status()!=null) {
+            post.setStatus(body.status());
+        }
+
         return ProductPostResponse.fromEntity(post);
     }
 

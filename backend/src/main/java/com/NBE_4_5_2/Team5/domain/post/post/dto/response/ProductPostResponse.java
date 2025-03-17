@@ -1,13 +1,13 @@
 package com.NBE_4_5_2.Team5.domain.post.post.dto.response;
 
+import com.NBE_4_5_2.Team5.domain.post.post.entity.ProductPost;
+import com.NBE_4_5_2.Team5.domain.post.post.enums.ProductStatus;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
-
-import com.NBE_4_5_2.Team5.domain.post.post.entity.ProductPost;
-
-import lombok.AllArgsConstructor;
-import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
@@ -29,6 +29,8 @@ public class ProductPostResponse {
 	private Integer viewCount; // 조회수
 	private Integer likedCount;
 
+	private ProductStatus status;
+
 	public static ProductPostResponse fromEntity(ProductPost post) {
 		return new ProductPostResponse(
 			post.getId(),
@@ -47,7 +49,8 @@ public class ProductPostResponse {
 			post.getCreatedAt(),
 			post.getModifiedAt(),
 			post.getViewCount(),
-			0
+			0,
+				post.getStatus()
 
 		);
 	}
@@ -70,7 +73,8 @@ public class ProductPostResponse {
 				post.getCreatedAt(),
 				post.getModifiedAt(),
 				post.getViewCount(),
-				likedCount
+				likedCount,
+				post.getStatus()
 		);
 	}
 
