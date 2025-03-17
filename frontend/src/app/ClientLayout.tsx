@@ -1,52 +1,42 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
-import { components } from "@/lib/backend/apiV1/schema";
-import client from "@/lib/client";
-import { cookies } from "next/headers";
-import client from "@/lib/backend/client";
-import { faBookBookmark, faThumbsUp } from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { Geist, Geist_Mono } from "next/font/google";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
+import { Button } from "@/components/ui/button";
+import client from "@/lib/client";
+import Link from "next/link";
 import { FaStore } from "react-icons/fa";
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
+  LoginMemberContext,
+  useLoginMember,
+} from "./stores/auth/loginMemberStore";
 
 
 export default function ClientLayout({
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
-
-export default function ClinetLayout({
   children,
-  fontVariable,
-  fontClassName,
-  me,
 }: Readonly<{
   children: React.ReactNode;
-  fontVariable: string;
-  fontClassName: string;
-  me: components["schemas"]["UserDto"];
 }>) {
-  const isLogin = me.id !== "";
   const router = useRouter();
-  const isLogined = me.id !== "";
+  const {
+    setLoginMember,
+    isLogin,
+    loginMember,
+    removeLoginMember,
+    isLoginMemberPending,
+    isAdmin,
+    setNoLoginMember,
+  } = useLoginMember();
+
+  const loginMemberContextValue = {
+    loginMember,
+    setLoginMember,
+    removeLoginMember,
+    isLogin,
+    isLoginMemberPending,
+    isAdmin,
+    setNoLoginMember,
+  };
 
   async function handleLogout(e: React.MouseEvent<HTMLButtonElement>) {
     e.preventDefault();
@@ -55,24 +45,50 @@ export default function ClinetLayout({
     });
 
     if (response.error) {
-      alert(response.error.message);
+      alert("로그아웃 되었습니다.");
+      removeLoginMember();
+      router.replace("/user/login");
       return;
     }
 
-    window.location.href = "/";
+    alert("로그아웃 되었습니다.");
+    removeLoginMember();
+    router.replace("/");
   }
 
+  async function fetchLoginMember() {
+    const response = await client.GET("/api/users/me", {
+      credentials: "include",
+    });
+
+    if (response.error) {
+      setNoLoginMember();
+      return;
+    }
+
+    setLoginMember(response.data.data);
+  }
+
+  useEffect(() => {
+    fetchLoginMember();
+  }, []);
+
   return (
-    <html lang="en" className={`${fontVariable}`}>
-      <body className={`min-h-[100dvh] flex flex-col ${fontClassName}`}>
-        <header className="flex justify-between">
-          <Link href="/" className="flex items-center gap-2">
-            <Button>
-              <FaStore className="text-lg" />
-              길게 볼 장터
-            </Button>
-          </Link>
-          {isLogin ? (
+    <LoginMemberContext.Provider value={loginMemberContextValue}>
+      <header className="flex justify-between">
+        <Link href="/" className="flex items-center gap-2">
+          <Button>
+            <FaStore className="text-lg" />
+            길게 볼 장터
+          </Button>
+        </Link>
+        {isLogin && (
+          <div className="flex gap-2">
+            <div className="flex items-center gap-2">
+              <Link href={"/payments"}>
+                <p>{loginMember.cash}원</p>
+              </Link>
+            </div>
             <div className="flex items-center gap-2">
               <Link href="/user/me">
                 <Button>내 정보</Button>
@@ -81,15 +97,16 @@ export default function ClinetLayout({
                 로그아웃
               </Button>
             </div>
-          ) : (
-            <Link href="/user/login">
-              <Button>로그인 및 회원가입</Button>
-            </Link>
-          )}
-        </header>
-        <div className="flex-grow">{children}</div>
-        <footer>푸터</footer>
-      </body>
-    </html>
+          </div>
+        )}
+        {!isLogin && (
+          <Link href="/user/login">
+            <Button>로그인 및 회원가입</Button>
+          </Link>
+        )}
+      </header>
+      <div className="flex flex-1 flex-col items-center w-full">{children}</div>
+      <footer>푸터</footer>
+    </LoginMemberContext.Provider>
   );
 }
