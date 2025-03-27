@@ -197,6 +197,56 @@ class PaymentControllerTest {
 		assertThat(user1.getCash()).isEqualTo(beforeCash);
 	}
 
+	@Test
+	@DisplayName("상품 구매 여부 조회")
+	void isPurchased() throws Exception {
+		//given
+
+		// 상품을 로그인한 유저가 구매
+
+		// 구매할 상품 찾기
+		PreviewPostResponse product = productPostService.getPosts(1, 1, "", "asc")
+			.getItems().get(0);
+
+		// 유저의 캐시가 차감되었는지 확인하기 위해 유저 엔티티 가져옴
+		User userBeforeBuy = userService.getUserByUsername("user1")
+			.orElseThrow(() -> new RuntimeException());
+		int beforeCash = userBeforeBuy.getCash();
+
+		// 상품 가격만큼 캐시 충전
+		chargeCash(product.getProductPrice());
+
+		// 상품 구매
+		ResultActions response = mockMvc.perform(post("/api/payments")
+			.contentType(MediaType.APPLICATION_JSON)
+			.content("""
+				{
+					\"productId\": \"%s\"
+				}
+				""".formatted(product.getId()))
+			.cookie(accessTokenCookie, refreshTokenCookie));
+
+		response
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("$.code").value("200-1"));
+
+		// when
+		// 상품을 구매한 유저가 로그인하고 API를 호출
+
+		ResultActions result = mockMvc.perform(get("/api/payments?post-id=%s"
+			.formatted(product.getId()))
+			.cookie(accessTokenCookie, refreshTokenCookie));
+
+		// then
+		// 결제했으므로 true를 반환해야함.
+		result
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("$.code").value("200-1"))
+			.andExpect(jsonPath("$.message").value("상품 결제 여부 조회 성공."))
+			.andExpect(jsonPath("$.data").value(true));
+
+	}
+
 	private void chargeCash(int totalAmount) throws Exception {
 		String uuid = "order-" + UUID.randomUUID();
 
@@ -218,16 +268,21 @@ class PaymentControllerTest {
 		String paymentKey = UUID.randomUUID().toString();
 
 		// when
-		// 결제 요청 request 성공 이후 결제 승인 request 처리
+
 		// 결제 승인 처리 과정에서 PG사의 API를 호출해야 함. 이를 모킹
 		Map<String, Object> body = util.paymentRequestResponse(uuid, paymentKey, totalPrice);
 
 		Mockito.when(paymentProvider.requestPayment(uuid, paymentKey, totalPrice))
 			.thenReturn(new ResponseEntity<>(body, HttpStatus.OK));
 
+		// 결제 요청 request 성공 이후 결제 승인 request 처리
 		ResultActions result = mockMvc.perform(get("/api/payments/request?orderId=%s&paymentKey=%s&amount=%s"
 			.formatted(uuid, paymentKey, totalPrice))
 			.cookie(accessTokenCookie, refreshTokenCookie)
 		);
+
+		result
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("$.code").value("200-1"));
 	}
 }
