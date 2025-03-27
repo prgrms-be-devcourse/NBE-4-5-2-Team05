@@ -4,19 +4,18 @@ import com.NBE_4_5_2.Team5.domain.chat.entity.ChatRoom;
 import com.NBE_4_5_2.Team5.domain.chat.service.ChatRoomService;
 import com.NBE_4_5_2.Team5.domain.post.post.entity.ProductPost;
 import com.NBE_4_5_2.Team5.domain.post.post.repository.ProductPostRepository;
+import com.NBE_4_5_2.Team5.domain.user.user.entity.Role;
 import com.NBE_4_5_2.Team5.domain.user.user.entity.User;
 import com.NBE_4_5_2.Team5.domain.user.user.service.UserService;
 import com.NBE_4_5_2.Team5.global.config.BaseTestConfig;
 import com.jayway.jsonpath.JsonPath;
-import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.annotation.Rollback;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
-
+import static org.junit.jupiter.api.Assertions.*;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -208,11 +207,11 @@ public class ChatRoomControllerTest {
                 .andExpect(jsonPath("$.message").value("삭제 완료"))
                 .andExpect(jsonPath("$.data").isEmpty());
 
-//        // 조회 검증
-//        getAction.andExpect(status().isOk())
-//                .andExpect(jsonPath("$.code").value("200"))
-//                .andExpect(jsonPath("$.message").value("채팅방 목록"))
-//                .andExpect(jsonPath("$.data").isEmpty()); // 데이터가 비어 있음을 검증
+        // 조회 검증
+        getAction.andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value("200"))
+                .andExpect(jsonPath("$.message").value("채팅방 목록"))
+                .andExpect(jsonPath("$.data").isEmpty()); // 데이터가 비어 있음을 검증
 
         // roomId가 존재하지 않음을 검증
         List<String> roomIds=JsonPath.read(getAction.andReturn().getResponse().getContentAsString(), "$.data[*].roomId");
@@ -359,6 +358,41 @@ public class ChatRoomControllerTest {
                 .andExpect(jsonPath("$.code").value("404"))
                 .andExpect(jsonPath("$.message").value("접근 권한 없는 채팅방"))
                 .andExpect(jsonPath("$.data").isEmpty());
+    }
+
+    @Test
+    @DisplayName("고객센터 연결")
+    void createCustomerService() throws Exception {
+        // Given
+        deleteAll();
+        // When
+        ResultActions action = mvc.perform(post("/api/chat/admin")
+                        .header("Authorization", "Bearer " + token)
+                        .contentType(APPLICATION_JSON))
+                .andDo(print());
+        // 채팅방 조회
+        ResultActions getAction = mvc.perform(get("/api/chat/rooms")
+                        .header("Authorization", "Bearer " + token)
+                        .contentType(APPLICATION_JSON))
+                .andDo(print());
+
+        // Then
+        action.andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value("200"))
+                .andExpect(jsonPath("$.message").value("고객센터"))
+                .andExpect(jsonPath("$.data").isNotEmpty());
+        // 조회 검증
+        getAction.andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value("200"))
+                .andExpect(jsonPath("$.message").value("채팅방 목록"))
+                .andExpect(jsonPath("$.data").isNotEmpty());
+
+        // 관리자 검증
+        String receiver = JsonPath.read(action.andReturn().getResponse().getContentAsString(), "$.data.receiver");
+        User admin = userService.getUserByUsername(receiver).orElseThrow(
+                () -> new RuntimeException("User not found")
+        );
+        assertEquals(Role.ADMIN, admin.getRole());
     }
     // Given
 
