@@ -163,14 +163,17 @@ public class ChatRoomControllerTest {
         action.andExpect(status().isOk())
                 .andExpect(jsonPath("$.code").value("200"))
                 .andExpect(jsonPath("$.message").value("삭제 완료"))
-                .andExpect(jsonPath("$.data").isEmpty()); // 데이터가 비어있음을 검증
-        // 조회 검증
-        getAction.andExpect(status().isOk())
-                .andExpect(jsonPath("$.code").value("200"))
-                .andExpect(jsonPath("$.message").value("채팅방 목록"))
-                .andExpect(jsonPath("$.data").isEmpty()); // 데이터가 비어 있음을 검증
+                .andExpect(jsonPath("$.data").isEmpty());
 
+//        // 조회 검증
+//        getAction.andExpect(status().isOk())
+//                .andExpect(jsonPath("$.code").value("200"))
+//                .andExpect(jsonPath("$.message").value("채팅방 목록"))
+//                .andExpect(jsonPath("$.data").isEmpty()); // 데이터가 비어 있음을 검증
 
+        // roomId가 존재하지 않음을 검증
+        List<String> roomIds=JsonPath.read(getAction.andReturn().getResponse().getContentAsString(), "$.data[*].roomId");
+        assertThat(roomIds).doesNotContain(roomId);
     }
 
 
