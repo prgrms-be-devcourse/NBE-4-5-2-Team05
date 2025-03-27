@@ -225,6 +225,31 @@ public class ChatRoomControllerTest {
         deleteAll();    // 초기화
     }
 
+    @Test
+    @DisplayName("존재하지 않는 채팅방 검색")
+    void findNotExistChatRoom() throws Exception {
+        // Given
+        createRoom();
+        List<ChatRoom> chatRoomList = chatRoomService.findRoomByUser(sender);
+        String roomId = chatRoomList.get(0).getRoomId();
+        receiver = chatRoomList.get(0).getReceiver();
+        System.out.println("roomId: " + roomId);
+        System.out.println("receiver: " + receiver);
+        deleteAll();    // 채팅방 삭제
+
+        // When: 검색 요청
+        ResultActions action = mvc.perform(get("/api/chat/search")
+                        .param("receiver", receiver)
+                        .header("Authorization", "Bearer " + token)
+                        .contentType(APPLICATION_JSON))
+                .andDo(print());
+
+        // Then: 검색 요청 결과 검증
+        action.andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.code").value("404"))
+                .andExpect(jsonPath("$.message").value("존재하지 않는 대화방입니다."))
+                .andExpect(jsonPath("$.data").isEmpty());
+    }
 
 
     // Given
