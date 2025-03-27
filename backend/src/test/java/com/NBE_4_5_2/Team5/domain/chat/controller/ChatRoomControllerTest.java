@@ -65,6 +65,7 @@ public class ChatRoomControllerTest {
         );
         sender = loginedUser.getNickname();
         token = userService.generateAuthTokenAsString(loginedUser);
+        System.out.println("토큰1: "+token);
 
         // 포스트 ID 설정
         ProductPost post = productPostRepository.findAll().stream()
@@ -82,6 +83,7 @@ public class ChatRoomControllerTest {
                         .contentType(APPLICATION_JSON))
                 .andDo(print()); // 요청의 Content-Type
         String roomId = JsonPath.read(action.andReturn().getResponse().getContentAsString(), "$.data.roomId");
+        System.out.println("sender: " + sender);
         System.out.println("임시 roomId: "+roomId);
         return roomId;
     }
@@ -311,7 +313,53 @@ public class ChatRoomControllerTest {
                 .andExpect(jsonPath("$.data").isEmpty());
     }
 
+    @Test
+    @DisplayName("채팅방 메세지 조회")
+    void getMessages() throws Exception {
+        // Given
+        String roomId = setUpChatRoom();
 
+        // When
+        ResultActions action = mvc.perform(get("/api/chat/message")
+                        .param("roomId", roomId)
+                        .header("Authorization", "Bearer " + token)
+                        .contentType(APPLICATION_JSON))
+                .andDo(print());
+
+        // Then
+        action.andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value("200"))
+                .andExpect(jsonPath("$.message").value(receiver+"와의 대화방"));
+                // todo: 메세지까지 조회
+    }
+
+
+
+    @Test
+    @DisplayName("접근 권한 없는 채팅방 메세지 조회")
+    void CantAccessGetMessages() throws Exception {
+        // Given
+        String roomId = setUpChatRoom();    // 채팅방 생성
+        // 새로운 계정으로 로그인
+        User loginedUser2 = userService.getUserByUsername("user2").orElseThrow(
+                () -> new RuntimeException("User not found")
+        );
+        String token2 = userService.generateAuthTokenAsString(loginedUser2);
+        System.out.println("토큰: "+ token2);
+
+        // When
+        ResultActions action = mvc.perform(get("/api/chat/message")
+                        .param("roomId", roomId)
+                        .header("Authorization", "Bearer " + token2)
+                        .contentType(APPLICATION_JSON))
+                .andDo(print());
+
+        // Then
+        action.andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.code").value("404"))
+                .andExpect(jsonPath("$.message").value("접근 권한 없는 채팅방"))
+                .andExpect(jsonPath("$.data").isEmpty());
+    }
     // Given
 
 
@@ -322,9 +370,6 @@ public class ChatRoomControllerTest {
 
 //
 //
-//    @Test
-//    void getMessages() {
-//    }
 //
 //
 }
