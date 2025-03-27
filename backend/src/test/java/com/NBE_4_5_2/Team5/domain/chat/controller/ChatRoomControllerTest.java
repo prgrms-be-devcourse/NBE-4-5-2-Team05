@@ -197,6 +197,33 @@ public class ChatRoomControllerTest {
         assertThat(roomIds).doesNotContain(roomId);
     }
 
+    @Test
+    @DisplayName("특정 사용자와의 채팅방 검색")
+    void findChatRooms() throws Exception {
+        // Given
+        createRoom();
+        List<ChatRoom> chatRoomList = chatRoomService.findRoomByUser(sender);
+        String roomId = chatRoomList.get(0).getRoomId();
+        receiver = chatRoomList.get(0).getReceiver();
+        System.out.println("receiver1: " + receiver);
+
+        // When: 검색 요청
+        ResultActions action = mvc.perform(get("/api/chat/search")
+                        .param("receiver", receiver)
+                        .header("Authorization", "Bearer " + token)
+                        .contentType(APPLICATION_JSON))
+                .andDo(print());
+
+        // Then: 검색 요청 결과 검증
+        action.andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value("200"))
+                .andExpect(jsonPath("$.message").value("success"))
+                .andExpect(jsonPath("$.data").isNotEmpty())
+                .andExpect(jsonPath("$.data.roomId").value(roomId)); // 정확한 roomId를 반환하는지 검증
+        System.out.println("receiver: " + receiver);
+        System.out.println("roomId: " + roomId);
+        deleteAll();    // 초기화
+    }
 
 
 
