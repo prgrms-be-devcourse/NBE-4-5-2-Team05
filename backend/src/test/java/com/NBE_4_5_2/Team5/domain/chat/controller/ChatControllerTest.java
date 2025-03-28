@@ -1,7 +1,5 @@
 package com.NBE_4_5_2.Team5.domain.chat.controller;
 
-import com.NBE_4_5_2.Team5.domain.chat.entity.ChatMessage;
-import com.NBE_4_5_2.Team5.domain.chat.entity.ChatRoom;
 import com.NBE_4_5_2.Team5.domain.chat.repository.ChatMessageRepository;
 import com.NBE_4_5_2.Team5.domain.chat.service.ChatRoomService;
 import com.NBE_4_5_2.Team5.domain.post.post.entity.ProductPost;
@@ -13,34 +11,32 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.fasterxml.jackson.module.paramnames.ParameterNamesModule;
 import com.jayway.jsonpath.JsonPath;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.messaging.converter.MappingJackson2MessageConverter;
-import org.springframework.messaging.simp.stomp.*;
+import org.springframework.messaging.simp.stomp.StompHeaders;
+import org.springframework.messaging.simp.stomp.StompSession;
+import org.springframework.messaging.simp.stomp.StompSessionHandlerAdapter;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.web.socket.WebSocketHttpHeaders;
-import org.springframework.web.socket.client.WebSocketClient;
-import org.springframework.web.socket.messaging.WebSocketStompClient;
 import org.springframework.web.socket.client.standard.StandardWebSocketClient;
+import org.springframework.web.socket.messaging.WebSocketStompClient;
 import org.springframework.web.socket.sockjs.client.SockJsClient;
 import org.springframework.web.socket.sockjs.client.WebSocketTransport;
 
-import static org.junit.jupiter.api.Assertions.*;
-
-import java.lang.reflect.Type;
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
+import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 
@@ -137,8 +133,8 @@ class ChatControllerTest {
 //    }
 
     @Test
-    @DisplayName("웹소켓 연결 테스트")
-    void testWebSocketConnection() throws Exception {
+    @DisplayName("웹소켓 연결")
+    void webSocketConnection() throws Exception {
         // 웹소켓 연결 URL 설정 (WebSocketConfig의 엔드포인트 참고)
         String url = String.format("ws://localhost:%d/ws-stomp", port);
 
@@ -166,11 +162,28 @@ class ChatControllerTest {
 
         // 연결 상태 로그 출력
         System.out.println("WebSocket 연결 상태: " + stompSession.isConnected());
-
-        // 테스트 종료 시 웹소켓 연결 종료
-        if (stompSession != null && stompSession.isConnected()) {
-            stompSession.disconnect();
-            System.out.println("WebSocket 연결이 종료되었습니다.");
-        }
+//
+//        // 테스트 종료 시 웹소켓 연결 종료
+//        if (stompSession != null && stompSession.isConnected()) {
+//            stompSession.disconnect();
+//            System.out.println("WebSocket 연결이 종료되었습니다.");
+//        }
     }
+
+    @Test
+    @DisplayName("웹소켓 연결 끊기")
+    void webSocketDisConnection() throws Exception {
+        // given : 연결
+//        webSocketConnection();
+        assertNotNull(stompSession,"given: 웹소켓이 연결되지 않음");
+        assertTrue(stompSession.isConnected(), "given: 웹소켓이 연결되지 않음");
+
+        // when
+        stompSession.disconnect();
+        System.out.println("종료");
+        //then
+        assertFalse(stompSession.isConnected(), "WebSocket 연결이 끊기지 않았습니다.");
+        System.out.println("연결상태: "+stompSession.isConnected());
+    }
+
 }
