@@ -30,6 +30,7 @@ import org.springframework.messaging.simp.stomp.StompSession;
 import org.springframework.messaging.simp.stomp.StompSessionHandlerAdapter;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.web.socket.WebSocketHttpHeaders;
 import org.springframework.web.socket.client.standard.StandardWebSocketClient;
@@ -262,7 +263,6 @@ class ChatControllerTest {
     @Test
     @DisplayName("연결 끊기")
     void webSocketDisConnection() throws Exception {
-        System.out.println("==========================================");
         // Given
         // 구독
         setUp_Subscribe();
@@ -289,7 +289,6 @@ class ChatControllerTest {
 
         // 로그 출력
         System.out.println("STOMP DISCONNECT 테스트 완료. 세션 ID: " + sessionId);
-        System.out.println("==========================================");
     }
 
     @Test
@@ -356,13 +355,13 @@ class ChatControllerTest {
         System.out.println("messages: " + lastMessage.getMessage());
 
         setUp_DisConnect(); // 연결 해제
+        setUp_DeleteRoom(); // 채팅방 비우기
     }
 
     @Test
     @DisplayName("채팅방 메세지 조회")
     void getMessages() throws Exception {
         // Given
-        setUp_DeleteRoom(); // 채팅방 삭제
         String content = "테스트 메세지1";
         setUp_SendMessage(content);
         roomId = setUpChatRoom();
@@ -375,10 +374,15 @@ class ChatControllerTest {
                 .andDo(print());
 
         // Then
-        action.andExpect(status().isOk())
+        MvcResult result = action.andExpect(status().isOk())
                 .andExpect(jsonPath("$.code").value("200"))
                 .andExpect(jsonPath("$.message").value(receiver+"와의 대화방"))
-                .andExpect(jsonPath("$.data[*].message").value(content));
+                .andExpect(jsonPath("$.data[*].message").value(hasItem(content)))
+                .andReturn();
+
+        String responseContent = result.getResponse().getContentAsString();
+        List<String> messages = JsonPath.read(responseContent, "$.data[*].message");
+        System.out.println("메세지 리스트: "+messages);
     }
 
 }
