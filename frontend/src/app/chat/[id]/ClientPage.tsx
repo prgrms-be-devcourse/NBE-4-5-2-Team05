@@ -147,7 +147,7 @@ export default function ClientPage({
   }, [roomId, cookie]);
 
   useEffect(() => {
-    getCurrentPostion();
+    getCurrentPosition();
   }, []);
 
   const handleInputChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -170,6 +170,8 @@ export default function ClientPage({
       message: inputMessage,
       sender: userNickname,
       type: "TALK",
+      latitude: 0,  
+      longitude: 0, 
     };
 
     stompClient.send(
@@ -214,6 +216,8 @@ export default function ClientPage({
       return;
     }
 
+    getCurrentPosition();
+
     const message = {
       roomId,
       sender: userNickname,
@@ -234,7 +238,7 @@ export default function ClientPage({
     return;
   };
 
-  const getCurrentPostion = () => {
+  const getCurrentPosition = () => {
     navigator.geolocation.getCurrentPosition((position) => {
       setLatitude(position.coords.latitude);
       setLongitude(position.coords.longitude);
@@ -259,7 +263,7 @@ export default function ClientPage({
       const protocol = `${process.env.NEXT_PUBLIC_PROTOCOL}`;
       let url = `${protocol}://${process.env.NEXT_PUBLIC_BACKEND_HOST}`;
       if (protocol === "http") {
-        url += `:${process.env.NEXT_PUBHLIC_BACKEND_PORT}`;
+        url += `:${process.env.NEXT_PUBLIC_BACKEND_PORT}`;
       }
       url += `/api/uploadFile`;
       const response = await fetch(url, {
@@ -279,6 +283,8 @@ export default function ClientPage({
         type: "IMAGE",
         sender: userNickname,
         image: imageUrl,
+        latitude: 0,  
+        longitude: 0,
       };
 
       setChatMessages((prevMessages) => [...prevMessages, message]); // 메시지를 상태에 추가
@@ -509,3 +515,4 @@ export default function ClientPage({
     </div>
   );
 }
+
