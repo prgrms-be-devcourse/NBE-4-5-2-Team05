@@ -207,8 +207,7 @@ public class ChatRoomController {
 		User userIdentity = userAuthService.getUserIdentity();
 		User user = userAuthService.getRealActor(userIdentity);
 
-		ChatRoom chatRoom=chatRoomService.getRoomByRoomId(user.getNickname(),receiver);
-
+		ChatRoom chatRoom=chatRoomService.findRoomByClients(user.getNickname(),receiver);
 		List<ChatMessage> messages= chatRoomService.getMessagesByUser(chatRoom.getRoomId(),user.getNickname());
 		String lastMessage="";
 		String lastTimestamp="";

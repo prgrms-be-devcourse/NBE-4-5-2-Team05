@@ -77,14 +77,12 @@ public class ChatRoomService {
 	// 채팅방 생성
 	public ChatRoom createChatRoom(String sender, String receiver) {
 		String roomId = findByRoomIdByUsers(sender, receiver);
-		System.out.println("=================================================");
 		System.out.println("roomId = " + roomId);
 		// 방이 이미 존재
 		if (roomId != null) {
 			return getRoomByRoomId(roomId, receiver);
 		}
 		else {
-			System.out.println("============================================진입=====");
 			// 새로운 roomId 할당
 			roomId = UUID.randomUUID().toString();
 			ChatRoom chatRoom = new ChatRoom(sender, receiver);
@@ -199,6 +197,16 @@ public class ChatRoomService {
 			}
 		}
 		return null;
+	}
+
+	public ChatRoom findRoomByClients(String sender, String receiver) {
+		List<ChatRoom> chatRoomList = findRoomByUser(sender);
+		for (ChatRoom chatRoom : chatRoomList) {
+			if(chatRoom.getSender().equals(receiver) || chatRoom.getReceiver().equals(receiver)){
+				return chatRoom;
+			}
+		}
+		throw new ServiceException("404","존재하지 않는 채팅방");
 	}
 
 //
