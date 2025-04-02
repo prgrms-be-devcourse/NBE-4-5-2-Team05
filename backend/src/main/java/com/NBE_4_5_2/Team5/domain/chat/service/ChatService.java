@@ -2,6 +2,8 @@ package com.NBE_4_5_2.Team5.domain.chat.service;
 
 import java.util.List;
 
+import jakarta.annotation.Resource;
+import org.springframework.data.redis.core.HashOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.listener.ChannelTopic;
 import org.springframework.stereotype.Service;
@@ -22,6 +24,10 @@ public class ChatService {
 	private final ChatRoomService chatRoomService;
 	private final ChatMessageRepository chatMessageRepository;
 
+	private static final String CHAT_ROOMS = "CHAT_ROOM";
+	@Resource(name = "objectRedisTemplate")
+	private HashOperations<String, String, ChatRoom> hashOpsChatRoom;
+
 	/**
 	 * destination정보에서 roomId 추출
 	 */
@@ -40,16 +46,24 @@ public class ChatService {
 	public void sendChatMessage(ChatMessage chatMessage) {
 		chatMessage.setUserCount(chatRoomService.getUserCount(chatMessage.getRoomId()));
 		ChatRoom chatRoom = chatRoomService.findByRoomId(chatMessage.getRoomId());
+		String receiver = chatRoomService.findOther(chatRoom.getRoomId(), chatMessage.getSender());
+
+		// 수신자가 채팅방 삭제한 상태
+		if(chatRoom.getDeleteStatus(receiver)) {
+			// 삭제 취소
+			chatRoom.setDeleteStatus(receiver, false);
+			hashOpsChatRoom.put(CHAT_ROOMS, chatRoom.getRoomId(), chatRoom);	// 레디스 업데이트
+		}
+		System.out.println(receiver+"의 삭제 여부: "+ chatRoom.getDeleteStatus(receiver));
 
 		if (ChatMessage.MessageType.TALK.equals(chatMessage.getType())) {
-
 			// redis로 메세지 발송
 			objectRedisTemplate.convertAndSend(channelTopic.getTopic(), chatMessage);
 			ChatMessage message = ChatMessage.builder()
 				.type(ChatMessage.MessageType.TALK)
 				.roomId(chatRoom.getRoomId()) // 동일한 roomId 사용
-				.client(chatRoom.getId()) // 클라이언트에 맞춰 설정
 				.sender(chatMessage.getSender()) // 원 메시지의 발신자
+				.receiver(receiver)
 				.message(chatMessage.getMessage()) // 원 메시지 내용
 				.userCount(chatMessage.getUserCount())
 				.image(chatMessage.getImage())
@@ -64,7 +78,6 @@ public class ChatService {
 			ChatMessage message = ChatMessage.builder()
 				.type(ChatMessage.MessageType.IMAGE)
 				.roomId(chatRoom.getRoomId()) // 동일한 roomId 사용
-				.client(chatRoom.getId()) // 클라이언트에 맞춰 설정
 				.sender(chatMessage.getSender()) // 원 메시지의 발신자
 				.message(chatMessage.getMessage()) // 원 메시지 내용
 				.userCount(chatMessage.getUserCount())
@@ -81,8 +94,8 @@ public class ChatService {
 			ChatMessage message = ChatMessage.builder()
 				.type(ChatMessage.MessageType.LOCATION)
 				.roomId(chatRoom.getRoomId()) // 동일한 roomId 사용
-				.client(chatRoom.getId()) // 클라이언트에 맞춰 설정
 				.sender(chatMessage.getSender()) // 원 메시지의 발신자
+				.receiver(receiver)
 				.message("위치 전송") // 메시지 내용
 				.userCount(chatMessage.getUserCount())
 				.latitude(chatMessage.getLatitude()) // 위도 설정

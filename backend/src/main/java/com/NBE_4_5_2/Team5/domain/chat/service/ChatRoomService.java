@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import com.NBE_4_5_2.Team5.global.exception.ServiceException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,12 +40,6 @@ public class ChatRoomService {
 	private HashOperations<String, String, String> hashOpsEnterInfo;
 	@Resource(name = "objectRedisTemplate")
 	private ValueOperations<String, String> valueOps;
-	@Autowired
-	private ProductPostService productPostService;
-	@Autowired
-	private Rq rq;
-	@Autowired
-	private UserService userService;
 	@Autowired
 	private ChatMessageRepository chatMessageRepository;
 
@@ -88,7 +83,7 @@ public class ChatRoomService {
 			ChatRoom chatRoom = getRoomByRoomId(roomId,receiver);
 			// 삭제 취소
 			chatRoom.setDeleteStatus(sender,false);
-			hashOpsChatRoom.put(CHAT_ROOMS, roomId, chatRoom);  // redis에 저장(sender)
+			hashOpsChatRoom.put(CHAT_ROOMS, roomId, chatRoom);  // redis에 업데이트
 			return chatRoom;
 		}
 		else {
@@ -128,12 +123,7 @@ public class ChatRoomService {
 		for (ChatRoom chatRoom : findAllRoom()) {
 			if (chatRoom.getSender().equals(username) || chatRoom.getReceiver().equals(username)) {
 				// 삭제된 채팅방 pass
-				if(chatRoom.getDeleteStatus(username)) {
-					System.out.println("__continue : "+chatRoom.getRoomId());
-					continue;
-				}
-				System.out.print("채팅방: "+ chatRoom.getName());
-				System.out.println(", 삭제 여부: "+chatRoom.getDeleteStatus(username));
+				if(chatRoom.getDeleteStatus(username)) continue;
 				chatRooms.add(chatRoom);
 			}
 		}
@@ -151,8 +141,21 @@ public class ChatRoomService {
 			throw new ForbiddenAccessException("405", "접근 권한 없는 채팅방");
 		}
 
-		ChatRoom chatRoom = findByRoomId(roomId);
-		return chatMessageRepository.findByRoomId(chatRoom.getRoomId());
+		List<ChatMessage> messages = chatMessageRepository.findByRoomId(roomId)
+				.stream()
+				// 삭제되지 않은 메세지만
+				.filter(message -> !message.getDeleteStatus(username))
+				.collect(Collectors.toList());
+
+		return messages;
+	}
+
+	public void deleteMessage(String roomId, String username) {
+		List<ChatMessage> messages = chatMessageRepository.findByRoomId(roomId);
+		// 삭제
+		messages.forEach(message -> {
+			message.setDeleteStatus(username, true);
+		});
 	}
 
 	// 채팅방 삭제
@@ -160,15 +163,13 @@ public class ChatRoomService {
 		if(!canAccess(roomId, username)){
 			throw new ForbiddenAccessException("405","접근 권한 없는 채팅방");
 		}
-//		hashOpsChatRoom.delete(CHAT_ROOMS, roomId);     // redis에서 삭제
+
 		ChatRoom chatRoom = findByRoomId(roomId);
 		chatRoom.setDeleteStatus(username,true);	// 논리적 삭제
-		System.out.println(username +" Status: "+chatRoom.getDeleteStatus(username));
-		hashOpsChatRoom.put(CHAT_ROOMS, roomId, chatRoom);
+		deleteMessage(roomId,username);	// 메세지 삭제
 		// 양측에서 모두 삭제했을 경우
-		if(isAllDelete(roomId)){
-			hashOpsChatRoom.delete(CHAT_ROOMS, roomId);     // redis에서 삭제
-		}
+		if(isAllDelete(roomId)) hashOpsChatRoom.delete(CHAT_ROOMS, roomId);     // redis에서 삭제
+		else hashOpsChatRoom.put(CHAT_ROOMS, roomId, chatRoom);	// redis에 업데이트
 	}
 
 	// 양측에서 삭제됐는지 검증
@@ -249,25 +250,5 @@ public class ChatRoomService {
 		}
 		throw new ServiceException("404","존재하지 않는 채팅방");
 	}
-
-//
-//	// 현재 두 사용자가 사용중인 roodId(개별저장소)
-//	public ChatRoom findByRoomIdByClients(String sender, String receiver) {
-//		for (String key : hashOpsEnterInfo.keys(CHAT_ROOMS)) {
-//			ChatRoom chatRoom = hashOpsChatRoom.get(CHAT_ROOMS, key);
-//
-//			if (chatRoom == null) {
-//				continue;
-//			}
-//
-//			if (chatRoom.getSender().equals(sender) && chatRoom.getReceiver().equals(receiver)
-//				|| chatRoom.getSender().equals(receiver) && chatRoom.getReceiver().equals(sender)) {
-//				if (chatRoom.getClient().equals(sender)) {
-//					return chatRoom;
-//				}
-//			}
-//		}
-//		return null;
-//	}
 
 }
