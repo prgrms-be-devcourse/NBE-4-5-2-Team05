@@ -71,6 +71,11 @@ public class ChatRoomService {
 		if(!canAccess(roomId, username)) {
 			throw new ForbiddenAccessException("405", "접근 권한 없는 채팅방");
 		}
+
+		if(getDeleteStatus(roomId, username)){
+			throw new ServiceException("404","존재하지 않는 채팅방");
+		}
+
 		return chatRoom;
 	}
 
@@ -80,7 +85,11 @@ public class ChatRoomService {
 		System.out.println("roomId = " + roomId);
 		// 방이 이미 존재
 		if (roomId != null) {
-			return getRoomByRoomId(roomId, receiver);
+			ChatRoom chatRoom = getRoomByRoomId(roomId,receiver);
+			// 삭제 취소
+			chatRoom.setDeleteStatus(sender,false);
+			hashOpsChatRoom.put(CHAT_ROOMS, roomId, chatRoom);  // redis에 저장(sender)
+			return chatRoom;
 		}
 		else {
 			// 새로운 roomId 할당
@@ -106,12 +115,25 @@ public class ChatRoomService {
 		return false; // 접근 불가
 	}
 
+	// 논리적 삭제 여부 검증
+	public boolean getDeleteStatus(String roomId, String username) {
+		ChatRoom chatRoom = findByRoomId(roomId);
+        return chatRoom.getDeleteStatus(username);
+	}
+
 	// 참가한 채팅방 목록 조회
 	public List<ChatRoom> findRoomByUser(String username) {
 		List<ChatRoom> chatRooms = new ArrayList<>();
 
 		for (ChatRoom chatRoom : findAllRoom()) {
 			if (chatRoom.getSender().equals(username) || chatRoom.getReceiver().equals(username)) {
+				// 삭제된 채팅방 pass
+				if(chatRoom.getDeleteStatus(username)) {
+					System.out.println("__continue : "+chatRoom.getRoomId());
+					continue;
+				}
+				System.out.print("채팅방: "+ chatRoom.getName());
+				System.out.println(", 삭제 여부: "+chatRoom.getDeleteStatus(username));
 				chatRooms.add(chatRoom);
 			}
 		}
@@ -138,8 +160,25 @@ public class ChatRoomService {
 		if(!canAccess(roomId, username)){
 			throw new ForbiddenAccessException("405","접근 권한 없는 채팅방");
 		}
-		hashOpsChatRoom.delete(CHAT_ROOMS, roomId);     // redis에서 삭제
+//		hashOpsChatRoom.delete(CHAT_ROOMS, roomId);     // redis에서 삭제
+		ChatRoom chatRoom = findByRoomId(roomId);
+		chatRoom.setDeleteStatus(username,true);	// 논리적 삭제
+		System.out.println(username +" Status: "+chatRoom.getDeleteStatus(username));
+		hashOpsChatRoom.put(CHAT_ROOMS, roomId, chatRoom);
+		// 양측에서 모두 삭제했을 경우
+		if(isAllDelete(roomId)){
+			hashOpsChatRoom.delete(CHAT_ROOMS, roomId);     // redis에서 삭제
+		}
 	}
+
+	// 양측에서 삭제됐는지 검증
+	public Boolean isAllDelete(String roomId){
+		ChatRoom chatRoom = findByRoomId(roomId);
+		String user1 = chatRoom.getSender();
+		String user2 = chatRoom.getReceiver();
+
+        return getDeleteStatus(roomId, user1) && getDeleteStatus(roomId, user2);
+    }
 
 	// 유저가 입장한 채팅방ID와 유저 세션ID 맵핑 정보 저장
 	public void setUserEnterInfo(String sessionId, String roomId) {
@@ -203,6 +242,8 @@ public class ChatRoomService {
 		List<ChatRoom> chatRoomList = findRoomByUser(sender);
 		for (ChatRoom chatRoom : chatRoomList) {
 			if(chatRoom.getSender().equals(receiver) || chatRoom.getReceiver().equals(receiver)){
+				// 삭제된 방 pass
+				if(chatRoom.getDeleteStatus(sender)) continue;
 				return chatRoom;
 			}
 		}
