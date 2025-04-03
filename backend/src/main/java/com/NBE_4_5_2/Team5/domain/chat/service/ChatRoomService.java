@@ -163,13 +163,15 @@ public class ChatRoomService {
 		if(!canAccess(roomId, username)){
 			throw new ForbiddenAccessException("405","접근 권한 없는 채팅방");
 		}
-
 		ChatRoom chatRoom = findByRoomId(roomId);
 		chatRoom.setDeleteStatus(username,true);	// 논리적 삭제
+		hashOpsChatRoom.put(CHAT_ROOMS, roomId, chatRoom);	// redis에 업데이트
 		deleteMessage(roomId,username);	// 메세지 삭제
 		// 양측에서 모두 삭제했을 경우
-		if(isAllDelete(roomId)) hashOpsChatRoom.delete(CHAT_ROOMS, roomId);     // redis에서 삭제
-		else hashOpsChatRoom.put(CHAT_ROOMS, roomId, chatRoom);	// redis에 업데이트
+		if(isAllDelete(roomId)) {
+			hashOpsChatRoom.delete(CHAT_ROOMS, roomId);     // redis에서 삭제
+			System.out.println("완전 삭제");
+		}
 	}
 
 	// 양측에서 삭제됐는지 검증
