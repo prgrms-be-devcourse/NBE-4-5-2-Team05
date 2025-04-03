@@ -79,7 +79,8 @@ public class ChatService {
 				.type(ChatMessage.MessageType.IMAGE)
 				.roomId(chatRoom.getRoomId()) // 동일한 roomId 사용
 				.sender(chatMessage.getSender()) // 원 메시지의 발신자
-				.message(chatMessage.getMessage()) // 원 메시지 내용
+				.receiver(receiver)
+				.message("") // 원 메시지 내용
 				.userCount(chatMessage.getUserCount())
 				.image(chatMessage.getImage())
 				.latitude(0.0f)
