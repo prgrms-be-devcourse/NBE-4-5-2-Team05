@@ -97,7 +97,7 @@ public class ChatService {
 				.roomId(chatRoom.getRoomId()) // 동일한 roomId 사용
 				.sender(chatMessage.getSender()) // 원 메시지의 발신자
 				.receiver(receiver)
-				.message("위치 전송") // 메시지 내용
+				.message("") // 메시지 내용
 				.userCount(chatMessage.getUserCount())
 				.latitude(chatMessage.getLatitude()) // 위도 설정
 				.longitude(chatMessage.getLongitude()) // 경도 설정

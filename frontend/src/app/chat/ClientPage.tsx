@@ -57,6 +57,16 @@ export default function ClientPage({
     }
   };
 
+  const getDisplayMessage = (messageType: string | undefined, lastMessage: string | undefined) =>{
+    if(messageType === "LOCATION"){
+      return "위치를 전송했습니다.";
+    }else if(messageType === "IMAGE"){
+      return "사진을 전송했습니다.";
+    }else{
+      return lastMessage || "";
+    }
+  }
+
   return (
     <div className="w-full">
     <h1 className="text-xl font-bold mb-4">채팅방 목록</h1>
@@ -93,7 +103,9 @@ export default function ClientPage({
               {searchChatRoomDto.map((room) => (
                 <Link key={room.roomId} href={`/chat/${room.roomId}`} className="block">
                   <div><strong>{room.name}</strong></div>
-                  <div className="text-gray-600 text-sm">{room.lastMessage}</div> 
+                  <div className="text-gray-600 text-sm">
+                    {getDisplayMessage(room.messageType ,room.lastMessage)}
+                  </div> 
                   <div className="text-gray-500 text-xs text-right"> 
                     {room.lastTimestamp}
                   </div>
@@ -114,7 +126,9 @@ export default function ClientPage({
               <div>
                 <strong className="text-lg">{room.other}</strong> 
               </div>
-              <div className="text-gray-600 text-sm">{room.lastMessage}</div> 
+              <div className="text-gray-600 text-sm">
+                {getDisplayMessage(room.messageType ,room.lastMessage)}
+              </div> 
               <div className="text-gray-500 text-xs text-right"> 
                 {room.lastTimestamp}
               </div>

@@ -347,11 +347,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /**
-         * 채팅방 목록 페이지 조회
-         * @description 채팅방 목록을 HTML 페이지로 반환합니다.
-         */
-        get: operations["rooms"];
+        get?: never;
         put?: never;
         /**
          * 채팅방 생성
@@ -660,26 +656,6 @@ export interface paths {
             cookie?: never;
         };
         get: operations["getRoomByRoomId"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/chat/room/{roomId}/show": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * 채팅방 상세 페이지 조회
-         * @description 채팅방 상세 페이지를 HTML로 반환합니다.
-         */
-        get: operations["showRoomDetailPage"];
         put?: never;
         post?: never;
         delete?: never;
@@ -1002,6 +978,9 @@ export interface components {
             userCount?: number;
             lastMessage?: string;
             lastTimestamp?: string;
+            isDelete?: {
+                [key: string]: boolean;
+            };
         };
         RsDataChatRoom: {
             code: string;
@@ -1090,9 +1069,9 @@ export interface components {
             offset?: number;
             sort?: components["schemas"]["SortObject"];
             /** Format: int32 */
-            pageSize?: number;
-            /** Format: int32 */
             pageNumber?: number;
+            /** Format: int32 */
+            pageSize?: number;
             unpaged?: boolean;
             paged?: boolean;
         };
@@ -1117,8 +1096,8 @@ export interface components {
         };
         SortObject: {
             empty?: boolean;
-            sorted?: boolean;
             unsorted?: boolean;
+            sorted?: boolean;
         };
         RsDataListPreviewPostResponse: {
             code: string;
@@ -1177,6 +1156,8 @@ export interface components {
             /** Format: int64 */
             userCount?: number;
             lastMessage?: string;
+            /** @enum {string} */
+            messageType?: "ENTER" | "QUIT" | "TALK" | "IMAGE" | "LOCATION";
             lastTimestamp?: string;
             other?: string;
         };
@@ -1202,6 +1183,7 @@ export interface components {
             timestamp?: string;
             lastMessage?: string;
             lastTimestamp?: string;
+            
         };
         RsDataListMessageDto: {
             code: string;
@@ -2091,35 +2073,6 @@ export interface operations {
             };
         };
     };
-    rooms: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json;charset=UTF-8": string;
-                };
-            };
-            /** @description Internal Server Error */
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json;charset=UTF-8": components["schemas"]["RsDataVoid"];
-                };
-            };
-        };
-    };
     createRoom: {
         parameters: {
             query: {
@@ -2688,37 +2641,6 @@ export interface operations {
                 };
                 content: {
                     "application/json;charset=UTF-8": components["schemas"]["RsDataChatRoom"];
-                };
-            };
-            /** @description Internal Server Error */
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json;charset=UTF-8": components["schemas"]["RsDataVoid"];
-                };
-            };
-        };
-    };
-    showRoomDetailPage: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                roomId: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json;charset=UTF-8": string;
                 };
             };
             /** @description Internal Server Error */

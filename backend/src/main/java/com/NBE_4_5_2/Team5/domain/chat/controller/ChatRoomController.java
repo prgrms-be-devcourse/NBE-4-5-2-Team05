@@ -120,9 +120,11 @@ public class ChatRoomController {
 					String other=chatRoomService.findOther(chatRoom.getRoomId(),user.getNickname());
 					List<ChatMessage> messages= chatRoomService.getMessagesByUser(chatRoom.getRoomId(),user.getNickname());
 					String lastMessage="";
+					ChatMessage.MessageType messageType = ChatMessage.MessageType.TALK;	// 초기값
 					String lastTimestamp="";
 					if(!messages.isEmpty()) {
 						lastMessage = messages.get(messages.size() - 1).getMessage();
+						messageType = messages.get(messages.size() - 1).getType();
 						lastTimestamp = messages.get(messages.size() - 1).getTimestamp();
 					}
 					return new ChatRoomDto(
@@ -131,6 +133,7 @@ public class ChatRoomController {
 							chatRoom.getName(),
 							chatRoom.getUserCount(),
 							lastMessage,
+							messageType,
 							lastTimestamp,
 							other
 					);
@@ -210,9 +213,11 @@ public class ChatRoomController {
 		ChatRoom chatRoom=chatRoomService.findRoomByClients(user.getNickname(),receiver);
 		List<ChatMessage> messages= chatRoomService.getMessagesByUser(chatRoom.getRoomId(),user.getNickname());
 		String lastMessage="";
+		ChatMessage.MessageType messageType = ChatMessage.MessageType.TALK;	// 초기값
 		String lastTimestamp="";
 		if(!messages.isEmpty()) {
 			lastMessage = messages.get(messages.size() - 1).getMessage();
+			messageType = messages.get(messages.size() - 1).getType();
 			lastTimestamp = messages.get(messages.size() - 1).getTimestamp();
 		}
 		ChatRoomDto chatRoomDto = new ChatRoomDto(
@@ -221,6 +226,7 @@ public class ChatRoomController {
 				chatRoom.getName(),
 				chatRoom.getUserCount(),
 				lastMessage, // 마지막 메시지 내용
+				messageType, // 마지막 메세지의 타입
 				lastTimestamp,
 				receiver
 		);
