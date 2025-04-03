@@ -115,9 +115,10 @@ export default function ClientPage({
 
                   if (messageResponse.data?.code === "200") {
                     setChatMessages(messageResponse.data.data); // 수신된 메시지로 상태 업데이트
-                    messagesEndRef.current?.scrollIntoView({
-                      behavior: "smooth",
-                    });
+                    // messagesEndRef.current?.scrollIntoView({
+                    //   behavior: "smooth",
+                    // });
+                    scrollToBottomWithOffset(50);
                   }
                 }
               );
@@ -149,6 +150,13 @@ export default function ClientPage({
   useEffect(() => {
     getCurrentPosition();
   }, []);
+
+  const scrollToBottomWithOffset = (offset: number) => {
+    if (messagesEndRef.current) {
+      messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
+      window.scrollBy(0, offset); // 지정된 offset만큼 스크롤을 더 내립니다.
+    }
+  };
 
   const handleInputChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
     setInputMessage(event.target.value);
@@ -182,7 +190,8 @@ export default function ClientPage({
     setInputMessage("");
 
     setChatMessages((prevMessages) => [...prevMessages, message]);
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" }); // 스크롤 이동
+    scrollToBottomWithOffset(50); // 스크롤 이동
+    // messagesEndRef.current?.scrollIntoView({ behavior: "smooth" }); // 스크롤 이동
   };
   const handleKeyPress = (event: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (event.key === "Enter") {
