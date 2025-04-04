@@ -49,7 +49,6 @@ export default function ClientPage({
   const [accessToken, setAccessToken] = useState<string>("");
   const [stompClient, setStompClient] = useState<any>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const [visibleMessagesCount, setVisibleMessagesCount] = useState(20);
   const messagesEndRef = useRef<null | HTMLDivElement>(null);
 
   const [isOpen, setIsOpen] = useState(false);
@@ -115,9 +114,6 @@ export default function ClientPage({
 
                   if (messageResponse.data?.code === "200") {
                     setChatMessages(messageResponse.data.data); // 수신된 메시지로 상태 업데이트
-                    // messagesEndRef.current?.scrollIntoView({
-                    //   behavior: "smooth",
-                    // });
                     scrollToBottomWithOffset(50);
                   }
                 }
@@ -150,6 +146,10 @@ export default function ClientPage({
   useEffect(() => {
     getCurrentPosition();
   }, []);
+
+  useEffect(() => {
+    scrollToBottomWithOffset(50);
+  }, [chatMessages]);
 
   const scrollToBottomWithOffset = (offset: number) => {
     if (messagesEndRef.current) {
@@ -191,7 +191,6 @@ export default function ClientPage({
 
     setChatMessages((prevMessages) => [...prevMessages, message]);
     scrollToBottomWithOffset(50); // 스크롤 이동
-    // messagesEndRef.current?.scrollIntoView({ behavior: "smooth" }); // 스크롤 이동
   };
   const handleKeyPress = (event: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (event.key === "Enter") {
@@ -308,10 +307,6 @@ export default function ClientPage({
     }
   };
 
-  const handleLoadMoreMessages = () => {
-    setVisibleMessagesCount((prevCount) => prevCount + 20); // 20개씩 추가
-  };
-
   return (
     <div className="flex flex-col h-screen w-full">
       <h1 className="text-xl font-bold mb-4 text-center">{title}</h1>
@@ -342,7 +337,8 @@ export default function ClientPage({
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
-      <div className="flex-grow overflow-auto flex flex-col mb-26 w-full">
+
+      <div className="flex-grow overflow-auto flex flex-col mb-20 w-full">
         <ul className="space-y-3 w-full">
           {chatMessages.map((message) => (
             <li
@@ -425,7 +421,7 @@ export default function ClientPage({
         style={{ display: "none" }}
       />
 
-      <div className="fixed bottom-0 left-0 right-0 bg-white p-4 border-t flex items-center">
+      <footer className="fixed bottom-0 left-0 right-0 bg-white p-4 border-t flex items-center">
         <div>
           {/* 팝업이 열려 있다면 렌더링 */}
           {isOpen && (
@@ -520,7 +516,7 @@ export default function ClientPage({
         >
           <FontAwesomeIcon icon={faArrowRight} />
         </Button>
-      </div>
+      </footer>
     </div>
   );
 }
