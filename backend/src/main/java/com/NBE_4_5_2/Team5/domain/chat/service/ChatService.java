@@ -70,6 +70,11 @@ public class ChatService {
 				.latitude(0.0f)
 				.longitude(0.0f)
 				.build();
+
+			chatRoom.setLastMessage(message.getMessage()); // 마지막 메시지 업데이트
+			chatRoom.setLastTimestamp(message.getTimestamp()); // 마지막 타임스탬프 업데이트
+
+			hashOpsChatRoom.put(CHAT_ROOMS, chatRoom.getRoomId(), chatRoom); // 레디스에 업데이트
 			// DB에 저장
 			chatMessageRepository.save(message);
 		} else if (ChatMessage.MessageType.IMAGE.equals(chatMessage.getType())) {
@@ -89,6 +94,7 @@ public class ChatService {
 
 			// redis로 메세지 발송
 			objectRedisTemplate.convertAndSend(channelTopic.getTopic(), message);
+			hashOpsChatRoom.put(CHAT_ROOMS, chatRoom.getRoomId(), chatRoom); // 레디스에 업데이트
 			chatMessageRepository.save(message);
 		} else if (ChatMessage.MessageType.LOCATION.equals(chatMessage.getType())) {
 			// LOCATION 타입 처리를 위한 코드 추가
@@ -105,6 +111,7 @@ public class ChatService {
 
 			// Redis로 메시지 발송
 			objectRedisTemplate.convertAndSend(channelTopic.getTopic(), message);
+			hashOpsChatRoom.put(CHAT_ROOMS, chatRoom.getRoomId(), chatRoom); // 레디스에 업데이트
 			chatMessageRepository.save(message);
 		}
 	}
