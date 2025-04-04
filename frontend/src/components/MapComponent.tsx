@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import "leaflet/dist/leaflet.css";
-// import L, { LatLng } from "leaflet";
+import L, { LatLng } from "leaflet";
 import dynamic from "next/dynamic";
 import { useMapEvents } from "react-leaflet/hooks";
 
@@ -9,24 +9,20 @@ interface MapWithMarkersProps {
   currentPos: { lat: number; lng: number; zoom: number };
 }
 
-let customIcon: L.Icon;
-if (typeof window !== "undefined") {
-  const L = require("leaflet");
-  customIcon = L.icon({
-    iconUrl: "/map/marker-icon.png",
-    // 가로(예: 40px), 세로(예: 50px)
-    iconSize: [50, 50],
-    iconAnchor: [25, 0], // 마커의 바닥(고정점)을 정 가운데로 맞추기
-  });
-}
+const customIcon = L.icon({
+  iconUrl: "/map/marker-icon.png",
+  // 가로(예: 40px), 세로(예: 50px)
+  iconSize: [50, 50],
+  iconAnchor: [25, 0], // 마커의 바닥(고정점)을 정 가운데로 맞추기
+});
 
 export default function MapWithMarkers({
   onLocationSelect,
   currentPos,
 }: MapWithMarkersProps) {
-  // console.log(currentPos);
-  const [markers, setMarkers] = useState<{lat: number; lng: number}[]>([]);
-  const [zoom, setZoom] = useState(currentPos.zoom);
+  console.log(currentPos);
+  const [markers, setMarkers] = useState<LatLng[]>([]);
+  let zoom = 15;
 
   const MapContainer = dynamic(
     () => import("react-leaflet").then((module) => module.MapContainer),
@@ -69,8 +65,8 @@ export default function MapWithMarkers({
     useMapEvents({
       click(e) {
         const newMarker = e.latlng;
-        setMarkers([{ lat: newMarker.lat, lng: newMarker.lng }]);
-        // console.log(newMarker);
+        setMarkers([newMarker]); // 마지막 클릭 위치만 저장
+        console.log(newMarker);
         onLocationSelect(newMarker.lat, newMarker.lng, zoom); // 부모 컴포넌트로 좌표 전달
       },
     });
@@ -78,8 +74,8 @@ export default function MapWithMarkers({
   }
 
   useEffect(() => {
-    setMarkers([{ lat: currentPos.lat, lng: currentPos.lng }]);
-  }, [currentPos]);
+    setMarkers([new LatLng(currentPos.lat, currentPos.lng)]);
+  }, []);
   return (
     <div className=" w-full h-full">
       <MapContainer
@@ -93,8 +89,13 @@ export default function MapWithMarkers({
         />
         <MapClickHandler />
         {markers.map((position, idx) => (
-            <Marker key={idx} position={[position.lat, position.lng]} icon={customIcon} />
+          <Marker key={idx} position={position} icon={customIcon} />
         ))}
+        <ZoomTracker
+          onZoomChange={(changedZoom) => {
+            zoom = changedZoom;
+          }}
+        ></ZoomTracker>
       </MapContainer>
     </div>
   );
