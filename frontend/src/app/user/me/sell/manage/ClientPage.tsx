@@ -84,11 +84,11 @@ export default function ClientPage({
   };
 
   return (
-    <div className="space-y-1">
+    <div className="space-y-1 w-full">
       <h2>내 상품 관리</h2>
 
       {/* 필터 */}
-      <div className="flex flex-col mb-4">
+      <div className="flex flex-col mb-4 ">
         {/* 전체, 판매중, 예약중, 판매완료 */}
         <div className="flex space-x-2">
           <div>
@@ -197,6 +197,29 @@ export default function ClientPage({
                         : post.status === "PURCHASED"
                           ? "판매 완료"
                           : "알 수 없음"}
+                  <TableCell>
+                    {/* 향후에 상품 글 상태 변경하게  */}
+                    <Select
+                      onValueChange={(value) =>
+                        handleStatusChange(post.id, value)
+                      }
+                      defaultValue={post.status}
+                    >
+                      <SelectTrigger className="w-[150px]">
+                        <SelectValue>
+                          {post.status === "AVAILABLE"
+                            ? "판매중"
+                            : post.status === "RESERVED"
+                            ? "예약중"
+                            : "판매 완료"}
+                        </SelectValue>
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="AVALIABLE">판매중</SelectItem>
+                        <SelectItem value="RESERVED">예약중</SelectItem>
+                        <SelectItem value="PURCHASED">판매완료</SelectItem>
+                      </SelectContent>
+                    </Select>
                   </TableCell>
 
                   {/* 최근 수정일 */}
@@ -226,7 +249,11 @@ export default function ClientPage({
         {Array.from({ length: pageInfo.totalPages }, (_, i) => (
           <Button
             key={i}
-            className={`border ${pageInfo.currentPage === i + 1 ? "bg-gray-800 text-white" : "bg-white text-black"}`}
+            className={`border ${
+              pageInfo.currentPage === i + 1
+                ? "bg-gray-800 text-white"
+                : "bg-white text-black"
+            }`}
             onClick={() => handlePageChange(i + 1)}
           >
             {i + 1}

@@ -7,6 +7,9 @@ import type { components } from "@/lib/backend/apiV1/schema";
 import client from "@/lib/client";
 import { LoginMemberContext } from "@/app/stores/auth/loginMemberStore";
 import Comments from "./_pages/comments";
+import { Button } from "@/components/ui/button";
+import { faComment } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 type ProductPostResponse = components["schemas"]["ProductPostResponse"];
 type StatusType = "AVAILABLE" | "RESERVED" | "PURCHASED";
@@ -285,6 +288,43 @@ export default function PostDetailPage() {
   if (error) return <div className="p-4 text-red-500">{error}</div>;
   if (!post) return <div className="p-4">게시글 정보를 찾을 수 없습니다.</div>;
 
+  const handleCreateChatRoom = async () => {
+    const isLoggedIn = await checkLoginStatus();
+    if (!isLoggedIn) {
+      alert("먼저 로그인을 해주세요.");
+      router.push("/user/login");
+      return;
+    }
+
+    try {
+      const createResponse = await client.POST("/api/chat/room", {
+        params: {
+          query: {
+            postId: postId, // 현재 게시글 ID 전송
+          },
+        },
+        credentials: "include",
+      });
+
+      if (createResponse.error) {
+        console.error("채팅방 생성 오류:", createResponse.error.message);
+        alert("채팅방 생성에 실패했습니다.");
+        return;
+      }
+
+      // 채팅방 생성 성공
+      const chatRoomId = createResponse.data.data.roomId; // 생성된 채팅방 ID
+      console.log("채팅방 생성 성공, ID:", chatRoomId);
+      router.push(`/chat/${chatRoomId}`); // 생성된 채팅방으로 이동
+    } catch (error) {
+      console.error("채팅방 생성 중 오류 발생:", error);
+      alert("채팅방 생성 중 오류가 발생했습니다.");
+    }
+  };
+
+
+
+  // 이미지 URL들을 소문자와 trim을 적용해 유효한 값만 필터링
   const images = post.imageUrls
     ? post.imageUrls
         .split(",")
@@ -303,6 +343,7 @@ export default function PostDetailPage() {
           {images.length > 0 ? (
             <div className="relative w-full h-64">
               <Image
+              loader={()=>images[0]}
                 src={images[0]}
                 alt={post.title || "이미지"}
                 fill
@@ -322,12 +363,14 @@ export default function PostDetailPage() {
             <li>작성자 닉네임: {post.writerName}</li>
           </ul>
           <div className="mt-4">
-            <button
-              onClick={() => router.push(`/chat/${post.id}`)}
-              className="px-4 py-2 bg-blue-500 text-white rounded"
-            >
-              채팅 걸기
-            </button>
+          <Button
+            variant="outline"
+            onClick={handleCreateChatRoom}
+            className="rounded-full bg-yellow-400 text-black py-2 px-4 border border-black-700 hover:bg-yellow-300"              
+          >
+            <FontAwesomeIcon icon={faComment} className="mr-2" />
+            채팅
+          </Button>
           </div>
         </div>
       </div>
@@ -372,6 +415,7 @@ export default function PostDetailPage() {
               {images.slice(1).map((imgUrl, idx) => (
                 <div key={idx} className="relative w-40 h-40">
                   <Image
+                  loader={()=>imgUrl}
                     src={imgUrl}
                     alt={`${post.title} - ${idx + 1}`}
                     fill

@@ -6,6 +6,7 @@ import type { components } from "@/lib/backend/apiV1/schema";
 import client from "@/lib/client";
 import fileUploadClient from "@/lib/fileUploadClient";
 import { LoginMemberContext } from "@/app/stores/auth/loginMemberStore";
+import MapComponent from "@/components/MapComponent";
 
 type Category = components["schemas"]["Category"];
 type ProductPostResponse = components["schemas"]["ProductPostResponse"];
@@ -173,7 +174,7 @@ export default function PostModifyPage() {
   if (error) return <div className="p-4 text-red-500">{error}</div>;
 
   return (
-    <div className="p-4">
+    <div className="p-4 w-full">
       <h1 className="text-2xl font-bold mb-4">판매글 수정</h1>
       <form
         onSubmit={handleSubmit}
@@ -268,6 +269,7 @@ export default function PostModifyPage() {
           </div>
           <div>
             <label className="block mb-1 font-semibold">위도</label>
+
             <input
               type="number"
               className="border w-full p-2"
