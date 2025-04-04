@@ -1068,12 +1068,12 @@ export interface components {
             /** Format: int64 */
             offset?: number;
             sort?: components["schemas"]["SortObject"];
-            /** Format: int32 */
-            pageNumber?: number;
-            /** Format: int32 */
-            pageSize?: number;
             unpaged?: boolean;
             paged?: boolean;
+            /** Format: int32 */
+            pageSize?: number;
+            /** Format: int32 */
+            pageNumber?: number;
         };
         RsDataSliceCommentDto: {
             code: string;
@@ -1183,7 +1183,6 @@ export interface components {
             timestamp?: string;
             lastMessage?: string;
             lastTimestamp?: string;
-            
         };
         RsDataListMessageDto: {
             code: string;
