@@ -875,6 +875,8 @@ export interface components {
             latitude?: number;
             /** Format: float */
             longitude?: number;
+            /** @enum {string} */
+            status?: "RESERVED" | "AVAILABLE" | "PURCHASED";
         };
         ProductPostResponse: {
             id?: string;
@@ -899,6 +901,8 @@ export interface components {
             viewCount?: number;
             /** Format: int32 */
             likedCount?: number;
+            /** @enum {string} */
+            status?: "RESERVED" | "AVAILABLE" | "PURCHASED";
         };
         RsDataProductPostResponse: {
             code: string;
@@ -984,9 +988,9 @@ export interface components {
             purchasedProducts?: components["schemas"]["ProductPost"][];
             writtenProducts?: components["schemas"]["ProductPost"][];
             wroteComments?: components["schemas"]["Comment"][];
+            memberAuthoritiesAsString?: string[];
             admin?: boolean;
             authorities?: components["schemas"]["GrantedAuthority"][];
-            memberAuthoritiesAsString?: string[];
         };
         UpdateNoticeReq: {
             title?: string;
@@ -1192,6 +1196,17 @@ export interface components {
             /** Format: int64 */
             offset?: number;
             sort?: components["schemas"]["SortObject"];
+
+            unpaged?: boolean;
+            paged?: boolean;
+            /** Format: int32 */
+            pageSize?: number;
+            /** Format: int32 */
+            pageNumber?: number;
+            /** Format: int32 */
+            pageNumber?: number;
+            unpaged?: boolean;
+
             paged?: boolean;
             /** Format: int32 */
             pageSize?: number;
@@ -1205,17 +1220,17 @@ export interface components {
             data: components["schemas"]["SliceCommentDto"];
         };
         SliceCommentDto: {
+            first?: boolean;
+            last?: boolean;
             /** Format: int32 */
             size?: number;
             content?: components["schemas"]["CommentDto"][];
             /** Format: int32 */
             number?: number;
             sort?: components["schemas"]["SortObject"];
-            first?: boolean;
-            last?: boolean;
+            pageable?: components["schemas"]["PageableObject"];
             /** Format: int32 */
             numberOfElements?: number;
-            pageable?: components["schemas"]["PageableObject"];
             empty?: boolean;
         };
         SortObject: {
@@ -1321,17 +1336,27 @@ export interface components {
             totalElements?: number;
             /** Format: int32 */
             totalPages?: number;
+
+            first?: boolean;
+            last?: boolean;
+
             /** Format: int32 */
             size?: number;
             content?: components["schemas"]["UserDto"][];
             /** Format: int32 */
             number?: number;
             sort?: components["schemas"]["SortObject"];
+
+            pageable?: components["schemas"]["PageableObject"];
+            /** Format: int32 */
+            numberOfElements?: number;
+
             first?: boolean;
             last?: boolean;
             /** Format: int32 */
             numberOfElements?: number;
             pageable?: components["schemas"]["PageableObject"];
+
             empty?: boolean;
         };
         RsDataPageUserDto: {
@@ -1344,17 +1369,27 @@ export interface components {
             totalElements?: number;
             /** Format: int32 */
             totalPages?: number;
+
+            first?: boolean;
+            last?: boolean;
+
             /** Format: int32 */
             size?: number;
             content?: components["schemas"]["NoticeResBody"][];
             /** Format: int32 */
             number?: number;
             sort?: components["schemas"]["SortObject"];
+
+            pageable?: components["schemas"]["PageableObject"];
+            /** Format: int32 */
+            numberOfElements?: number;
+
             first?: boolean;
             last?: boolean;
             /** Format: int32 */
             numberOfElements?: number;
             pageable?: components["schemas"]["PageableObject"];
+
             empty?: boolean;
         };
         RsDataPageNoticeResBody: {
